@@ -144,4 +144,12 @@ public abstract class jIBCommandThread implements jIBCommand, Runnable {
         //TODO: commandThread::getCommandName() - Figure out a method for unique naming commandThreads.
         return commandName + getChannel();
     }
+    
+    /**
+     * Returns a simple command name, minus the channel.
+     * @return
+     */
+    public String getSimpleCommandName() {
+    	return commandName;
+    }
 }

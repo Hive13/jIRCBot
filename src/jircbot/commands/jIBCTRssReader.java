@@ -31,13 +31,21 @@ public class jIBCTRssReader extends jIBCommandThread {
     private URL feedURL = null;
 
     private List<SyndEntry> lastEntryList = null;
-    
+
     public jIBCTRssReader(PircBot bot, String channel, String rssFeedLink) throws MalformedURLException {
         this(bot, channel, new URL(rssFeedLink));
     }
 
     public jIBCTRssReader(PircBot bot, String channel, URL rssFeedLink) {
-        super(bot, "RssReader", channel, 1000*30);
+    	this(bot, "RssReader", channel, rssFeedLink);
+    }
+    
+    public jIBCTRssReader(PircBot bot, String commandName, String channel, String rssFeedLink) throws MalformedURLException{
+    	this(bot, commandName, channel, new URL(rssFeedLink));
+    }
+    
+    public jIBCTRssReader(PircBot bot, String commandName, String channel, URL rssFeedLink) {
+        super(bot, commandName, channel, 1000*30);
         feedURL = rssFeedLink;
         lastEntryList = new ArrayList<SyndEntry>();
     }
@@ -60,7 +68,7 @@ public class jIBCTRssReader extends jIBCommandThread {
             entryList.removeAll(lastEntryList);
             if(entryList.size() > 0) {
                 // If any entries remain, send a message to the channel.
-                sendMessage("RssReader - " + entryList.get(0).getTitle() + " [ " + entryList.get(0).getLink() + "]");
+                sendMessage(this.getSimpleCommandName() + " - " + entryList.get(0).getTitle() + " [ " + entryList.get(0).getLink() + " ]");
             }
             
             lastEntryList = tempEntryList;

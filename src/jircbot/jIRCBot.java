@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jircbot.commands.jIBCPluginList;
 import jircbot.commands.jIBCTRssReader;
 import jircbot.commands.jIBCommand;
 import jircbot.commands.jIBCommandThread;
@@ -90,12 +91,15 @@ public class jIRCBot extends PircBot {
         // Add all commands
         addCommand(new jIBTimeCmd());
         addCommand(new jIBQuitCmd());
+        addCommand(new jIBCPluginList(commands));
 
         try {
             // Add all command threads.
-            addCommandThread(new jIBCTRssReader(this, channelList.get(0),
-                    //"http://www.hive13.org/?feed=rss2"));
-                    "http://wiki.hive13.org/index.php?title=Special:RecentChanges&feed=rss"));
+            addCommandThread(new jIBCTRssReader(this, "WikiFeed", channelList.get(0),
+                    "http://wiki.hive13.org/index.php?title=Special:RecentChanges&feed=rss&hideminor=1"));
+            
+            addCommandThread(new jIBCTRssReader(this, "Hive13Blog", channelList.get(0),
+                    "http://www.hive13.org/?feed=rss2"));
         } catch (MalformedURLException ex) {
             Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
                     ex);
