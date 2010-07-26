@@ -171,4 +171,18 @@ public class jIRCBot extends PircBot {
     public void onDisconnect() {
         System.exit(0);
     }
+    
+    /**
+     * Checks to see if the bot is actively in the specified channel.
+     * @param channel   Name of the channel to check for.
+     * @return          Returns true if the bot is in the channel.
+     */
+    public boolean inChannel(String channel) {
+        String channelList[] = this.getChannels();
+        for(String _channel : channelList) {
+            if(_channel.equals(channel))
+                return true;
+        }
+        return false;
+    }
 }
