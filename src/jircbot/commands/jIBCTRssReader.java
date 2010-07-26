@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jircbot.jIRCTools;
+
 import org.jibble.pircbot.PircBot;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -68,7 +70,9 @@ public class jIBCTRssReader extends jIBCommandThread {
             entryList.removeAll(lastEntryList);
             if(entryList.size() > 0) {
                 // If any entries remain, send a message to the channel.
-                sendMessage(this.getSimpleCommandName() + " - " + entryList.get(0).getTitle() + " [ " + entryList.get(0).getLink() + " ]");
+                sendMessage(this.getSimpleCommandName() 
+                		+ " - " + entryList.get(0).getTitle() 
+                		+ " [ " + jIRCTools.generateShortURL( entryList.get(0).getLink()) + " ]");
             }
             
             lastEntryList = tempEntryList;
