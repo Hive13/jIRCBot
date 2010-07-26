@@ -74,6 +74,8 @@ public class jIRCBot extends PircBot {
         // Grab configuration information.
         botName = config.getProperty("nick", "Hive13Bot");
         serverAddress = config.getProperty("server", "irc.freenode.net");
+        jIRCTools.bitlyName = config.getProperty("bitlyName", "");
+        jIRCTools.bitlyAPIKey = config.getProperty("bitlyAPI", "");
 
         // Parse the list of channels to join.
         String strChannels = config.getProperty("channels", "#Hive13_test");
