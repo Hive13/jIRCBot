@@ -103,6 +103,7 @@ public class jIRCBot extends PircBot {
         } catch (MalformedURLException ex) {
             Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
                     ex);
+            this.log("Error: jIRCBot()" + ex.toString());
         }
 
         // Connect to IRC
@@ -119,12 +120,15 @@ public class jIRCBot extends PircBot {
         } catch (NickAlreadyInUseException ex) {
             Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
                     ex);
+            this.log("Error: jIRCBot()" + ex.toString());
         } catch (IrcException ex) {
             Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
                     ex);
+            this.log("Error: jIRCBot()" + ex.toString());
         } catch (IOException ex) {
             Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
                     ex);
+            this.log("Error: jIRCBot()" + ex.toString());
         }
     }
 
