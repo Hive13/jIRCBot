@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package jircbot.Commands;
+package jircbot.commands;
 
 import org.jibble.pircbot.PircBot;
 
@@ -23,9 +23,17 @@ import org.jibble.pircbot.PircBot;
  */
 public interface jIBCommand {
 
-    // Each BotCommand implementor will return the command name to which they respond
+    /**
+     * Each BotCommand implementor will return the command name to which they respond.
+     */
     public String getCommandName();
 
-    // The method where each BotCommand implementor will handle the event
+    /** 
+     * The method where each BotCommand implementor will handle the event
+     * @param bot       The bot to which this command belongs.
+     * @param channel   The channel the message originated on.
+     * @param sender    The initiator of the message we are handling.
+     * @param message   The message that we are handling.
+     */
     public void handleMessage(PircBot bot, String channel, String sender, String message);
 }

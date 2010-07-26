@@ -2,71 +2,135 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package jircbot;
 
-import jircbot.Commands.jIBCommand;
-import jircbot.Commands.jIBTimeCmd;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jircbot.Commands.jIBQuitCmd;
+
+import jircbot.commands.jIBCTRssReader;
+import jircbot.commands.jIBCommand;
+import jircbot.commands.jIBCommandThread;
+import jircbot.commands.jIBQuitCmd;
+import jircbot.commands.jIBTimeCmd;
+
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.jibble.pircbot.PircBot;
 
 /**
- *
+ * 
  * @author vincenpt
  */
 public class jIRCBot extends PircBot {
+    // Store the commands
+    /* 
+     * Important Stuff for threadedCommands - We can have multiple cT w/ the
+     * same name. - What is unique about a tC then? - Name + channel, we can
+     * only have 1 tC per channel. - Going to need to change the name for each
+     * instance per channel. - Each tC has the following: - tC implementation
+     */
+    private final HashMap<String, jIBCommand> commands;
+
+    // The character which tells the bot we're talking to it and not
+    // anyone/anything else.
+    private final String prefix = "!";
+    // Server to join
+    private String serverAddress = "";
+    // Username to use
+    private String botName = "";
+    // List of channels to join
+    private final List<String> channelList;
 
     /**
-     * @param args the command line arguments
+     * @param args  the command line arguments
      */
     public static void main(String[] args) {
         Properties config = new Properties();
         try {
-            config.load(new FileInputStream("pbdemo.properties"));
+            config.load(new FileInputStream("jIRCBot.properties"));
         } catch (IOException ex) {
-            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                    ex);
         }
 
-       new jIRCBot(config);
+        new jIRCBot(config);
     }
 
-    // Store the commands
-    private final List<jIBCommand> commands;
-
-    // The character which tells the bot we're talking to it and not anyone/anything else.
-    private final String prefix = "!";
-    
     private jIRCBot(Properties config) {
-        commands = new ArrayList<jIBCommand>();
+        // Initialize lists
+        commands = new HashMap<String, jIBCommand>();
 
+        channelList = new ArrayList<String>();
+
+        // Grab configuration information.
+        botName = config.getProperty("nick", "Hive13Bot");
+        serverAddress = config.getProperty("server", "irc.freenode.net");
+
+        // Parse the list of channels to join.
+        String strChannels = config.getProperty("channels", "#Hive13_test");
+        String splitChannels[] = strChannels.split(",");
+        for (int i = 0; i < splitChannels.length; i++) {
+            String channel = splitChannels[i].trim();
+            if (channel.length() > 0) {
+                channelList.add(channel);
+            }
+        }
+
+        // Make it so that the bot outputs lots of information when run.
         setVerbose(true);
 
         // Add all commands
-        commands.add(new jIBTimeCmd());
-        commands.add(new jIBQuitCmd());
+        addCommand(new jIBTimeCmd());
+        addCommand(new jIBQuitCmd());
+
+        try {
+            // Add all command threads.
+            addCommandThread(new jIBCTRssReader(this, channelList.get(0),
+                    //"http://www.hive13.org/?feed=rss2"));
+                    "http://wiki.hive13.org/index.php?title=Special:RecentChanges&feed=rss"));
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                    ex);
+        }
 
         // Connect to IRC
         setAutoNickChange(true);
-        setName(config.getProperty("nick", "Hive13Bot"));
+        setName(botName);
         try {
-            connect(config.getProperty("server", "irc.freenode.net"));
-            joinChannel(config.getProperty("channel", "#Hive13_test"));
+            // Connect to the config server
+            connect(serverAddress);
+
+            // Connect to all channels listed in the config.
+            for (Iterator<String> i = channelList.iterator(); i.hasNext();) {
+                joinChannel(i.next());
+            }
         } catch (NickAlreadyInUseException ex) {
-            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                    ex);
         } catch (IrcException ex) {
-            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                    ex);
         } catch (IOException ex) {
-            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                    ex);
         }
+    }
+
+    public void addCommand(jIBCommand cmd) {
+        commands.put(cmd.getCommandName(), cmd);
+    }
+
+    public void addCommandThread(jIBCommandThread cmd) {
+        commands.put(cmd.getCommandName(), cmd);
+        new Thread(cmd).start();
     }
 
     @Override
@@ -74,16 +138,31 @@ public class jIRCBot extends PircBot {
             String hostname, String message) {
 
         // Find out if the message was for this bot
-        if(message.startsWith(prefix)) {
+        if (message.startsWith(prefix)) {
             message = message.replace(prefix, "");
 
-            // Find out the command given (do simply)
-            for(jIBCommand cmd : commands) {
-                // If the msg starts w/ the cmd the bot reponds to, remove the
-                // cmd from the message and pass the event along to the botCmd
-                if(message.startsWith(cmd.getCommandName())) {
-                    cmd.handleMessage(this, channel, sender, message.replace(cmd.getCommandName(), "").trim());
-                }
+            jIBCommand cmd;
+            // Check to see if it is a standard command.
+            if ((cmd = commands.get(message)) != null)
+                cmd.handleMessage(this, channel, sender,
+                        message.replace(cmd.getCommandName(), "").trim());
+            // It was not a standard command, is it for a threaded one?
+            else if ((cmd = commands.get(message + channel)) != null) {
+                jIBCommandThread cmdT = (jIBCommandThread) cmd;
+                if (cmdT.getIsRunning())
+                    cmdT.stop();
+                else
+                    /*
+                     * We are just restarting the previously stopped command.
+                     * But was it actually stopped? This is a curious method. We
+                     * are certainly not referencing a new command, but it was
+                     * running in an infinite while loop, when stop() is called,
+                     * we set a boolean to false, which kills the while loop,
+                     * but the member variables will still be the same as when
+                     * the commandThread was initialized.
+                     */
+                    new Thread(cmdT).start();
+
             }
         }
     }
