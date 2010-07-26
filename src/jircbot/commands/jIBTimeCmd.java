@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package jircbot.Commands;
+package jircbot.commands;
 
 import java.util.Date;
 import org.jibble.pircbot.PircBot;
