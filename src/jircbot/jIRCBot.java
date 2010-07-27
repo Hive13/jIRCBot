@@ -108,7 +108,7 @@ public class jIRCBot extends PircBot {
                     "http://groups.google.com/group/cincihackerspace/feed/rss_v2_0_msgs.xml"));
             
             addCommandThread(new jIBCTRssReader(this, "Hive13Flickr", channelList.get(0),
-                    "http://api.flickr.com/services/feeds/photos_public.gne?id=34817627223@N01&tags=hive13&lang=en-us&format=atom"));
+                    "http://api.flickr.com/services/feeds/photos_public.gne?tags=hive13&lang=en-us&format=rss_200"));
             
             addCommandThread(new jIBCTRssReader(this, "Hive13Twitter", channelList.get(0),
                     "http://twitter.com/statuses/user_timeline/39281942.rss"));
