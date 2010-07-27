@@ -29,25 +29,32 @@ import com.sun.syndication.io.XmlReader;
  * @author vincenpt
  */
 public class jIBCTRssReader extends jIBCommandThread {
-   
+    public enum formatItem {
+        commandName,
+        title,
+        link,
+        author
+    }
+    
+    public final String[] formatItems = { "[commandName]", "[Title]", "[Link]", "[Author]" };
+    
+    private String formatString = "[commandName] - [Title] [Link]";
+    
     private URL feedURL = null;
 
     private List<SyndEntry> lastEntryList = null;
-
-    public jIBCTRssReader(PircBot bot, String channel, String rssFeedLink) throws MalformedURLException {
-        this(bot, channel, new URL(rssFeedLink));
-    }
-
-    public jIBCTRssReader(PircBot bot, String channel, URL rssFeedLink) {
-    	this(bot, "RssReader", channel, rssFeedLink);
+    
+    public jIBCTRssReader(PircBot bot, String commandName, String channel, String rssFeedLink) throws MalformedURLException {
+        this(bot, "[commandName] - [Title] [Link]", commandName, channel, new URL(rssFeedLink));
     }
     
-    public jIBCTRssReader(PircBot bot, String commandName, String channel, String rssFeedLink) throws MalformedURLException{
-    	this(bot, commandName, channel, new URL(rssFeedLink));
+    public jIBCTRssReader(PircBot bot, String formatString, String commandName, String channel, String rssFeedLink) throws MalformedURLException {
+        this(bot, formatString, commandName, channel, new URL(rssFeedLink));
     }
     
-    public jIBCTRssReader(PircBot bot, String commandName, String channel, URL rssFeedLink) {
+    public jIBCTRssReader(PircBot bot, String formatString, String commandName, String channel, URL rssFeedLink) {
         super(bot, commandName, channel, 1000*30);
+        this.formatString = formatString;
         feedURL = rssFeedLink;
         lastEntryList = new ArrayList<SyndEntry>();
     }
@@ -70,9 +77,7 @@ public class jIBCTRssReader extends jIBCommandThread {
             entryList.removeAll(lastEntryList);
             if(entryList.size() > 0) {
                 // If any entries remain, send a message to the channel.
-                sendMessage(this.getSimpleCommandName() 
-                		+ " - " + entryList.get(0).getTitle() 
-                		+ " [ " + jIRCTools.generateShortURL( entryList.get(0).getLink()) + " ]");
+                sendMessage(formatMessage(entryList.get(0)));
             }
             
             lastEntryList = tempEntryList;
@@ -92,17 +97,25 @@ public class jIBCTRssReader extends jIBCommandThread {
         }
     }
 
+    private String formatMessage(SyndEntry entry) {
+        String message = formatString;
+        message = message.replace(formatItems[0], getSimpleCommandName());
+        message = message.replace(formatItems[1], entry.getTitle());
+        message = message.replace(formatItems[2], "[ " + jIRCTools.generateShortURL(entry.getLink()) + " ]");
+        message = message.replace(formatItems[3], entry.getAuthor());
+        
+        return message;
+    }
+    
     /**
      * 
      * This class is simply here to sort lists of SyndEntries.
      *
      */
     class SyndEntryComparator implements Comparator<SyndEntry> {
-
         public int compare(SyndEntry o1, SyndEntry o2) {
             int pubDateCompare = o2.getPublishedDate().compareTo(o1.getPublishedDate());
             return pubDateCompare;
         }
-
     }
 }

@@ -97,7 +97,8 @@ public class jIRCBot extends PircBot {
 
         try {
             // Add all command threads.
-            addCommandThread(new jIBCTRssReader(this, "WikiFeed", channelList.get(0),
+            addCommandThread(new jIBCTRssReader(this, "[commandName] - [Title] - [Author] [Link]",
+                    "WikiFeed", channelList.get(0),
                     "http://wiki.hive13.org/index.php?title=Special:RecentChanges&feed=rss&hideminor=1"));
             
             addCommandThread(new jIBCTRssReader(this, "Hive13Blog", channelList.get(0),
