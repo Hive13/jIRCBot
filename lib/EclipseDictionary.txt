@@ -2,3 +2,5 @@ bot
 config
 vincenpt
 username
+firefox
+google
