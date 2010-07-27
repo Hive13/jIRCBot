@@ -7,6 +7,7 @@ package jircbot.commands;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -63,9 +64,30 @@ public class jIBCTRssReader extends jIBCommandThread {
 
         try {
 
+            /* Google Groups RSS Feed was giving me 403, here is why:
+             * Hi Dinesh,
+                You can set User-Agent of your http request to any of the bot’s user-agent 
+                so that Google treat it as a bot. To change the user agent of request use 
+                XmlReader(java.net.URLConnection conn) constructor of XmlReader class. 
+                Pass the conn object which has the user agent set to proper value.
+                conn.setRequestProperty(”User-Agent”,”whateveryouwant”);
+                
+                Also, check this out:
+                http://www.java2s.com/Code/Java/Network-Protocol/UsingURLConnection.htm
+                
+                And here... a list of user-age strings:
+                http://www.useragentstring.com/pages/useragentstring.php
+                
+                Firefox 3.6.8:
+                Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-CN; rv:1.9.2.8) Gecko/20100722 Firefox/3.6.8
+             */
+            // Here we pretend to be the google bot to fake out User-Agent sniffing programs.
+            URLConnection conn = feedURL.openConnection();
+            conn.setRequestProperty("User-Agent", "Googlebot/2.1 (+http://www.googlebot.com/bot.html)");
+            
             // Create a feed off of the URL and get the latest news.
             SyndFeedInput input = new SyndFeedInput();
-            SyndFeed feed = input.build(new XmlReader(feedURL));
+            SyndFeed feed = input.build(new XmlReader(conn));
 
             // Get the feed's list of entries
             @SuppressWarnings("unchecked")
