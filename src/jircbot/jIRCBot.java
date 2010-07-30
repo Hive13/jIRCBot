@@ -4,7 +4,9 @@
  */
 package jircbot;
 
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -156,7 +158,20 @@ public class jIRCBot extends PircBot {
     @Override
     public void onMessage(String channel, String sender, String login,
             String hostname, String message) {
-
+        
+        /* Experimental code for logging the channel.
+        FileWriter fstream;
+        try {
+            fstream = new FileWriter(channel.replace("#", "_") + ".log", true);
+            BufferedWriter out = new BufferedWriter(fstream);
+            out.write(sender + ": " + message + "\n");
+            out.close();
+        } catch (IOException e) {
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null, e);
+            this.log("Error: jIRCBot()" + e.toString());
+        }//*/
+        //jIRCTools.insertMessage(channel, "", sender, message);
+        
         // Find out if the message was for this bot
         if (message.startsWith(prefix)) {
             message = message.replace(prefix, "");

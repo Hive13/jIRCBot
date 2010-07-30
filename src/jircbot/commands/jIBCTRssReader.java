@@ -88,7 +88,7 @@ public class jIBCTRssReader extends jIBCommandThread {
             // Create a feed off of the URL and get the latest news.
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(conn));
-
+            
             // Get the feed's list of entries
             @SuppressWarnings("unchecked")
             List<SyndEntry> entryList = feed.getEntries();
