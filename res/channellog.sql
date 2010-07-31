@@ -3,21 +3,17 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 30, 2010 at 02:31 PM
+-- Generation Time: Jul 30, 2010 at 07:55 PM
 -- Server version: 5.1.36
 -- PHP Version: 5.3.0
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
 --
 -- Database: `channellog`
 --
+CREATE DATABASE `channellog` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `channellog`;
 
 -- --------------------------------------------------------
 
@@ -25,6 +21,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Table structure for table `channel`
 --
 
+DROP TABLE IF EXISTS `channel`;
 CREATE TABLE IF NOT EXISTS `channel` (
   `pk_ChannelID` int(11) NOT NULL AUTO_INCREMENT,
   `vcServer` varchar(256) CHARACTER SET latin1 NOT NULL,
@@ -32,12 +29,14 @@ CREATE TABLE IF NOT EXISTS `channel` (
   PRIMARY KEY (`pk_ChannelID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `messages`
 --
 
+DROP TABLE IF EXISTS `messages`;
 CREATE TABLE IF NOT EXISTS `messages` (
   `pk_MessageID` bigint(20) NOT NULL AUTO_INCREMENT,
   `fk_ChannelID` int(11) NOT NULL,
@@ -50,5 +49,3 @@ CREATE TABLE IF NOT EXISTS `messages` (
   KEY `fk_ChannelID` (`fk_ChannelID`),
   FULLTEXT KEY `vcMessage` (`vcMessage`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
-
---

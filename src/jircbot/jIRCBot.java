@@ -170,7 +170,7 @@ public class jIRCBot extends PircBot {
             Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null, e);
             this.log("Error: jIRCBot()" + e.toString());
         }//*/
-        //jIRCTools.insertMessage(channel, "", sender, message);
+        jIRCTools.insertMessage(channel, "", sender, message);
         
         // Find out if the message was for this bot
         if (message.startsWith(prefix)) {
