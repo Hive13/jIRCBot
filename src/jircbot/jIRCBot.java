@@ -4,9 +4,7 @@
  */
 package jircbot;
 
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -27,6 +25,8 @@ import jircbot.commands.jIBTimeCmd;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.jibble.pircbot.PircBot;
+
+import jircbot.jIRCTools.eMsgTypes;
 
 /**
  * 
@@ -49,6 +49,7 @@ public class jIRCBot extends PircBot {
     private String serverAddress = "";
     // Username to use
     private String botName = "";
+    
     // List of channels to join
     private final List<String> channelList;
 
@@ -76,9 +77,20 @@ public class jIRCBot extends PircBot {
         // Grab configuration information.
         botName = config.getProperty("nick", "Hive13Bot");
         serverAddress = config.getProperty("server", "irc.freenode.net");
+        
+        // If we have bit.ly information, grab it. This is used
+        // to shorten URLs
         jIRCTools.bitlyName = config.getProperty("bitlyName", "");
         jIRCTools.bitlyAPIKey = config.getProperty("bitlyAPI", "");
 
+        // If we have jdbc information, grab it. This is used
+        // to log the chat room.
+        jIRCTools.jdbcURL = config.getProperty("bitlyName", "");
+        jIRCTools.jdbcUser = config.getProperty("bitlyName", "");
+        jIRCTools.jdbcPass = config.getProperty("bitlyName", "");
+            // If there is no URL or no username, then jdbc will not be enabled.
+        jIRCTools.jdbcEnabled = (jIRCTools.jdbcURL.length() > 0 && jIRCTools.jdbcUser.length() > 0);
+        
         // Parse the list of channels to join.
         String strChannels = config.getProperty("channels", "#Hive13_test");
         String splitChannels[] = strChannels.split(",");
@@ -159,18 +171,7 @@ public class jIRCBot extends PircBot {
     public void onMessage(String channel, String sender, String login,
             String hostname, String message) {
         
-        /* Experimental code for logging the channel.
-        FileWriter fstream;
-        try {
-            fstream = new FileWriter(channel.replace("#", "_") + ".log", true);
-            BufferedWriter out = new BufferedWriter(fstream);
-            out.write(sender + ": " + message + "\n");
-            out.close();
-        } catch (IOException e) {
-            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null, e);
-            this.log("Error: jIRCBot()" + e.toString());
-        }//*/
-        jIRCTools.insertMessage(channel, this.getServer(), sender, message, jIRCTools.eMsgTypes.publicMsg);
+        jIRCTools.insertMessage(channel, this.getServer(), sender, message, eMsgTypes.publicMsg);
         
         // Find out if the message was for this bot
         if (message.startsWith(prefix)) {
@@ -202,6 +203,18 @@ public class jIRCBot extends PircBot {
         }
     }
 
+    public void onAction(String sender, String login, String hostname, String target, String action) {
+        jIRCTools.insertMessage(target, this.getServer(), sender, action, eMsgTypes.actionMsg);
+    }
+    
+    public void onJoin(String channel, String sender, String login, String hostname) {
+        jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.joinMsg);
+    }
+    
+    public void onPart(String channel, String sender, String login, String hostname) {
+        jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.partMsg);
+    }
+    
     @Override
     public void onDisconnect() {
         System.exit(0);

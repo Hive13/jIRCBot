@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 package jircbot.commands;
-
+//TODO: Document this class.
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
