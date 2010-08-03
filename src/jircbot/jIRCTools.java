@@ -1,5 +1,5 @@
 package jircbot;
-
+// TODO: Document this class.
 import static com.rosaloves.bitlyj.Bitly.*;
 
 import java.sql.Connection;
@@ -7,36 +7,30 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jircbot.jIRCTools.eMsgTypes;
-
-/*
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-*/
 public class jIRCTools {
 	public static String bitlyName = "";
 	public static String bitlyAPIKey = "";
-	
-	public static String jdbcURL = "jdbc:mysql://192.168.2.143:3306/channellog";
-	public static String jdbcUser = "chanlogger";
-	public static String jdbcPass = "qF7yWI4Tcnsb4qD";
+
+    public static boolean jdbcEnabled = false;
+	public static String jdbcURL = "";
+	public static String jdbcUser = "";
+	public static String jdbcPass = "";
 	
 	public enum eMsgTypes {
 	    publicMsg,
 	    privateMsg,
-	    statusMsg
+	    actionMsg,
+	    joinMsg,
+	    partMsg
 	}
 	
 	public static String generateShortURL(String longURL) {
 		return generateShortURL(longURL, bitlyName, bitlyAPIKey);
 	}
+	
 	public static String generateShortURL(String longURL, String username, String apikey) {
 		String result = "Username or API key are not initialized";
 		if(bitlyName.length() > 0 && bitlyAPIKey.length() > 0)
@@ -45,6 +39,8 @@ public class jIRCTools {
 	}
 	
 	public static void insertMessage(String channel, String server, String username, String msg, eMsgTypes msgType) {
+	    if(!jIRCTools.jdbcEnabled)
+            return;
 	    
 	    int chanID = getChannelID(channel, server);
 	    if(chanID == -1) { // Channel does not exist... try to create it.
@@ -74,6 +70,9 @@ public class jIRCTools {
 	}
 	
 	public static int getChannelID(String channel, String server) {
+	    if(!jIRCTools.jdbcEnabled)
+            return -1;
+	    
 	    String stmtGetChannelID = "SELECT pk_ChannelID FROM channel WHERE vcServer=? AND vcChannel=?";
 	    
 	    try {
@@ -95,6 +94,9 @@ public class jIRCTools {
 	}
 	
 	public static int insertChannel(String channel, String server) {
+	    if(!jIRCTools.jdbcEnabled)
+            return -1;
+	    
 	    String stmtInsertChannel = "INSERT INTO channel " +
 	    		"( vcChannel, vcServer )" +
 	    		"VALUES" +
