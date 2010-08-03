@@ -86,8 +86,8 @@ public class jIRCBot extends PircBot {
         // If we have jdbc information, grab it. This is used
         // to log the chat room.
         jIRCTools.jdbcURL = config.getProperty("jdbcURL", "");
-        jIRCTools.jdbcUser = config.getProperty("jdbcUser", "");
-        jIRCTools.jdbcPass = config.getProperty("jdbcPass", "");
+        jIRCTools.jdbcUser = config.getProperty("jdbcUsername", "");
+        jIRCTools.jdbcPass = config.getProperty("jdbcPassword", "");
             // If there is no URL or no username, then jdbc will not be enabled.
         jIRCTools.jdbcEnabled = (jIRCTools.jdbcURL.length() > 0 && jIRCTools.jdbcUser.length() > 0);
         
