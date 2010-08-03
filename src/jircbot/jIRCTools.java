@@ -37,7 +37,7 @@ public class jIRCTools {
 	    		"( ?, ?, ?, ? )";
 	    try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.2.143:3306/channellog", "chanlogger", "qF7yWI4Tcnsb4qD");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/channellog", "chanlogger", "qF7yWI4Tcnsb4qD");
             PreparedStatement stmt = conn.prepareStatement(insertStatement);
             stmt.setInt(1, 1);
             stmt.setInt(2, 1);
