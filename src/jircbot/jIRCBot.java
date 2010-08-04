@@ -90,6 +90,9 @@ public class jIRCBot extends PircBot {
         jIRCTools.jdbcPass = config.getProperty("jdbcPassword", "");
             // If there is no URL or no username, then jdbc will not be enabled.
         jIRCTools.jdbcEnabled = (jIRCTools.jdbcURL.length() > 0 && jIRCTools.jdbcUser.length() > 0);
+        if(!jIRCTools.jdbcEnabled) {
+            this.log("@@@ ALERT @@@ - JDBC Logging is disabled!");
+        }
         
         // Parse the list of channels to join.
         String strChannels = config.getProperty("channels", "#Hive13_test");
