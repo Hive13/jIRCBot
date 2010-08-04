@@ -38,7 +38,8 @@ public class jIRCTools {
 	    actionMsg,
 	    joinMsg,
 	    partMsg, 
-	    nickChange
+	    nickChange, 
+	    quitMsg
 	}
 	
 	/**

@@ -101,9 +101,10 @@ public class jIBCTRssReader extends jIBCommandThread {
             if(tempEntryList.size() > 0) {
                 // If any entries remain, send a message to the channel.
                 sendMessage(formatMessage(entryList.get(0)));
+
+                lastEntryList = entryList;
             }
             
-            lastEntryList = entryList;
   
         } catch (MalformedURLException ex) {
             Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE, null, ex);
