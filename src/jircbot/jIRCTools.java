@@ -11,14 +11,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class jIRCTools {
+    /** Username to use for the bit.ly API */
 	public static String bitlyName = "";
+	/** API key to use for the bit.ly API */
 	public static String bitlyAPIKey = "";
 
+	/** 
+	 * This must be checked by each JDBC method to ensure
+	 * that the JDBC integration is configured.
+	 */
     public static boolean jdbcEnabled = false;
+    /** JDBC URL to use to connect to the database */
 	public static String jdbcURL = "";
+    /** Username for the MySQL database to connect too */
 	public static String jdbcUser = "";
+    /** Password for the MySQL database user. */
 	public static String jdbcPass = "";
-	
+
+    /** 
+     * The different types of messages saved in the 
+     * database.
+     */
 	public enum eMsgTypes {
 	    publicMsg,
 	    privateMsg,
@@ -28,10 +41,26 @@ public class jIRCTools {
 	    nickChange
 	}
 	
+	/**
+	 * Bit.ly API integration to generate a shortened URL.
+	 * Make sure that the bitlyName and bitlyAPIKey are specified
+	 * before calling this method.
+	 * 
+	 * @param longURL  Long URL to shorten.
+	 * @return         Returns a bit.ly shortened URL
+	 */
 	public static String generateShortURL(String longURL) {
 		return generateShortURL(longURL, bitlyName, bitlyAPIKey);
 	}
 	
+	/**
+	 * Uses the Bit.ly API to generate a short URL.
+	 * 
+	 * @param longURL  The log URL to shorten.
+	 * @param username The Bit.ly username to use.
+	 * @param apikey   Bit.ly APIKey associated w/ the username.
+	 * @return         Returns a shortened bit.ly URL.
+	 */
 	public static String generateShortURL(String longURL, String username, String apikey) {
 		String result = "Username or API key are not initialized";
 		if(bitlyName.length() > 0 && bitlyAPIKey.length() > 0)
@@ -39,6 +68,16 @@ public class jIRCTools {
 		return result;
 	}
 	
+	/**
+	 * Inserts a new message into the "messages" table of the
+	 * attached MySQL database.
+	 * 
+	 * @param channel  Name of the channel the message relates to.
+	 * @param server   The server the bot is connected too.
+	 * @param username The username of related to this message.
+	 * @param msg      The actual contents of the message.
+	 * @param msgType  The type of message (Public, private, join // part, etc..)
+	 */
 	public static void insertMessage(String channel, String server, String username, String msg, eMsgTypes msgType) {
 	    if(!jIRCTools.jdbcEnabled)
             return;
@@ -70,6 +109,14 @@ public class jIRCTools {
         }
 	}
 	
+	/**
+	 * Finds the database ID for a channel && server
+	 * 
+	 * @param channel  The name of the channel.
+	 * @param server   The server the bot is connected too.
+	 * @return         The ID # for the channel or -1 if it
+	 *                 is unable to find the channel.
+	 */
 	public static int getChannelID(String channel, String server) {
 	    if(!jIRCTools.jdbcEnabled)
             return -1;
@@ -94,6 +141,15 @@ public class jIRCTools {
 	    return -1; // Failed to find a channelID
 	}
 	
+	/**
+	 * Inserts a new channel, it does not check to make sure the
+	 * channel // server pair does not already exist.
+	 * 
+	 * @param channel  Name of the channel
+	 * @param server   Name of the server
+	 * @return         The ID # for the new channel or 
+	 *                 -1 if it fails to add the channel.
+	 */
 	public static int insertChannel(String channel, String server) {
 	    if(!jIRCTools.jdbcEnabled)
             return -1;
