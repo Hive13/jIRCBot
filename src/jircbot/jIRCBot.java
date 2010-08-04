@@ -158,21 +158,27 @@ public class jIRCBot extends PircBot {
         }
     }
 
+    /**
+     * Adds a command to the list of known commands.
+     * @param cmd   Command to add to the command list.
+     */
     public void addCommand(jIBCommand cmd) {
         commands.put(cmd.getCommandName(), cmd);
     }
 
+    /**
+     * Adds a commandThread to the list of known commands.
+     * @param cmd   CommandThread to add to the command list.
+     */
     public void addCommandThread(jIBCommandThread cmd) {
         commands.put(cmd.getCommandName(), cmd);
         new Thread(cmd).start();
     }
 
-    @Override
     public void onMessage(String channel, String sender, String login,
             String hostname, String message) {
         
         jIRCTools.insertMessage(channel, this.getServer(), sender, message, eMsgTypes.publicMsg);
-        
         // Find out if the message was for this bot
         if (message.startsWith(prefix)) {
             message = message.replace(prefix, "");
@@ -203,22 +209,9 @@ public class jIRCBot extends PircBot {
         }
     }
 
-    public void onAction(String sender, String login, String hostname, String target, String action) {
-        jIRCTools.insertMessage(target, this.getServer(), sender, action, eMsgTypes.actionMsg);
-    }
-    
-    public void onJoin(String channel, String sender, String login, String hostname) {
-        jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.joinMsg);
-    }
-    
-    public void onPart(String channel, String sender, String login, String hostname) {
-        jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.partMsg);
-    }
-    
-    public void onNickChange(String oldNick, String login, String hostname, String newNick) {
-        jIRCTools.insertMessage("", this.getServer(), login, oldNick, eMsgTypes.nickChange);
-    }
-    
+    /*
+     * If the bot is disconnected from the server, quit the bot.
+     */
     @Override
     public void onDisconnect() {
         System.exit(0);
@@ -237,4 +230,23 @@ public class jIRCBot extends PircBot {
         }
         return false;
     }
+    
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    // The following is only used for message logging purposes right now.
+    public void onAction(String sender, String login, String hostname, String target, String action) {
+        jIRCTools.insertMessage(target, this.getServer(), sender, action, eMsgTypes.actionMsg);
+    }
+    
+    public void onJoin(String channel, String sender, String login, String hostname) {
+        jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.joinMsg);
+    }
+    
+    public void onPart(String channel, String sender, String login, String hostname) {
+        jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.partMsg);
+    }
+    
+    public void onNickChange(String oldNick, String login, String hostname, String newNick) {
+        jIRCTools.insertMessage("", this.getServer(), login, oldNick, eMsgTypes.nickChange);
+    }
+    
 }
