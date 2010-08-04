@@ -11,6 +11,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,16 +94,16 @@ public class jIBCTRssReader extends jIBCommandThread {
             @SuppressWarnings("unchecked")
             List<SyndEntry> entryList = feed.getEntries();
             Collections.sort(entryList, new SyndEntryComparator());
-            List<SyndEntry> tempEntryList = new ArrayList<SyndEntry>(entryList);
             
-            // Remove any entries that we have already seen.
-            entryList.removeAll(lastEntryList);
-            if(entryList.size() > 0) {
+            // Check for new entries.
+            List<SyndEntry> tempEntryList = getNewEntryies(entryList);
+            
+            if(tempEntryList.size() > 0) {
                 // If any entries remain, send a message to the channel.
                 sendMessage(formatMessage(entryList.get(0)));
             }
             
-            lastEntryList = tempEntryList;
+            lastEntryList = entryList;
   
         } catch (MalformedURLException ex) {
             Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE, null, ex);
@@ -119,6 +120,42 @@ public class jIBCTRssReader extends jIBCommandThread {
         }
     }
 
+    private List<SyndEntry> getNewEntryies(List<SyndEntry> newEntryList) {
+        /*
+         * So here is the deal. We have two lists.
+         * 1. newEntryList
+         * 2. lastEntryList
+         * 
+         * Both should be sorted by publishedDate so that the 0
+         * item is the latest item in that list. If they were integers:
+         * 1. newEntryList
+         * - [8, 7, 6, 5, 4, 3, 2]
+         * 2. lastEntryList
+         * - [6, 5, 4, 3, 2, 1, 0]
+         * 
+         * The result should be:
+         * - [8, 7]
+         * 
+         * Go through newEntryList until item 'i' is < lastEntryList[0].
+         * Then remove all from newEntryList until only.
+         */
+        if(lastEntryList == null || lastEntryList.size() == 0) {
+            return newEntryList;
+        }
+        List<SyndEntry> resultList = new ArrayList<SyndEntry>();
+        SyndEntry lastSyndEntry = lastEntryList.get(0);
+        Iterator<SyndEntry> i = newEntryList.iterator();
+        while(i.hasNext()) {
+            SyndEntry curEntry = i.next();
+            if(curEntry.getPublishedDate().after(lastSyndEntry.getPublishedDate())) {
+                resultList.add(curEntry);
+            } else {
+                return resultList;
+            }
+        }
+        return resultList;
+    }
+    
     private String formatMessage(SyndEntry entry) {
         String message = formatString;
         message = message.replace(formatItems[0], getSimpleCommandName());
