@@ -215,6 +215,10 @@ public class jIRCBot extends PircBot {
         jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.partMsg);
     }
     
+    public void onNickChange(String oldNick, String login, String hostname, String newNick) {
+        jIRCTools.insertMessage("", this.getServer(), login, oldNick, eMsgTypes.nickChange);
+    }
+    
     @Override
     public void onDisconnect() {
         System.exit(0);

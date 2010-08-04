@@ -24,7 +24,8 @@ public class jIRCTools {
 	    privateMsg,
 	    actionMsg,
 	    joinMsg,
-	    partMsg
+	    partMsg, 
+	    nickChange
 	}
 	
 	public static String generateShortURL(String longURL) {
