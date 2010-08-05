@@ -77,21 +77,37 @@ if($sql) while($row = mysql_fetch_array($res, MYSQL_ASSOC)){
     echo '<a id="msg'.$row['pk_MessageID'].'" href="index.php?d='.$row['d'].'#msg'.$row['pk_MessageID'].'" class="time">';
     echo '['.$row['t'].']';
     echo '</a>';
+    $listItem = '';
     if($row['vcMsgType'] == 'publicMsg'){
-        echo '<b style="color:#'.substr(md5($row['vcUsername']),0,6).'">'.htmlspecialchars($row['vcUsername']).'</b><span class="user">';
-    }else{
-        echo '<b>*</b><span class="server">';
+        $listItem = '<b style="color:#'.substr(md5($row['vcUsername']),0,6).'">'.htmlspecialchars($row['vcUsername']).'</b><span class="user">';
+        $listItem .= htmlspecialchars($row['vcMessage']).'</span></li>';
+    } else if($row['vcMsgType'] == 'actionMsg') {
+        $listItem  = '<b>&gt;&gt;&gt;</b><span class="user" >';
+        $listItem .= '<strong style="color:#'.substr(md5($row['vcUsername']),0,6).'">';
+        $listItem .= htmlspecialchars($row['vcUsername']).' '.htmlspecialchars($row['vcMessage']);
+        $listItem .= '</strong>';
+        $listItem .= '</span></li>';
+    } else if($row['vcMsgType'] == 'joinMsg') {
+        $listItem  = '<b>*</b><span class="server">';
+        $listItem .= htmlspecialchars($row['vcUsername']).' joined the channel.';
+        $listItem .= '</span></li>';
+    } else if($row['vcMsgType'] == 'partMsg' || $row['vcMsgType'] == 'quitMsg') {
+        $listItem = '<b>*</b><span class="server">';
+        $listItem .= htmlspecialchars($row['vcUsername']).' left the channel.';
+        $listItem .= '</span></li>';
+    } else if($row['vcMsgType'] == 'nickChange') {
+        $listItem = '<b>*</b><span class="server">';
+        $listItem .= htmlspecialchars($row['vcUsername']).' changed their nick to'.htmlspecialchars($row['vcMessage']).'.';
+        $listItem .= '</span></li>';
+    } else{
+        $listItem = '<b>*</b><span class="server">';
+        $listItem .= htmlspecialchars($row['vcMessage']).'</span></li>';
     }
-    $msg = htmlspecialchars(  $row['vcMessage']);
-    $msg = preg_replace_callback('/((https?|ftp):\/\/[\w-?&;#~=\.\/\@%:]+[\w\/])/ui',
-                                 'format_link',$msg);
+    
+    $listItem = preg_replace_callback('/((https?|ftp):\/\/[\w-?&;#~=\.\/\@%:]+[\w\/])/ui',
+                                 'format_link',$listItem);
 
-    if(substr($msg,0,3) == '/me'){
-        $msg = '<strong>'.htmlspecialchars($row['vcUsername']).substr($msg,3).'</strong>';
-    }
-    echo $msg;
-    echo '</span>';
-    echo '</li>';
+    echo $listItem;
 
 }
 echo '</ul>';
