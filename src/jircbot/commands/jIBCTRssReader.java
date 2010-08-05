@@ -164,7 +164,7 @@ public class jIBCTRssReader extends jIBCommandThread {
         message = message.replace(formatItems[2], "[ " + jIRCTools.generateShortURL(entry.getLink()) + " ]");
         message = message.replace(formatItems[3], entry.getAuthor());
         
-        return message;
+        return message.replace("\n", "");
     }
     
     /**
