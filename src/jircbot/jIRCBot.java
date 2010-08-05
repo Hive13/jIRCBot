@@ -121,8 +121,10 @@ public class jIRCBot extends PircBot {
             addCommandThread(new jIBCTRssReader(this, "Hive13Blog", channelList.get(0),
                     "http://www.hive13.org/?feed=rss2"));
             
-            addCommandThread(new jIBCTRssReader(this, "Hive13List", channelList.get(0),
-                    "http://groups.google.com/group/cincihackerspace/feed/rss_v2_0_msgs.xml"));
+            addCommandThread(new jIBCTRssReader(this, "[commandName] - [Title] - [Author] [Link]", 
+            		"Hive13List", channelList.get(0), 
+            		"http://groups.google.com/group/cincihackerspace/feed/rss_v2_0_msgs.xml"));
+            
             // PTV: Flickr feed has been known to have issues... 
             addCommandThread(new jIBCTRssReader(this, "Hive13Flickr", channelList.get(0),
                     "http://api.flickr.com/services/feeds/photos_public.gne?tags=hive13&lang=en-us&format=rss_200"));
