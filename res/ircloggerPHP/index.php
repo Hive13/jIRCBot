@@ -3,7 +3,6 @@
 require("func.php");
 $conf = loadconfig('irclogger.config.php');
 
-
 header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -17,18 +16,20 @@ header('Content-Type: text/html; charset=utf-8');
 <body>
 <?php
 $dbh = getdbhandle($conf);
+$ircChan = mysql_real_escape_string($conf['irc_channel']);
+$ircServer = mysql_real_escape_string($conf['irc_server']);
 
 if(isSet($_REQUEST['s'])){
     $sql = "SELECT pk_MessageID, DATE(tsMsgTime) as d, TIME(tsMsgTime) as t, vcUsername, vcMsgType, vcMessage
               FROM messages, channel 
-             WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '#hive13_test' AND 
+             WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '".$ircChan."' AND vcServer = '".$ircServer."' AND 
              MATCH (vcMessage)
            AGAINST ('".addslashes($_REQUEST['s'])."')
           ORDER BY tsMsgTime DESC, pk_MessageID DESC";
 }elseif(isSet($_REQUEST['u'])){
     $sql = "SELECT tsMsgTime
               FROM messages, channel
-             WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '#hive13_test' AND
+             WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '".$ircChan."' AND vcServer = '".$ircServer."' AND 
                    vcUsername = '".addslashes($_REQUEST['u'])."'
           ORDER BY tsMsgTime DESC, pk_MessageID DESC
              LIMIT 1";
@@ -37,7 +38,7 @@ if(isSet($_REQUEST['s'])){
     if($row['tsMsgTime']){
         $sql = "SELECT pk_MessageID, DATE(tsMsgTime) as d, TIME(tsMsgTime) as t, vcUsername, vcMsgType, vcMessage
               FROM messages, channel
-             WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '#hive13_test' AND
+             WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '".$ircChan."' AND vcServer = '".$ircServer."' AND 
                    tsMsgTime >= '".addslashes($row['tsMsgTime'])."'
           ORDER BY tsMsgTime, pk_MessageID";
     }else{
@@ -53,7 +54,7 @@ if(isSet($_REQUEST['s'])){
 
     $sql = "SELECT pk_MessageID, DATE(tsMsgTime) as d, TIME(tsMsgTime) as t, vcUsername, vcMsgType, vcMessage
               FROM messages, channel
-             WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '#hive13_test' AND
+             WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '".$ircChan."' AND vcServer = '".$ircServer."' AND 
                    DATE(tsMsgTime) = DATE('".addslashes($date)."')
           ORDER BY tsMsgTime, pk_ChannelID";
 }
@@ -114,7 +115,7 @@ echo '</ul>';
 
 $sql = "SELECT DISTINCT DATE(tsMsgTime) as d, DAY(tsMsgTime) as day
           FROM messages, channel
-         WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '#hive13_test' AND
+         WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '".$ircChan."' AND vcServer = '".$ircServer."' AND 
                tsMsgTime > DATE_SUB(NOW(), INTERVAL 30 DAY)
       ORDER BY tsMsgTime";
 $res = mysql_query($sql,$dbh);
