@@ -60,13 +60,13 @@ if(isSet($_REQUEST['s'])){
 
 if($sql) $res = mysql_query($sql,$dbh);
 
-if($date){
+if(isSet($date)){
     echo '<form action="index.php">';
     echo '<h1>Log for <input type="text" name="d" value="'.htmlspecialchars($date).'" /></h1>';
     echo '</form>';
-}elseif($sql && $_REQUEST['u']){
+}elseif($sql && isSet($_REQUEST['u'])){
     echo '<h1>Log since last login of '.htmlspecialchars($_REQUEST['u']).'</h1>';
-}elseif($sql && $_REQUEST['s']){
+}elseif($sql && isSet($_REQUEST['s'])){
     echo '<h1>Matching lines for '.htmlspecialchars($_REQUEST['s']).'</h1>';
     echo '<p>Click the timestamp to see the line in context.</p>';
 }
