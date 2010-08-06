@@ -250,7 +250,7 @@ public class jIRCBot extends PircBot {
         jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.partMsg);
     }
     public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
-        jIRCTools.insertMessage("", this.getServer(), sourceNick, "", eMsgTypes.quitMsg);
+        jIRCTools.insertMessage("", this.getServer(), sourceNick, reason, eMsgTypes.quitMsg);
     }
     
     public void onNickChange(String oldNick, String login, String hostname, String newNick) {
