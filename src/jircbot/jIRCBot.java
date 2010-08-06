@@ -27,7 +27,8 @@ import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.jibble.pircbot.PircBot;
 
-import jircbot.jIRCTools.eMsgTypes;
+import jircbot.support.jIRCTools;
+import jircbot.support.jIRCTools.eMsgTypes;
 
 /**
  * 
@@ -184,7 +185,6 @@ public class jIRCBot extends PircBot {
 
     public void onMessage(String channel, String sender, String login,
             String hostname, String message) {
-        
         jIRCTools.insertMessage(channel, this.getServer(), sender, message, eMsgTypes.publicMsg);
         // Find out if the message was for this bot
         if (message.startsWith(prefix)) {
