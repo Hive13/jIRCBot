@@ -1,4 +1,4 @@
-package jircbot;
+package jircbot.support;
 // TODO: Document this class.
 import static com.rosaloves.bitlyj.Bitly.*;
 
@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import jircbot.jIRCBot;
 
 public class jIRCTools {
     /** Username to use for the bit.ly API */

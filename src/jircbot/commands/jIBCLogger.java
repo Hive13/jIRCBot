@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import jircbot.jIRCTools;
+import jircbot.support.jIRCTools;
 
 import org.jibble.pircbot.PircBot;
 
