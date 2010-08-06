@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jircbot.commands.jIBCLogger;
 import jircbot.commands.jIBCPluginList;
 import jircbot.commands.jIBCTRssReader;
 import jircbot.commands.jIBCommand;
@@ -111,6 +112,7 @@ public class jIRCBot extends PircBot {
         addCommand(new jIBTimeCmd());
         addCommand(new jIBQuitCmd());
         addCommand(new jIBCPluginList(commands));
+        addCommand(new jIBCLogger());
 
         try {
             // Add all command threads.
@@ -190,11 +192,15 @@ public class jIRCBot extends PircBot {
 
             jIBCommand cmd;
             // Check to see if it is a standard command.
-            if ((cmd = commands.get(message)) != null)
-                cmd.handleMessage(this, channel, sender,
-                        message.replace(cmd.getCommandName(), "").trim());
+            String[] sCmd = message.split(" ", 2);
+            if ((cmd = commands.get(sCmd[0])) != null)
+                if(sCmd.length == 2)
+                    cmd.handleMessage(this, channel, sender, sCmd[1].trim());
+                else
+                    cmd.handleMessage(this, channel, sender, "");
+                    
             // It was not a standard command, is it for a threaded one?
-            else if ((cmd = commands.get(message + channel)) != null) {
+            else if ((cmd = commands.get(sCmd[0] + channel)) != null) {
                 jIBCommandThread cmdT = (jIBCommandThread) cmd;
                 if (cmdT.getIsRunning())
                     cmdT.stop();
