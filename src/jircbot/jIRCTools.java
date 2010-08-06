@@ -70,31 +70,31 @@ public class jIRCTools {
 	}
 	
 	/**
-	 * Inserts a new message into the "messages" table of the
-	 * attached MySQL database.
-	 * 
-	 * @param channel  Name of the channel the message relates to.
-	 * @param server   The server the bot is connected too.
-	 * @param username The username of related to this message.
-	 * @param msg      The actual contents of the message.
-	 * @param msgType  The type of message (Public, private, join // part, etc..)
-	 */
-	public static void insertMessage(String channel, String server, String username, String msg, eMsgTypes msgType) {
-	    if(!jIRCTools.jdbcEnabled)
+     * Inserts a new message into the "messages" table of the
+     * attached MySQL database.
+     * 
+     * @param channel  Name of the channel the message relates to.
+     * @param server   The server the bot is connected too.
+     * @param username The username of related to this message.
+     * @param msg      The actual contents of the message.
+     * @param msgType  The type of message (Public, private, join // part, etc..)
+     */
+    public static void insertMessage(String channel, String server, String username, String msg, eMsgTypes msgType) {
+        if(!jIRCTools.jdbcEnabled)
             return;
-	    
-	    int chanID = getChannelID(channel, server);
-	    if(chanID == -1) { // Channel does not exist... try to create it.
-	        if((chanID = insertChannel(channel, server)) == -1) { // Did the create work?
-	            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, "Failed to insert new channel: " + channel + "@" + server + "\n");
-	        }
-	    }
-	    
-	    String insertStatement = "INSERT INTO messages " +
-	    		"( fk_ChannelID, vcMsgType, vcUsername, vcMessage )" +
-	    		"VALUES" +
-	    		"( ?, ?, ?, ? )";
-	    try {
+        
+        int chanID = getChannelID(channel, server);
+        if(chanID == -1) { // Channel does not exist... try to create it.
+            if((chanID = insertChannel(channel, server)) == -1) { // Did the create work?
+                Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, "Failed to insert new channel: " + channel + "@" + server + "\n");
+            }
+        }
+        
+        String insertStatement = "INSERT INTO messages " +
+                "( fk_ChannelID, vcMsgType, vcUsername, vcMessage )" +
+                "VALUES" +
+                "( ?, ?, ?, ? )";
+        try {
             Class.forName("com.mysql.jdbc.Driver");
             Connection conn = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
             PreparedStatement stmt = conn.prepareStatement(insertStatement);
@@ -108,7 +108,49 @@ public class jIRCTools {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-	}
+    }
+    
+    /**
+     * Inserts a new message into the "messages" table of the
+     * attached MySQL database.
+     * 
+     * @param channel  Name of the channel the message relates to.
+     * @param server   The server the bot is connected too.
+     * @param username The username of related to this message.
+     * @param msg      The actual contents of the message.
+     * @param msgType  The type of message (Public, private, join // part, etc..)
+     */
+    public static void insertMessage(String channel, String server, String username, String msg, eMsgTypes msgType, String tsMsgDate) {
+        if(!jIRCTools.jdbcEnabled)
+            return;
+        
+        int chanID = getChannelID(channel, server);
+        if(chanID == -1) { // Channel does not exist... try to create it.
+            if((chanID = insertChannel(channel, server)) == -1) { // Did the create work?
+                Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, "Failed to insert new channel: " + channel + "@" + server + "\n");
+            }
+        }
+        
+        String insertStatement = "INSERT INTO messages " +
+                "( fk_ChannelID, vcMsgType, vcUsername, vcMessage, tsMsgTime )" +
+                "VALUES" +
+                "( ?, ?, ?, ?, ? )";
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
+            PreparedStatement stmt = conn.prepareStatement(insertStatement);
+            stmt.setInt(1, chanID);
+            stmt.setString(2, msgType.toString());
+            stmt.setString(3, username);
+            stmt.setString(4, msg);
+            stmt.setString(5, tsMsgDate);
+            stmt.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 	
 	/**
 	 * Finds the database ID for a channel && server
@@ -175,4 +217,5 @@ public class jIRCTools {
         
 	    return getChannelID(channel, server);
 	}
+
 }
