@@ -4,3 +4,4 @@ vincenpt
 username
 firefox
 google
+flickr

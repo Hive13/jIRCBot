@@ -39,10 +39,14 @@ import jircbot.support.jIRCTools.eMsgTypes;
 public class jIRCBot extends PircBot {
     // Store the commands
     /* 
-     * Important Stuff for threadedCommands - We can have multiple cT w/ the
-     * same name. - What is unique about a tC then? - Name + channel, we can
-     * only have 1 tC per channel. - Going to need to change the name for each
-     * instance per channel. - Each tC has the following: - tC implementation
+     * Important Stuff for threadedCommands
+     *  - We can have multiple cT w/ the same name. 
+     *  - What is unique about a tC then?
+     *   - Name + channel, we can only have 1 tC per channel.
+     *      - Fixed: Each command 
+     *   - Going to need to change the name for each instance per channel. 
+     *   - Each tC has the following:
+     *      - tC implementation
      */
     private final HashMap<String, jIBCommand> commands;
 
@@ -341,6 +345,7 @@ public class jIRCBot extends PircBot {
             Iterator<String> i = channels.iterator();
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), sourceNick, reason, eMsgTypes.quitMsg);
+                
             }
         }
     }
@@ -352,7 +357,27 @@ public class jIRCBot extends PircBot {
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), oldNick, newNick, eMsgTypes.nickChange);
             }
+            
             userList.put(newNick, channels);
         }
-    }    
+    } 
+    
+    public boolean isUserKnownToNickServ(String username) {
+        /*
+         * Ok, This is going to be a bit hackish.  Current implementation
+         * requires that if we want to know if a user is on our "Auth" list
+         * we need to send the following message:
+         * ./msg nickserv info <username>
+         * 
+         * To which we get the response:
+         * -NickServ(NickServ@services.)- Information on cjdavis (account cjdavis):
+         * -NickServ(NickServ@services.)- Registered : Jun 22 00:14:39 2008 (2 years, 6 weeks, 4 days, 18:37:47 ago)
+         * -NickServ(NickServ@services.)- Last addr  : ~cjdavis@72.49.163.38
+         * -NickServ(NickServ@services.)- Last seen  : now
+         *  -NickServ(NickServ@services.)- Flags      : HideMail
+         * -NickServ(NickServ@services.)- *** End of Info ***
+
+         */
+        return false;
+    }
 }
