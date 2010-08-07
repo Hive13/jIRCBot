@@ -345,7 +345,6 @@ public class jIRCBot extends PircBot {
             Iterator<String> i = channels.iterator();
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), sourceNick, reason, eMsgTypes.quitMsg);
-                
             }
         }
     }
@@ -357,12 +356,11 @@ public class jIRCBot extends PircBot {
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), oldNick, newNick, eMsgTypes.nickChange);
             }
-            
             userList.put(newNick, channels);
         }
     } 
     
-    public boolean isUserKnownToNickServ(String username) {
+    public boolean isUserAuthed(String username, List<String> AuthedUsers) {
         /*
          * Ok, This is going to be a bit hackish.  Current implementation
          * requires that if we want to know if a user is on our "Auth" list
@@ -374,9 +372,32 @@ public class jIRCBot extends PircBot {
          * -NickServ(NickServ@services.)- Registered : Jun 22 00:14:39 2008 (2 years, 6 weeks, 4 days, 18:37:47 ago)
          * -NickServ(NickServ@services.)- Last addr  : ~cjdavis@72.49.163.38
          * -NickServ(NickServ@services.)- Last seen  : now
-         *  -NickServ(NickServ@services.)- Flags      : HideMail
+         * -NickServ(NickServ@services.)- Flags      : HideMail
          * -NickServ(NickServ@services.)- *** End of Info ***
-
+         * 
+         * From this we can parse some information:
+         *  - The actual account name: cjdavis
+         *  - The current account name: cjdavis
+         *  - If they are logged on.
+         *  
+         *  So. If we are going through the list of users and ask about: Paul_hive13
+         *  We get a response that tells us their real username is pvince and that
+         *  they are indeed currently logged on.
+         */
+        
+        /*
+         * With the above background on the nickServ, how can we do this?
+         * 1. Send nickserv private message
+         * 2. Set "Waiting for nickserv" flag w/ the username we asked about.
+         * 3. Wait for the flag to 
+         * While we wait on 3 here,  the code in "On Private Message"
+         * will be doing the following:
+         * 1. Check is the nickserv flag set.
+         * 1.1 Flag is set, look for the following lines:
+         *      - "Information on <nickservFlag> (account <username>):" || "<nickservFlag> is not registered"
+         *      - "Last seen   : now" || "Last seen    : Date"
+         *      - "*** End of Info ****
+         * 1.2 Wait for the "End of Info" or "not registered" flag
          */
         return false;
     }
