@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +27,7 @@ import jircbot.commands.jIBTimeCmd;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.jibble.pircbot.PircBot;
+import org.jibble.pircbot.User;
 
 import jircbot.support.jIRCTools;
 import jircbot.support.jIRCTools.eMsgTypes;
@@ -55,6 +57,21 @@ public class jIRCBot extends PircBot {
     // List of channels to join
     private final List<String> channelList;
 
+    /*
+     * Ok, the userList is a bit hackish at the moment
+     * and there is the potential that it will leak some
+     * memory.  Basically I try to programatically keep
+     * track of what users are in the channels the bot lives
+     * in and what their current usernames are.
+     * 
+     * The basic problem is this: I only remove users
+     * from the list when they leave a channel or quit
+     * the server.  If they leave through other means
+     * (kick, ban, other?) they will get stuck in the
+     * userList until the bot leaves & rejoins the channel.
+     */
+    private final HashMap<String, List<String>> userList;
+    
     /**
      * @param args  the command line arguments
      */
@@ -71,11 +88,13 @@ public class jIRCBot extends PircBot {
     }
 
     private jIRCBot(Properties config) {
+
         // Initialize lists
         commands = new HashMap<String, jIBCommand>();
 
         channelList = new ArrayList<String>();
 
+        userList = new HashMap<String, List<String>>();
         // Grab configuration information.
         botName = config.getProperty("nick", "Hive13Bot");
         serverAddress = config.getProperty("server", "irc.freenode.net");
@@ -248,20 +267,92 @@ public class jIRCBot extends PircBot {
         jIRCTools.insertMessage(target, this.getServer(), sender, action, eMsgTypes.actionMsg);
     }
     
+    public void onUserList(String channel, User[] users) {
+        // TODO: This method currently has the potential to allow for duplicate channels in the list.
+        for(int i = 0; i < users.length; i++) {
+            List<String> channels;
+            if((channels = userList.get(users[i].getNick())) != null) {
+                // yes! Update it.
+                channels.add(channel);
+            }
+            else {
+                // no! Add it.
+                channels = new ArrayList<String>();
+                channels.add(channel);
+                userList.put(users[i].getNick(), channels);
+            }
+        }
+    }
     public void onJoin(String channel, String sender, String login, String hostname) {
-        jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.joinMsg);
+        // Do we know about this user?
+        if(sender.equals(this.getName())) {
+            // We just joined a channel, get the list of users in this channel.
+            // *UPDATE* This does not work... use the "OnUserList" method.
+        } else {
+            // This is someone else joining the channel.
+            List<String> channels;
+            if((channels = userList.get(sender)) != null) {
+                // yes! Update it.
+                channels.add(channel);
+            }
+            else {
+                // no! Add it.
+                channels = new ArrayList<String>();
+                channels.add(channel);
+                userList.put(sender, channels);
+            }
+            jIRCTools.insertMessage(channel, this.getServer(), sender, "", eMsgTypes.joinMsg);
+        }
     }
     
     public void onPart(String channel, String sender, String login, String hostname) {
-        jIRCTools.insertMessage(channel, this.getServer(), login, "", eMsgTypes.partMsg);
+        // Did we just leave the channel?
+        if(sender.equals(this.getName())) {
+            // Yes, remove the list of users we know in this channel.
+            //  ** NOTE ** This is going to be horribly in-efficient.
+            Iterator<Entry<String, List<String>>> it = userList.entrySet().iterator();
+            while(it.hasNext()) {
+                Entry<String, List<String>> e = it.next();
+                List<String> chanList = e.getValue();
+                // Remove any channel with the name in this list.
+                chanList.remove(channel);
+                
+                // If that was the only channel, remove the item.
+                if(chanList.isEmpty())
+                    userList.remove(e.getKey());
+            }
+        } else {
+            // No, it was someone else.
+            List<String> channels;
+            if((channels = userList.get(sender)) != null) {
+                channels.remove(channel);
+                
+                // Was this the only channel the user as in?
+                if(channels.isEmpty())
+                   userList.remove(sender);
+            }
+            jIRCTools.insertMessage(channel, this.getServer(), sender, "", eMsgTypes.partMsg);
+        }
     }
     public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
-        jIRCTools.insertMessage("", this.getServer(), sourceNick, reason, eMsgTypes.quitMsg);
+        // This could be us, but if we quit, who cares?
+        List<String> channels;
+        if((channels = userList.remove(sourceNick)) != null) {
+            Iterator<String> i = channels.iterator();
+            while(i.hasNext()) {
+                jIRCTools.insertMessage(i.next(), this.getServer(), sourceNick, reason, eMsgTypes.quitMsg);
+            }
+        }
     }
     
     public void onNickChange(String oldNick, String login, String hostname, String newNick) {
-        jIRCTools.insertMessage("", this.getServer(), login, oldNick, eMsgTypes.nickChange);
-    }
-    
-    
+        List<String> channels;
+        if((channels = userList.remove(oldNick)) != null) {
+            Iterator<String> i = channels.iterator();
+            while(i.hasNext()) {
+                jIRCTools.insertMessage(i.next(), this.getServer(), oldNick, newNick, eMsgTypes.nickChange);
+            }
+            userList.put(newNick, channels);
+        }
+    }    
 }
