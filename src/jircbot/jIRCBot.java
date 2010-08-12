@@ -61,6 +61,9 @@ public class jIRCBot extends PircBot {
     // List of channels to join
     private final List<String> channelList;
 
+    // List of Authorized usernames
+    private final List<String> authedUserList;
+    
     /*
      * Ok, the userList is a bit hackish at the moment
      * and there is the potential that it will leak some
@@ -99,6 +102,10 @@ public class jIRCBot extends PircBot {
         channelList = new ArrayList<String>();
 
         userList = new HashMap<String, List<String>>();
+        
+        authedUserList = new ArrayList<String>();
+        authedUserList.add("pvince");
+        
         // Grab configuration information.
         botName = config.getProperty("nick", "Hive13Bot");
         serverAddress = config.getProperty("server", "irc.freenode.net");
@@ -360,45 +367,125 @@ public class jIRCBot extends PircBot {
         }
     } 
     
+    /*
+     * Ok, This is going to be a bit hackish.  Current implementation
+     * requires that if we want to know if a user is on our "Auth" list
+     * we need to send the following message:
+     * ./msg nickserv info <username>
+     * 
+     * To which we get the response:
+     * -NickServ(NickServ@services.)- Information on cjdavis (account cjdavis):
+     * -NickServ(NickServ@services.)- Registered : Jun 22 00:14:39 2008 (2 years, 6 weeks, 4 days, 18:37:47 ago)
+     * -NickServ(NickServ@services.)- Last addr  : ~cjdavis@72.49.163.38
+     * -NickServ(NickServ@services.)- Last seen  : now
+     * -NickServ(NickServ@services.)- Flags      : HideMail
+     * -NickServ(NickServ@services.)- *** End of Info ***
+     * 
+     * From this we can parse some information:
+     *  - The actual account name: cjdavis
+     *  - The current account name: cjdavis
+     *  - If they are logged on.
+     *  
+     *  So. If we are going through the list of users and ask about: Paul_hive13
+     *  We get a response that tells us their real username is pvince and that
+     *  they are indeed currently logged on.
+     */
+    
+    /*
+     * With the above background on the nickServ, how can we do this?
+     * 1. Send nickserv private message
+     * 2. Set "Waiting for nickserv" flag w/ the username we asked about.
+     * 3. Wait for the flag to 
+     * While we wait on 3 here,  the code in "On Private Message"
+     * will be doing the following:
+     * 1. Check is the nickserv flag set.
+     * 1.1 Flag is set, look for the following lines:
+     *      - "Information on <nickservFlag> (account <username>):" || "<nickservFlag> is not registered"
+     *      - "Last seen   : now" || "Last seen    : Date"
+     *      - "*** End of Info ****
+     * 1.2 Wait for the "End of Info" or "not registered" flag
+     */
+    public void onPrivateMessage(String sender, String login, String hostname, String message) {
+        if(true)
+            return;
+        String username = "";
+        if(!(username = getNickServUsername()).isEmpty()) {
+            String strQueryResponseStart = "Information on " + username + " (account ";
+            String strQueryFailed = username + " is not registered.";
+            String strQueryLastSeen = "Last seen  : ";
+            String strQueryEnd = "*** End of Info ***";
+            
+            if(message.startsWith(strQueryResponseStart)) {
+                int indexStart = strQueryResponseStart.length();
+                int indexEnd = strQueryResponseStart.lastIndexOf(")");
+                setNickServUsername(message.substring(indexStart, indexEnd));
+            } else if (message.startsWith(strQueryLastSeen)) {
+                int indexStart = strQueryLastSeen.length();
+                //int indexEnd = strQueryLastSeen.lastIndexOf(")");
+                String loggedIn = message.substring(indexStart);
+                if(loggedIn.equals("now")) {
+                    setNickServLoggedIn(true);
+                } else {
+                    setNickServLoggedIn(false);
+                }
+            } else if (message.startsWith(strQueryFailed)) {
+                setNickServLoggedIn(false);
+                setNickServQueryFinished(true);
+            } else if (message.startsWith(strQueryEnd)) {
+                setNickServQueryFinished(true);
+            }
+        }
+    }
+    
+    private String nickServUsername = "";
+    private synchronized String getNickServUsername() {
+        return nickServUsername;
+    }
+    private synchronized void setNickServUsername(String username) {
+        nickServUsername = username;
+    }
+    
+    private boolean nickServLoggedIn = false;
+    private synchronized boolean isNickServLoggedIn() {
+        return nickServLoggedIn;
+    }
+    private synchronized void setNickServLoggedIn(boolean loggedIn) {
+        nickServLoggedIn = loggedIn;
+    }
+    
+    private boolean nickServQueryFinished = false;
+    private synchronized boolean isNickServQueryFinished() {
+        return nickServQueryFinished;
+    }
+    private synchronized void setNickServQueryFinished(boolean queryFinished) {
+        nickServQueryFinished = queryFinished;
+    }
+    
+    
     public boolean isUserAuthed(String username, List<String> AuthedUsers) {
-        /*
-         * Ok, This is going to be a bit hackish.  Current implementation
-         * requires that if we want to know if a user is on our "Auth" list
-         * we need to send the following message:
-         * ./msg nickserv info <username>
-         * 
-         * To which we get the response:
-         * -NickServ(NickServ@services.)- Information on cjdavis (account cjdavis):
-         * -NickServ(NickServ@services.)- Registered : Jun 22 00:14:39 2008 (2 years, 6 weeks, 4 days, 18:37:47 ago)
-         * -NickServ(NickServ@services.)- Last addr  : ~cjdavis@72.49.163.38
-         * -NickServ(NickServ@services.)- Last seen  : now
-         * -NickServ(NickServ@services.)- Flags      : HideMail
-         * -NickServ(NickServ@services.)- *** End of Info ***
-         * 
-         * From this we can parse some information:
-         *  - The actual account name: cjdavis
-         *  - The current account name: cjdavis
-         *  - If they are logged on.
-         *  
-         *  So. If we are going through the list of users and ask about: Paul_hive13
-         *  We get a response that tells us their real username is pvince and that
-         *  they are indeed currently logged on.
-         */
-        
-        /*
-         * With the above background on the nickServ, how can we do this?
-         * 1. Send nickserv private message
-         * 2. Set "Waiting for nickserv" flag w/ the username we asked about.
-         * 3. Wait for the flag to 
-         * While we wait on 3 here,  the code in "On Private Message"
-         * will be doing the following:
-         * 1. Check is the nickserv flag set.
-         * 1.1 Flag is set, look for the following lines:
-         *      - "Information on <nickservFlag> (account <username>):" || "<nickservFlag> is not registered"
-         *      - "Last seen   : now" || "Last seen    : Date"
-         *      - "*** End of Info ****
-         * 1.2 Wait for the "End of Info" or "not registered" flag
-         */
+        setNickServUsername(username);
+        sendMessage("paul_hive13", "info " + username);
+        while(!isNickServQueryFinished()) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                        ex);
+                this.log("Error: jIRCBot()" + ex.toString());
+            }
+        }
+        if(AuthedUsers.contains(getNickServUsername()))
+            return isNickServLoggedIn();
         return false;
+    }
+    
+    class userAuthQuery implements Runnable {
+
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            
+        }
+        
     }
 }

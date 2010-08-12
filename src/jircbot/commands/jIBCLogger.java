@@ -7,13 +7,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import jircbot.jIRCBot;
 import jircbot.support.jIRCTools;
 
 import org.jibble.pircbot.PircBot;
+
 
 public class jIBCLogger implements jIBCommand {
 
@@ -32,7 +36,11 @@ public class jIBCLogger implements jIBCommand {
         this.channel = channel;
         this.path = message;
         
-        new Thread(new logParser()).start();
+        List<String> authedUsers = new ArrayList<String>();
+        
+        boolean result =((jIRCBot)bot).isUserAuthed(message, authedUsers);
+        bot.sendMessage(channel, message + " is auth'ed: " + result);
+        //new Thread(new logParser()).start();
     }
     
     
