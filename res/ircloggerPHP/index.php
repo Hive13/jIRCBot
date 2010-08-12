@@ -20,12 +20,16 @@ $ircChan = mysql_real_escape_string($conf['irc_channel']);
 $ircServer = mysql_real_escape_string($conf['irc_server']);
 
 if(isSet($_REQUEST['s'])){
-    $sql = "SELECT pk_MessageID, DATE(tsMsgTime) as d, TIME(tsMsgTime) as t, vcUsername, vcMsgType, vcMessage
-              FROM messages, channel 
-             WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '".$ircChan."' AND vcServer = '".$ircServer."' AND 
-             MATCH (vcMessage)
-           AGAINST ('".addslashes($_REQUEST['s'])."')
-          ORDER BY tsMsgTime DESC, pk_MessageID DESC";
+    $sql = "SELECT pk_MessageID, DATE(tsMsgTime) as d, TIME(tsMsgTime) as t, 
+                  vcUsername, vcMsgType, vcMessage, 
+                  match(vcMessage) 
+                  AGAINST ('".addslashes($_REQUEST['s'])."' IN BOOLEAN MODE) AS rank 
+           FROM messages, channel 
+           WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '".$ircChan."' 
+                 AND vcServer='".$ircServer."' AND 
+                 MATCH(vcMessage) 
+                 AGAINST ('".addslashes($_REQUEST['s'])."' IN BOOLEAN MODE) 
+           ORDER BY rank DESC, tsMsgTime DESC, pk_MessageID DESC";
 }elseif(isSet($_REQUEST['u'])){
     $sql = "SELECT tsMsgTime
               FROM messages, channel
