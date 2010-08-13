@@ -126,7 +126,10 @@ $res = mysql_query($sql,$dbh);
 
 echo '<div class="archive">Last 30 days: ';
 while($row = mysql_fetch_array($res, MYSQL_ASSOC)){
-    echo '<a href="index.php?d='.$row['d'].'">'.$row['day'].'</a> ';
+    $archiveLink = '<a ';
+    if(isSet($_REQUEST['d']) && $_REQUEST['d'] == $row['d'])
+      $archiveLink .= 'class="current" ';
+    echo $archiveLink.'href="index.php?d='.$row['d'].'" >'.$row['day'].'</a> ';
 }
 echo '</div>';
 
