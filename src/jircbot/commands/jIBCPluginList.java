@@ -24,7 +24,9 @@ public class jIBCPluginList implements jIBCommand {
 		String resultMsg = sender + ": ";
 		Iterator<jIBCommand> i = commands.values().iterator();
 		while(i.hasNext()) {
-			resultMsg += i.next().getCommandName() + " ";
+			resultMsg += i.next().getCommandName();
+			if(i.hasNext())
+			    resultMsg += ", ";
 		}
 		bot.sendMessage(channel, resultMsg);
 	}
