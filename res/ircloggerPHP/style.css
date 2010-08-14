@@ -14,10 +14,6 @@ ul#log {
     padding: 0;
 }
 
-current {
-    color: #F00
-}
-
 ul#log li {
     clear: left;
     float: left;
