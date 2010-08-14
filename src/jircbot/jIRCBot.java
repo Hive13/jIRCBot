@@ -30,6 +30,7 @@ import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
 
 import jircbot.support.jIRCTools;
+import jircbot.support.jIRCUser;
 import jircbot.support.jIRCTools.eMsgTypes;
 
 /**
@@ -77,7 +78,7 @@ public class jIRCBot extends PircBot {
      * (kick, ban, other?) they will get stuck in the
      * userList until the bot leaves & rejoins the channel.
      */
-    private final HashMap<String, List<String>> userList;
+    private final HashMap<String, jIRCUser> userList;
     
     /**
      * @param args  the command line arguments
@@ -101,7 +102,7 @@ public class jIRCBot extends PircBot {
 
         channelList = new ArrayList<String>();
 
-        userList = new HashMap<String, List<String>>();
+        userList = new HashMap<String, jIRCUser>();
         
         authedUserList = new ArrayList<String>();
         authedUserList.add("pvince");
@@ -281,16 +282,16 @@ public class jIRCBot extends PircBot {
     public void onUserList(String channel, User[] users) {
         // TODO: This method currently has the potential to allow for duplicate channels in the list.
         for(int i = 0; i < users.length; i++) {
-            List<String> channels;
-            if((channels = userList.get(users[i].getNick())) != null) {
+            jIRCUser user;
+            if((user = userList.get(users[i].getNick())) != null) {
                 // yes! Update it.
-                channels.add(channel);
+                user.addChannel(channel);
             }
             else {
                 // no! Add it.
-                channels = new ArrayList<String>();
-                channels.add(channel);
-                userList.put(users[i].getNick(), channels);
+                user = new jIRCUser(users[i].getNick());
+                user.addChannel(channel);
+                userList.put(user.getUsername(), user);
             }
         }
     }
@@ -301,16 +302,16 @@ public class jIRCBot extends PircBot {
             // *UPDATE* This does not work... use the "OnUserList" method.
         } else {
             // This is someone else joining the channel.
-            List<String> channels;
-            if((channels = userList.get(sender)) != null) {
+            jIRCUser user;
+            if((user = userList.get(sender)) != null) {
                 // yes! Update it.
-                channels.add(channel);
+                user.addChannel(channel);
             }
             else {
                 // no! Add it.
-                channels = new ArrayList<String>();
-                channels.add(channel);
-                userList.put(sender, channels);
+                user = new jIRCUser(sender);
+                user.addChannel(channel);
+                userList.put(user.getUsername(), user);
             }
             jIRCTools.insertMessage(channel, this.getServer(), sender, "", eMsgTypes.joinMsg);
         }
@@ -321,25 +322,25 @@ public class jIRCBot extends PircBot {
         if(sender.equals(this.getName())) {
             // Yes, remove the list of users we know in this channel.
             //  ** NOTE ** This is going to be horribly in-efficient.
-            Iterator<Entry<String, List<String>>> it = userList.entrySet().iterator();
+            Iterator<Entry<String, jIRCUser>> it = userList.entrySet().iterator();
             while(it.hasNext()) {
-                Entry<String, List<String>> e = it.next();
-                List<String> chanList = e.getValue();
+                Entry<String, jIRCUser> e = it.next();
+                jIRCUser user = e.getValue();
                 // Remove any channel with the name in this list.
-                chanList.remove(channel);
+                user.removeChannel(channel);
                 
                 // If that was the only channel, remove the item.
-                if(chanList.isEmpty())
+                if(user.getChannelCount() == 0)
                     userList.remove(e.getKey());
             }
         } else {
             // No, it was someone else.
-            List<String> channels;
-            if((channels = userList.get(sender)) != null) {
-                channels.remove(channel);
+            jIRCUser user;
+            if((user = userList.get(sender)) != null) {
+                user.removeChannel(channel);
                 
                 // Was this the only channel the user as in?
-                if(channels.isEmpty())
+                if(user.getChannelCount() == 0)
                    userList.remove(sender);
             }
             jIRCTools.insertMessage(channel, this.getServer(), sender, "", eMsgTypes.partMsg);
@@ -347,9 +348,9 @@ public class jIRCBot extends PircBot {
     }
     public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
         // This could be us, but if we quit, who cares?
-        List<String> channels;
-        if((channels = userList.remove(sourceNick)) != null) {
-            Iterator<String> i = channels.iterator();
+        jIRCUser user;
+        if((user = userList.remove(sourceNick)) != null) {
+            Iterator<String> i = user.getChannelIterator();
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), sourceNick, reason, eMsgTypes.quitMsg);
             }
@@ -357,13 +358,14 @@ public class jIRCBot extends PircBot {
     }
     
     public void onNickChange(String oldNick, String login, String hostname, String newNick) {
-        List<String> channels;
-        if((channels = userList.remove(oldNick)) != null) {
-            Iterator<String> i = channels.iterator();
+        jIRCUser user;
+        if((user = userList.remove(oldNick)) != null) {
+            Iterator<String> i = user.getChannelIterator();
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), oldNick, newNick, eMsgTypes.nickChange);
             }
-            userList.put(newNick, channels);
+            user.setUsername(newNick);
+            userList.put(user.getUsername(), user);
         }
     }
 }

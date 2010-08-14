@@ -1,6 +1,7 @@
 package jircbot.support;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * This class is different from the pIRCBot's User class in that
@@ -86,10 +87,28 @@ public class jIRCUser {
      * @return  An array of channel names that the 
      *          user is known to be in.
      */
-    public String[] getChannels() {
+    public String[] getChannelArray() {
         return (String[]) _channels.values().toArray();
     }
 
+    /**
+     * Returns an iterator of the list of channels.
+     * @return  Returns an iterator of the list of channels
+     *          that we know the user is present in.
+     */
+    public Iterator<String> getChannelIterator() {
+        return _channels.values().iterator();
+    }
+    
+    /**
+     * Returns the number of channels that we know the user is
+     * present in.
+     * @return  The number of channels that we know the user is
+     *          present in.
+     */
+    public int getChannelCount() {
+        return _channels.size();
+    }
     /**
      * Returns the user's known username.
      * @return  The user's known username.
@@ -98,6 +117,13 @@ public class jIRCUser {
         return _username;
     }
 
+    /**
+     * Change the user's username.
+     * @param username  New username for this user.
+     */
+    public void setUsername(String username) {
+        this._username = username;
+    }
     /**
      * Set the user's authorization level.
      * @param authLevel The user's knew authorization
