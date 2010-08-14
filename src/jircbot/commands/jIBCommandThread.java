@@ -4,6 +4,8 @@
  */
 package jircbot.commands;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.jibble.pircbot.PircBot;
 
 /**
@@ -15,7 +17,7 @@ public abstract class jIBCommandThread implements jIBCommand, Runnable {
 
     protected PircBot bot = null;
     protected String channel = "";
-    protected boolean isRunning = true;
+    protected AtomicBoolean isRunning = null;
 
     protected long loopDelay = 1000;
     protected String commandName = "";
@@ -55,7 +57,7 @@ public abstract class jIBCommandThread implements jIBCommand, Runnable {
         this.commandName = commandName;
         this.channel = channel;
         this.loopDelay = delay;
-        this.isRunning = isRunning;
+        this.isRunning = new AtomicBoolean(isRunning);
     }
 
     /**
@@ -114,19 +116,24 @@ public abstract class jIBCommandThread implements jIBCommand, Runnable {
     }
 
     /**
-     * This method is used to check if the bot is still running.
-     * @return
+     * This method is used to check if the commandThread is still running.
+     * @return  True if the command thread is running.
      */
-    public synchronized boolean getIsRunning() {
-        return isRunning;
+    public boolean getIsRunning() {
+        // WARNING! This method is accessed from multiple threads
+        //          and therefore implements an AtomicBoolean.
+        return isRunning.get();
     }
 
     /**
      * This method safely changes the value of the isRunning private variable.
-     * @param running
+     * @param running   New internal status for the thread. True means it is
+     *                  running, false means it is stopped.
      */
-    private synchronized void setIsRunning(boolean running) {
-        isRunning = running;
+    private void setIsRunning(boolean running) {
+        // WARNING! This method is accessed from multiple threads
+        //          and therefore implements an AtomicBoolean.
+        isRunning.set(running);
     }
 
     /**
