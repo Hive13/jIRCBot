@@ -102,7 +102,7 @@ if($sql) while($row = mysql_fetch_array($res, MYSQL_ASSOC)){
         $listItem .= '</span></li>';
     } else if($row['vcMsgType'] == 'nickChange') {
         $listItem = '<b>*</b><span class="server">';
-        $listItem .= htmlspecialchars($row['vcUsername']).' changed their nick to'.htmlspecialchars($row['vcMessage']).'.';
+        $listItem .= htmlspecialchars($row['vcUsername']).' changed their nick to '.htmlspecialchars($row['vcMessage']).'.';
         $listItem .= '</span></li>';
     } else{
         $listItem = '<b>*</b><span class="server">';
