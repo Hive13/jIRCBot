@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,7 +80,18 @@ public class jIRCBot extends PircBot {
      * (kick, ban, other?) they will get stuck in the
      * userList until the bot leaves & rejoins the channel.
      */
+    
+    /*         !!!!!!!!! WARNING !!!!!!!!!!!!!!
+     * The userList is accessed from multiple threads
+     * simultateously.  ONLY access it through aproved
+     * safe methods.  If you need to access a function
+     * that is not exposed through the one of these
+     * functions, you may write a new one using the
+     * userListMutex to ensure that only one thread is 
+     * actively accessing the userList.
+     */
     private final HashMap<String, jIRCUser> userList;
+    private Semaphore userListMutex;
     
     /**
      * @param args  the command line arguments
@@ -103,6 +116,7 @@ public class jIRCBot extends PircBot {
         channelList = new ArrayList<String>();
 
         userList = new HashMap<String, jIRCUser>();
+        userListMutex = new Semaphore(1);
         
         authedUserList = new ArrayList<String>();
         authedUserList.add("pvince");
@@ -197,23 +211,6 @@ public class jIRCBot extends PircBot {
         }
     }
 
-    /**
-     * Adds a command to the list of known commands.
-     * @param cmd   Command to add to the command list.
-     */
-    public void addCommand(jIBCommand cmd) {
-        commands.put(cmd.getCommandName(), cmd);
-    }
-
-    /**
-     * Adds a commandThread to the list of known commands.
-     * @param cmd   CommandThread to add to the command list.
-     */
-    public void addCommandThread(jIBCommandThread cmd) {
-        commands.put(cmd.getCommandName(), cmd);
-        new Thread(cmd).start();
-    }
-
     public void onMessage(String channel, String sender, String login,
             String hostname, String message) {
         jIRCTools.insertMessage(channel, this.getServer(), sender, message, eMsgTypes.publicMsg);
@@ -283,7 +280,7 @@ public class jIRCBot extends PircBot {
         // TODO: This method currently has the potential to allow for duplicate channels in the list.
         for(int i = 0; i < users.length; i++) {
             jIRCUser user;
-            if((user = userList.get(users[i].getNick())) != null) {
+            if((user = userListGet(users[i].getNick())) != null) {
                 // yes! Update it.
                 user.addChannel(channel);
             }
@@ -291,7 +288,7 @@ public class jIRCBot extends PircBot {
                 // no! Add it.
                 user = new jIRCUser(users[i].getNick());
                 user.addChannel(channel);
-                userList.put(user.getUsername(), user);
+                userListPut(user);
             }
         }
     }
@@ -303,7 +300,7 @@ public class jIRCBot extends PircBot {
         } else {
             // This is someone else joining the channel.
             jIRCUser user;
-            if((user = userList.get(sender)) != null) {
+            if((user = userListGet(sender)) != null) {
                 // yes! Update it.
                 user.addChannel(channel);
             }
@@ -311,7 +308,7 @@ public class jIRCBot extends PircBot {
                 // no! Add it.
                 user = new jIRCUser(sender);
                 user.addChannel(channel);
-                userList.put(user.getUsername(), user);
+                userListPut(user);
             }
             jIRCTools.insertMessage(channel, this.getServer(), sender, "", eMsgTypes.joinMsg);
         }
@@ -322,7 +319,12 @@ public class jIRCBot extends PircBot {
         if(sender.equals(this.getName())) {
             // Yes, remove the list of users we know in this channel.
             //  ** NOTE ** This is going to be horribly in-efficient.
-            Iterator<Entry<String, jIRCUser>> it = userList.entrySet().iterator();
+            //             We need to get each user, then go through
+            //             each user's list of channels and remove the
+            //             channel from that list.
+            //             So I think that makes this take about n^x where we
+            //             we have n users and x channels.
+            Iterator<Entry<String, jIRCUser>> it = userListEntrySet().iterator();
             while(it.hasNext()) {
                 Entry<String, jIRCUser> e = it.next();
                 jIRCUser user = e.getValue();
@@ -331,17 +333,17 @@ public class jIRCBot extends PircBot {
                 
                 // If that was the only channel, remove the item.
                 if(user.getChannelCount() == 0)
-                    userList.remove(e.getKey());
+                    userListRemove(e.getKey());
             }
         } else {
             // No, it was someone else.
             jIRCUser user;
-            if((user = userList.get(sender)) != null) {
+            if((user = userListGet(sender)) != null) {
                 user.removeChannel(channel);
                 
                 // Was this the only channel the user as in?
                 if(user.getChannelCount() == 0)
-                   userList.remove(sender);
+                   userListRemove(sender);
             }
             jIRCTools.insertMessage(channel, this.getServer(), sender, "", eMsgTypes.partMsg);
         }
@@ -349,7 +351,7 @@ public class jIRCBot extends PircBot {
     public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
         // This could be us, but if we quit, who cares?
         jIRCUser user;
-        if((user = userList.remove(sourceNick)) != null) {
+        if((user = userListRemove(sourceNick)) != null) {
             Iterator<String> i = user.getChannelIterator();
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), sourceNick, reason, eMsgTypes.quitMsg);
@@ -359,13 +361,129 @@ public class jIRCBot extends PircBot {
     
     public void onNickChange(String oldNick, String login, String hostname, String newNick) {
         jIRCUser user;
-        if((user = userList.remove(oldNick)) != null) {
+        if((user = userListRemove(oldNick)) != null) {
             Iterator<String> i = user.getChannelIterator();
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), oldNick, newNick, eMsgTypes.nickChange);
             }
             user.setUsername(newNick);
-            userList.put(user.getUsername(), user);
+            userListPut(user);
         }
+    }
+    
+    /* Ok, time to look into how to authorize users again.
+     * Here is the basic sequence of steps that need to occur:
+     * 1. Send "info <Username>" message to 'nickserv' user.
+     * 2. Parse returned response from 'nickserv' user to determine if the user is indeed authorized.
+     * 
+     * Perhaps best to try to do the 'Auth' requests as users are created, then just act as if the requests
+     * have gone through?
+     * 
+     * This presents the potential that multiple threads will be accessing and mutating the 'userList' variable.
+     * This may require that I encapsulate accessor & mutator methods for it.
+     */
+    
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    // Utility functions for member variables.
+    /**
+     * Adds a command to the list of known commands.
+     * @param cmd   Command to add to the command list.
+     */
+    public void addCommand(jIBCommand cmd) {
+        commands.put(cmd.getCommandName(), cmd);
+    }
+
+    /**
+     * Adds a commandThread to the list of known commands.
+     * @param cmd   CommandThread to add to the command list.
+     */
+    public void addCommandThread(jIBCommandThread cmd) {
+        commands.put(cmd.getCommandName(), cmd);
+        new Thread(cmd).start();
+    }
+    
+    
+
+    /**
+     * Safely returns the jIRCUser associated with the passed
+     * in username from the userList.
+     * 
+     * @param username  Key for the userList variable.
+     * @return          The jIRCUser associated with the passed
+     *                  in username.
+     */
+    public jIRCUser userListGet(String username) {
+        jIRCUser result = null;
+        try {
+            userListMutex.acquire();
+            result = userList.get(username);
+        } catch (InterruptedException e) {
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                    e);
+            e.printStackTrace();
+        } finally {
+            userListMutex.release();
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Safely adds the passed in user to the userList.
+     * @param user  jIRCUser to add to the userList.
+     */
+    public void userListPut(jIRCUser user) {
+        try {
+            userListMutex.acquire();
+            userList.put(user.getUsername(), user);
+        } catch (InterruptedException e) {
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                    e);
+            e.printStackTrace();
+        } finally {
+            userListMutex.release();
+        }
+    }
+    
+    /**
+     * Safely wraps the userList.remove(String) method.
+     * 
+     * @param username  Username of the user to remove.
+     * @return          The removed jIRCUser.
+     */
+    public jIRCUser userListRemove(String username) {
+        jIRCUser result = null;
+        try {
+            userListMutex.acquire();
+            result = userList.remove(username);
+        } catch (InterruptedException e) {
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                    e);
+            e.printStackTrace();
+        } finally {
+            userListMutex.release();
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Safely wraps the userList.EntrySet() method.
+     * 
+     * @return  The set of Keys & entries for userList.
+     */
+    public Set<Entry<String, jIRCUser>> userListEntrySet() {
+        Set<Entry<String, jIRCUser>> result = null;
+        try {
+            userListMutex.acquire();
+            result = userList.entrySet();
+        } catch (InterruptedException e) {
+            Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+                    e);
+            e.printStackTrace();
+        } finally {
+            userListMutex.release();
+        }
+        return result;
     }
 }
