@@ -83,7 +83,7 @@ public class jIRCBot extends PircBot {
     
     /*         !!!!!!!!! WARNING !!!!!!!!!!!!!!
      * The userList is accessed from multiple threads
-     * simultateously.  ONLY access it through aproved
+     * Simultaneously.  ONLY access it through approved
      * safe methods.  If you need to access a function
      * that is not exposed through the one of these
      * functions, you may write a new one using the
@@ -382,7 +382,15 @@ public class jIRCBot extends PircBot {
      * This presents the potential that multiple threads will be accessing and mutating the 'userList' variable.
      * This may require that I encapsulate accessor & mutator methods for it.
      */
-    
+    public void startAuthForUser(jIRCUser user) {
+        this.sendMessage("paul_hive13", "info " + user.getUsername());
+    }
+    public void onPrivateMessage(String sender, String login, String hostname, String message) {
+        /* Ok, this is going to be interesting, and I think in retrospect all of that work
+         * I did to make sure that userList was thread safe might have been a waste of time.
+         * 
+         */
+    }
     // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     // Utility functions for member variables.
     /**
@@ -444,7 +452,7 @@ public class jIRCBot extends PircBot {
             userListMutex.release();
         }
     }
-    
+
     /**
      * Safely wraps the userList.remove(String) method.
      * 
