@@ -23,8 +23,8 @@ import jircbot.commands.jIBCPluginList;
 import jircbot.commands.jIBCTRssReader;
 import jircbot.commands.jIBCommand;
 import jircbot.commands.jIBCommandThread;
-import jircbot.commands.jIBQuitCmd;
-import jircbot.commands.jIBTimeCmd;
+import jircbot.commands.jIBCQuitCmd;
+import jircbot.commands.jIBCTimeCmd;
 
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
@@ -155,8 +155,8 @@ public class jIRCBot extends PircBot {
         setVerbose(true);
 
         // Add all commands
-        addCommand(new jIBTimeCmd());
-        addCommand(new jIBQuitCmd());
+        addCommand(new jIBCTimeCmd());
+        addCommand(new jIBCQuitCmd());
         addCommand(new jIBCPluginList(commands));
         addCommand(new jIBCLogger());
 

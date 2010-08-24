@@ -14,9 +14,9 @@ import org.jibble.pircbot.PircBot;
  *
  * @author AMcBain ( http://www.asmcbain.net/ ) @ 2009
  */
-public class jIBTimeCmd implements jIBCommand {
+public class jIBCTimeCmd implements jIBCommand {
 
-    public jIBTimeCmd() {
+    public jIBCTimeCmd() {
     }
 
     public String getCommandName() {
