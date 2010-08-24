@@ -178,4 +178,22 @@ public class jIBCTRssReader extends jIBCommandThread {
             return pubDateCompare;
         }
     }
+
+	@Override
+	public void handleMessage(PircBot bot, String channel, String sender,
+			String message) {
+		if (this.getIsRunning())
+			this.stop();
+        else
+            /*
+             * We are just restarting the previously stopped command.
+             * But was it actually stopped? This is a curious method. We
+             * are certainly not referencing a new command, but it was
+             * running in an infinite while loop, when stop() is called,
+             * we set a boolean to false, which kills the while loop,
+             * but the member variables will still be the same as when
+             * the commandThread was first initialized.
+             */
+            new Thread(this).start();
+	}
 }
