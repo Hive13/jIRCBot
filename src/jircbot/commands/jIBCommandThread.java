@@ -59,14 +59,7 @@ public abstract class jIBCommandThread implements jIBCommand, Runnable {
         this.loopDelay = delay;
         this.isRunning = new AtomicBoolean(isRunning);
     }
-
-    /**
-     * This command type is not made for handling messages.
-     */
-    public void handleMessage(PircBot bot, String channel, String sender, String message) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    
     /**
      * This is a wrapper for the bot.sendMessage command.  It automatically sends any
      * messages to the correct channel.  It also acts as a way to prevent the command

@@ -219,32 +219,14 @@ public class jIRCBot extends PircBot {
             message = message.replace(prefix, "");
 
             jIBCommand cmd;
-            // Check to see if it is a standard command.
+            // Check to see if it is a known standard command.
             String[] sCmd = message.split(" ", 2);
-            if ((cmd = commands.get(sCmd[0])) != null)
+            if ((cmd = commands.get(sCmd[0])) != null ||
+        		(cmd = commands.get(sCmd[0] + channel)) != null)
                 if(sCmd.length == 2)
                     cmd.handleMessage(this, channel, sender, sCmd[1].trim());
                 else
                     cmd.handleMessage(this, channel, sender, "");
-                    
-            // It was not a standard command, is it for a threaded one?
-            else if ((cmd = commands.get(sCmd[0] + channel)) != null) {
-                jIBCommandThread cmdT = (jIBCommandThread) cmd;
-                if (cmdT.getIsRunning())
-                    cmdT.stop();
-                else
-                    /*
-                     * We are just restarting the previously stopped command.
-                     * But was it actually stopped? This is a curious method. We
-                     * are certainly not referencing a new command, but it was
-                     * running in an infinite while loop, when stop() is called,
-                     * we set a boolean to false, which kills the while loop,
-                     * but the member variables will still be the same as when
-                     * the commandThread was initialized.
-                     */
-                    new Thread(cmdT).start();
-
-            }
         }
     }
 
