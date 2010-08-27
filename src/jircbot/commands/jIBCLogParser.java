@@ -13,7 +13,7 @@ import java.util.Locale;
 
 import jircbot.support.jIRCTools;
 
-public class jIBCLogger extends jIBCommand {
+public class jIBCLogParser extends jIBCommand {
 
     @Override
     public String getCommandName() {
@@ -50,8 +50,10 @@ public class jIBCLogger extends jIBCommand {
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            result = false;
         } catch (IOException e) {
             e.printStackTrace();
+            result = false;
         } finally {
             try {
                 if (reader != null) {
