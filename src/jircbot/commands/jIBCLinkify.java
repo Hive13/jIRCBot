@@ -7,6 +7,7 @@ import jircbot.support.jIRCTools;
 
 public class jIBCLinkify extends jIBCommand {
 
+	public final int MAX_URL_LENGTH = 25;
     @Override
     public String getCommandName() {
         return "Linkify";
@@ -21,9 +22,12 @@ public class jIBCLinkify extends jIBCommand {
 
         String returnMsg = "";
         while (m.find()) {
-            String shortURL = jIRCTools.generateShortURL(m.group());
-            String urlTitle = jIRCTools.getShortURLTitle(shortURL);
-            returnMsg += urlTitle + " [ " + shortURL + " ]; ";
+        	String url = "";
+        	if((url = m.group()).length() > MAX_URL_LENGTH) {
+	            String shortURL = jIRCTools.generateShortURL(url);
+	            String urlTitle = jIRCTools.getShortURLTitle(shortURL);
+	            returnMsg += urlTitle + " [ " + shortURL + " ]; ";
+        	}
         }
         
         if(!returnMsg.isEmpty()) {
