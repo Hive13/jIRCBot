@@ -72,6 +72,34 @@ public class jIRCTools {
 	}
 	
 	/**
+	 * Calls on the Bit.ly API to find the title of an already shortened
+	 * URL. Make sure that the bitlyName and bitlyAPIKey are specified
+     * before calling this method.
+	 * 
+	 * @param shortURL An already shortened Bit.ly URL.
+	 * @return         Returns the title of the page the Bit.ly URL links too.
+	 */
+	public static String getShortURLTitle(String shortURL) {
+	    return getShortURLTitle(shortURL, bitlyName, bitlyAPIKey);
+	}
+	
+	/**
+	 * Calls on the Bit.ly API to find the title of an already shortened
+     * URL.
+     * 
+	 * @param shortURL An already shortened Bit.ly URL.
+	 * @param username The Bit.ly username to use.
+	 * @param apikey   Bit.ly APIKey associated w/ the username.
+	 * @return         Returns the title of the page the Bit.ly URL links too.
+	 */
+	public static String getShortURLTitle(String shortURL, String username, String apikey) {
+	    String result = "Username or API key are not initialized";
+        if(bitlyName.length() > 0 && bitlyAPIKey.length() > 0)
+            result = as(username, apikey).call(info(shortURL)).getTitle();
+	    return result;
+	}
+	
+	/**
      * Inserts a new message into the "messages" table of the
      * attached MySQL database.
      * 

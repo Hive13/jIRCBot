@@ -1,10 +1,9 @@
 package jircbot.commands;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import jircbot.support.jIRCTools;
 
 public class jIBCLinkify extends jIBCommand {
 
@@ -19,16 +18,20 @@ public class jIBCLinkify extends jIBCommand {
         String regex = "(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\[\\]\\(\\)\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\[\\]\\(\\)\\w\\-\\@?^=%&amp;/~\\+#])";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(message);
-        ArrayList<URL> foundURLs = new ArrayList<URL>();
+
+        String returnMsg = "";
         while (m.find()) {
-            try {
-                foundURLs.add(new URL(m.group()));
-                
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            String shortURL = jIRCTools.generateShortURL(m.group());
+            String urlTitle = jIRCTools.getShortURLTitle(shortURL);
+            returnMsg += urlTitle + " [ " + shortURL + " ]; ";
         }
         
+        if(!returnMsg.isEmpty()) {
+            // Remove the last ';' character
+            returnMsg = returnMsg.substring(0, returnMsg.length()-2);
+            bot.sendMessage(channel, returnMsg);
+        }
+
     }
 
 }
