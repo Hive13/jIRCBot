@@ -21,7 +21,11 @@ import org.jibble.pircbot.PircBot;
  *
  * @author AMcBain ( http://www.asmcbain.net/ ) @ 2009
  */
-public abstract class jIBCommand {
+public abstract class jIBCommand implements Runnable {
+    protected PircBot bot;
+    protected String channel;
+    protected String sender;
+    protected String message;
 
     /**
      * Each BotCommand implementor will return the command name to which they respond.
@@ -35,6 +39,13 @@ public abstract class jIBCommand {
      * @param sender    The initiator of the message we are handling.
      * @param message   The message that we are handling.
      */
-    public abstract void handleMessage(PircBot bot, String channel, String sender, String message);
-
+    public void handleMessage(PircBot bot, String channel, String sender, String message) {
+        this.bot = bot;
+        this.channel = channel;
+        this.sender = sender;
+        this.message = message;
+        new Thread(this).start();
+    }
+    
+    public abstract void run();
 }
