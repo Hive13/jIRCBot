@@ -53,7 +53,7 @@ public class jIRCBot extends PircBot {
      *      - tC implementation
      */
     private final HashMap<String, jIBCommand> commands;
-    private final ArrayList<jIBCommand> generalCommands;
+    private final ArrayList<jIBCommand> lineParseCommands;
 
     // The character which tells the bot we're talking to it and not
     // anyone/anything else.
@@ -115,7 +115,7 @@ public class jIRCBot extends PircBot {
         // Initialize lists
         commands = new HashMap<String, jIBCommand>();
 
-        generalCommands = new ArrayList<jIBCommand>();
+        lineParseCommands = new ArrayList<jIBCommand>();
         
         channelList = new ArrayList<String>();
 
@@ -158,9 +158,12 @@ public class jIRCBot extends PircBot {
         // Make it so that the bot outputs lots of information when run.
         setVerbose(true);
 
-        generalCommands.add(new jIBCTTell());
+        // Add commands that parse every single line
+        // WARNING!! Be sparing with these commands
+        //           their code should be run asynchronously
+        addLineParseCommand(new jIBCTTell());
         
-        // Add all commands
+        // Add passive commands
         addCommand(new jIBCTimeCmd());
         addCommand(new jIBCQuitCmd());
         addCommand(new jIBCPluginList(commands));
@@ -236,7 +239,7 @@ public class jIRCBot extends PircBot {
         }
         
         // Run the commands that run with every message
-        Iterator<jIBCommand> i = generalCommands.iterator();
+        Iterator<jIBCommand> i = lineParseCommands.iterator();
         while(i.hasNext()) {
             i.next().handleMessage(this, channel, sender, message);
         }
@@ -404,7 +407,13 @@ public class jIRCBot extends PircBot {
         new Thread(cmd).start();
     }
     
-    
+    /**
+     * Adds a command that parses each line received.
+     * @param cmd   Command to add to the line parsing command.
+     */
+    public void addLineParseCommand(jIBCommand cmd) {
+        lineParseCommands.add(cmd);
+    }
 
     /**
      * Safely returns the jIRCUser associated with the passed
