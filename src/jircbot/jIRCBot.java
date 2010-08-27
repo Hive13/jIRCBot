@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jircbot.commands.jIBCLinkify;
-import jircbot.commands.jIBCLogger;
+import jircbot.commands.jIBCLogParser;
 import jircbot.commands.jIBCPluginList;
 import jircbot.commands.jIBCTRssReader;
 import jircbot.commands.jIBCTTell;
@@ -169,7 +169,7 @@ public class jIRCBot extends PircBot {
         addCommand(new jIBCTimeCmd());
         addCommand(new jIBCQuitCmd());
         addCommand(new jIBCPluginList(commands));
-        addCommand(new jIBCLogger());
+        addCommand(new jIBCLogParser());
 
         try {
             // Add all command threads.
