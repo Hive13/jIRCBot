@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import jircbot.commands.jIBCLogger;
 import jircbot.commands.jIBCPluginList;
 import jircbot.commands.jIBCTRssReader;
+import jircbot.commands.jIBCTTell;
 import jircbot.commands.jIBCommand;
 import jircbot.commands.jIBCommandThread;
 import jircbot.commands.jIBCQuitCmd;
@@ -52,6 +53,7 @@ public class jIRCBot extends PircBot {
      *      - tC implementation
      */
     private final HashMap<String, jIBCommand> commands;
+    private final ArrayList<jIBCommand> generalCommands;
 
     // The character which tells the bot we're talking to it and not
     // anyone/anything else.
@@ -113,6 +115,8 @@ public class jIRCBot extends PircBot {
         // Initialize lists
         commands = new HashMap<String, jIBCommand>();
 
+        generalCommands = new ArrayList<jIBCommand>();
+        
         channelList = new ArrayList<String>();
 
         userList = new HashMap<String, jIRCUser>();
@@ -154,6 +158,8 @@ public class jIRCBot extends PircBot {
         // Make it so that the bot outputs lots of information when run.
         setVerbose(true);
 
+        generalCommands.add(new jIBCTTell());
+        
         // Add all commands
         addCommand(new jIBCTimeCmd());
         addCommand(new jIBCQuitCmd());
@@ -227,6 +233,12 @@ public class jIRCBot extends PircBot {
                     cmd.handleMessage(this, channel, sender, sCmd[1].trim());
                 else
                     cmd.handleMessage(this, channel, sender, "");
+        }
+        
+        // Run the commands that run with every message
+        Iterator<jIBCommand> i = generalCommands.iterator();
+        while(i.hasNext()) {
+            i.next().handleMessage(this, channel, sender, message);
         }
     }
 
