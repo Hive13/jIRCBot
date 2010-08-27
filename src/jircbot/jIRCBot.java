@@ -18,6 +18,7 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jircbot.commands.jIBCLinkify;
 import jircbot.commands.jIBCLogger;
 import jircbot.commands.jIBCPluginList;
 import jircbot.commands.jIBCTRssReader;
@@ -162,6 +163,7 @@ public class jIRCBot extends PircBot {
         // WARNING!! Be sparing with these commands
         //           their code should be run asynchronously
         addLineParseCommand(new jIBCTTell());
+        addLineParseCommand(new jIBCLinkify());
         
         // Add passive commands
         addCommand(new jIBCTimeCmd());
