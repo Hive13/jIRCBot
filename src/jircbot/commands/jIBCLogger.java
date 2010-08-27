@@ -16,7 +16,7 @@ import jircbot.support.jIRCTools;
 import org.jibble.pircbot.PircBot;
 
 
-public class jIBCLogger implements jIBCommand {
+public class jIBCLogger extends jIBCommand {
 
     @Override
     public String getCommandName() {

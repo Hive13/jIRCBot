@@ -11,7 +11,7 @@ import org.jibble.pircbot.PircBot;
  *
  * @author vincenpt
  */
-public class jIBCQuitCmd implements jIBCommand{
+public class jIBCQuitCmd extends jIBCommand{
 
     public String getCommandName() {
         return "quit";
