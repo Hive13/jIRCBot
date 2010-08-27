@@ -21,12 +21,12 @@ import org.jibble.pircbot.PircBot;
  *
  * @author AMcBain ( http://www.asmcbain.net/ ) @ 2009
  */
-public interface jIBCommand {
+public abstract class jIBCommand {
 
     /**
      * Each BotCommand implementor will return the command name to which they respond.
      */
-    public String getCommandName();
+    public abstract String getCommandName();
 
     /** 
      * The method where each BotCommand implementor will handle the event
@@ -35,5 +35,6 @@ public interface jIBCommand {
      * @param sender    The initiator of the message we are handling.
      * @param message   The message that we are handling.
      */
-    public void handleMessage(PircBot bot, String channel, String sender, String message);
+    public abstract void handleMessage(PircBot bot, String channel, String sender, String message);
+
 }

@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import org.jibble.pircbot.PircBot;
 
-public class jIBCPluginList implements jIBCommand {
+public class jIBCPluginList extends jIBCommand {
 
 	private HashMap<String, jIBCommand> commands;
 	

@@ -13,7 +13,7 @@ import org.jibble.pircbot.PircBot;
  * that run in the background and can react to externally generated events.
  * @author vincenpt
  */
-public abstract class jIBCommandThread implements jIBCommand, Runnable {
+public abstract class jIBCommandThread extends jIBCommand implements Runnable {
 
     protected PircBot bot = null;
     protected String channel = "";
