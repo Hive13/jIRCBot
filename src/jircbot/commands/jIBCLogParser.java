@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import org.jibble.pircbot.PircBot;
+
 import jircbot.support.jIRCTools;
 
 public class jIBCLogParser extends jIBCommand {
@@ -20,7 +22,7 @@ public class jIBCLogParser extends jIBCommand {
         return "logParser";
     }
 
-    public void run() {
+    public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
         bot.sendMessage(channel, "Starting to parse log...");
         boolean result = translateLogToSQL(message);
         if (result)

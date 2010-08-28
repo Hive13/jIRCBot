@@ -225,7 +225,7 @@ public class jIRCBot extends PircBot {
     public void onMessage(String channel, String sender, String login,
             String hostname, String message) {
         jIRCTools.insertMessage(channel, this.getServer(), sender, message, eMsgTypes.publicMsg);
-        // Find out if the message was for this bot
+        // Find out if the message was directed as a command.
         if (message.startsWith(prefix)) {
             message = message.replace(prefix, "");
 
@@ -240,7 +240,13 @@ public class jIRCBot extends PircBot {
                     cmd.handleMessage(this, channel, sender, "");
         }
         
-        // Run the commands that run with every message
+        /* Run the commands that run with every message
+         * It is especially important to make sure that these
+         * commands are thread safe.  All commands are run
+         * as new threads, however these commands have a greater
+         * potential to still be running if several messages
+         * come in fast.
+         */
         Iterator<jIBCommand> i = lineParseCommands.iterator();
         while(i.hasNext()) {
             i.next().handleMessage(this, channel, sender, message);

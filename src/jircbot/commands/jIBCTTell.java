@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.jibble.pircbot.PircBot;
+
 public class jIBCTTell extends jIBCommand {
 
 	private final int MAX_MSG_QUEUE = 25;
@@ -29,7 +31,7 @@ public class jIBCTTell extends jIBCommand {
 	}
 
     @Override
-    public void run() {
+    public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
     	sender = sender.toLowerCase();
         String[] splitMsg = message.split(" ", 3);
         if(splitMsg[0].equals(getCommandName())) {

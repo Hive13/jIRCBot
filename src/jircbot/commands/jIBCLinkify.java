@@ -3,6 +3,8 @@ package jircbot.commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jibble.pircbot.PircBot;
+
 import jircbot.support.jIRCTools;
 
 public class jIBCLinkify extends jIBCommand {
@@ -19,7 +21,7 @@ public class jIBCLinkify extends jIBCommand {
     }
 
     @Override
-    public void run() {
+    public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
         // (http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\[\]\(\)\w\-\.,@?^=%&amp;:/~\+#]*[\[\]\(\)\w\-\@?^=%&amp;/~\+#])
         String regex = "(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\[\\]\\(\\)\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\[\\]\\(\\)\\w\\-\\@?^=%&amp;/~\\+#])";
         Pattern p = Pattern.compile(regex);

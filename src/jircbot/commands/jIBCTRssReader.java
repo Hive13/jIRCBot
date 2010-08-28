@@ -67,11 +67,11 @@ public class jIBCTRssReader extends jIBCommandThread {
 
             /* Google Groups RSS Feed was giving me 403, here is why:
              * Hi Dinesh,
-                You can set User-Agent of your http request to any of the bot’s user-agent 
+                You can set User-Agent of your http request to any of the botï¿½s user-agent 
                 so that Google treat it as a bot. To change the user agent of request use 
                 XmlReader(java.net.URLConnection conn) constructor of XmlReader class. 
                 Pass the conn object which has the user agent set to proper value.
-                conn.setRequestProperty(”User-Agent”,”whateveryouwant”);
+                conn.setRequestProperty(ï¿½User-Agentï¿½,ï¿½whateveryouwantï¿½);
                 
                 Also, check this out:
                 http://www.java2s.com/Code/Java/Network-Protocol/UsingURLConnection.htm
@@ -180,8 +180,7 @@ public class jIBCTRssReader extends jIBCommandThread {
     }
 
 	@Override
-	public void handleMessage(PircBot bot, String channel, String sender,
-			String message) {
+	public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
 		if (this.getIsRunning())
 			this.stop();
         else
