@@ -5,12 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
-/*
- * This is an interesting thought that I just had.  I do not think any of our
- * commands NEED to by run synchronously, why not just have a "CommandLauncher"
- * class or something similar so that longer running commands do not lock
- * up the processes but are instead launched off in their own threads.
- */
 public class jIBCTTell extends jIBCommand {
 
 	private final int MAX_MSG_QUEUE = 25;
@@ -36,6 +30,7 @@ public class jIBCTTell extends jIBCommand {
 
     @Override
     public void run() {
+    	sender = sender.toLowerCase();
         String[] splitMsg = message.split(" ", 3);
         if(splitMsg[0].equals(getCommandName())) {
             if(splitMsg.length == 3) {
