@@ -232,8 +232,8 @@ public class jIRCBot extends PircBot {
             jIBCommand cmd;
             // Check to see if it is a known standard command.
             String[] sCmd = message.split(" ", 2);
-            if ((cmd = commands.get(sCmd[0])) != null ||
-        		(cmd = commands.get(sCmd[0] + channel)) != null)
+            if ((cmd = commands.get(sCmd[0].toLowerCase())) != null ||
+        		(cmd = commands.get(sCmd[0].toLowerCase() + channel)) != null)
                 if(sCmd.length == 2)
                     cmd.handleMessage(this, channel, sender, sCmd[1].trim());
                 else
@@ -397,7 +397,7 @@ public class jIRCBot extends PircBot {
      * @param cmd   Command to add to the command list.
      */
     public void addCommand(jIBCommand cmd) {
-        commands.put(cmd.getCommandName(), cmd);
+        commands.put(cmd.getCommandName().toLowerCase(), cmd);
     }
 
     /**
@@ -405,7 +405,7 @@ public class jIRCBot extends PircBot {
      * @param cmd   CommandThread to add to the command list.
      */
     public void addCommandThread(jIBCommandThread cmd) {
-        commands.put(cmd.getCommandName(), cmd);
+        commands.put(cmd.getCommandName().toLowerCase(), cmd);
         new Thread(cmd).start();
     }
     
