@@ -32,7 +32,6 @@ public class jIBCTTell extends jIBCommand {
 
     @Override
     public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
-    	sender = sender.toLowerCase();
         String[] splitMsg = message.split(" ", 3);
         if(splitMsg[0].equals(getCommandName())) {
             if(splitMsg.length == 3) {
@@ -41,7 +40,7 @@ public class jIBCTTell extends jIBCommand {
                 ArrayList<storedMsg> msglist;
                 if((msglist = msgMap.get(splitMsg[1])) == null) {
                     msglist = new ArrayList<storedMsg>();
-                    msgMap.put(splitMsg[1], msglist);
+                    msgMap.put(splitMsg[1].toLowerCase(), msglist);
                 }
                 if(msglist.size() <= MAX_MSG_QUEUE) {
                     msglist.add(new storedMsg(new Date(), splitMsg[2], sender));
@@ -58,7 +57,7 @@ public class jIBCTTell extends jIBCommand {
         }
         // Now we need to check to see if sender has any waiting messages.
         ArrayList<storedMsg> msgList;
-        if((msgList = msgMap.remove(sender)) != null) {
+        if((msgList = msgMap.remove(sender.toLowerCase())) != null) {
             Iterator<storedMsg> i = msgList.iterator();
             while(i.hasNext()) {
                 storedMsg curMsg = i.next();
