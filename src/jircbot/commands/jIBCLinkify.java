@@ -1,5 +1,6 @@
 package jircbot.commands;
 
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,17 +34,17 @@ public class jIBCLinkify extends jIBCommand {
         	if((url = m.group()).length() > MAX_URL_LENGTH) {
 	            String shortURL = jIRCTools.generateShortURL(url);
 	            String urlTitle;
-	            int sleepCount = 0;
 	            // The title is not retrieved by bit.ly immediately, we can optionally
 	            // move on, likely without the title, or we can repeatedly try
 	            // until we get a response or timeout.
+	            Date start = new Date();
+	            long duration = 0;
 	            while((urlTitle = jIRCTools.getShortURLTitle(shortURL)).isEmpty()
-	            		&& WAIT_FOR_TITLE && (sleepCount*200) < WAIT_FOR_TITLE_TIMEOUT) {
+	            		&& WAIT_FOR_TITLE && duration < WAIT_FOR_TITLE_TIMEOUT) {
 	            	try {
 						Thread.sleep(200);
-						if(sleepCount % 5 == 0)
-							bot.log("Waiting for URL title [ " + sleepCount*200 + " ms ]");
-						sleepCount += 1;
+						duration = (new Date()).getTime() - start.getTime();
+						bot.log("Waiting for URL title [ " + duration + " ms ]");
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
