@@ -22,12 +22,44 @@ import org.jibble.pircbot.PircBot;
  * @author AMcBain ( http://www.asmcbain.net/ ) @ 2009
  */
 public abstract class jIBCommand implements Runnable {
-    protected PircBot bot;
-    protected String channel;
-    protected String sender;
-    protected String message;
+    private PircBot _bot;
+    private String _channel;
+    private String _sender;
+    private String _message;
 
-    /**
+    public synchronized PircBot getBot() {
+		return _bot;
+	}
+
+	public synchronized void setBot(PircBot bot) {
+		this._bot = bot;
+	}
+
+	public synchronized String getChannel() {
+		return _channel;
+	}
+
+	public synchronized void setChannel(String channel) {
+		this._channel = channel;
+	}
+
+	public synchronized String getSender() {
+		return _sender;
+	}
+
+	public synchronized void setSender(String sender) {
+		this._sender = sender;
+	}
+
+	public synchronized String getMessage() {
+		return _message;
+	}
+
+	public synchronized void setMessage(String message) {
+		this._message = message;
+	}
+
+	/**
      * Each BotCommand implementor will return the command name to which they respond.
      */
     public abstract String getCommandName();
@@ -40,12 +72,16 @@ public abstract class jIBCommand implements Runnable {
      * @param message   The message that we are handling.
      */
     public void handleMessage(PircBot bot, String channel, String sender, String message) {
-        this.bot = bot;
-        this.channel = channel;
-        this.sender = sender;
-        this.message = message;
+    	setBot(bot);
+    	setChannel(channel);
+    	setSender(sender);
+    	setMessage(message);
         new Thread(this).start();
     }
     
-    public abstract void run();
+    public void run() {
+    	runHandleMessage(getBot(), getChannel(), getSender(), getMessage());
+    }
+    
+    public abstract void runHandleMessage(PircBot bot, String channel, String sender, String message);
 }

@@ -5,6 +5,8 @@
 
 package jircbot.commands;
 
+import org.jibble.pircbot.PircBot;
+
 /**
  *
  * @author vincenpt
@@ -16,7 +18,7 @@ public class jIBCQuitCmd extends jIBCommand{
     }
 
     @Override
-    public void run() {
+    public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
         bot.quitServer("Cya losers!");
     }
 }

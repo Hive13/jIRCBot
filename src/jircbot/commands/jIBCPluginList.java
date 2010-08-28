@@ -3,6 +3,8 @@ package jircbot.commands;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.jibble.pircbot.PircBot;
+
 public class jIBCPluginList extends jIBCommand {
 
 	private HashMap<String, jIBCommand> commands;
@@ -17,7 +19,7 @@ public class jIBCPluginList extends jIBCommand {
 	}
 
     @Override
-    public void run() {
+    public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
         String resultMsg = sender + ": ";
         Iterator<jIBCommand> i = commands.values().iterator();
         while(i.hasNext()) {

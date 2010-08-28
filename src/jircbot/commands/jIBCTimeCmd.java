@@ -7,6 +7,8 @@ package jircbot.commands;
 
 import java.util.Date;
 
+import org.jibble.pircbot.PircBot;
+
 /**
  * A simple time command. Tells the bot to give
  * the current time when it is given "time".
@@ -23,7 +25,7 @@ public class jIBCTimeCmd extends jIBCommand {
     }
 
     @Override
-    public void run() {
+    public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
         bot.sendMessage(channel, sender + ": The time is now " + (new Date()));
         
     }
