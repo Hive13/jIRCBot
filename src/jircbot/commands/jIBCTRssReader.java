@@ -4,7 +4,10 @@
  */
 package jircbot.commands;
 //TODO: Document this class.
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -24,6 +27,7 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
+import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.XmlReader;
 
 /**
@@ -31,12 +35,13 @@ import com.sun.syndication.io.XmlReader;
  * @author vincenpt
  */
 public class jIBCTRssReader extends jIBCommandThread {
-    public enum formatItem {
+    /* This is not used * /
+     public enum formatItem {
         commandName,
         title,
         link,
         author
-    }
+    }//*/
     
     public final String[] formatItems = { "[commandName]", "[Title]", "[Link]", "[Author]" };
     
@@ -46,6 +51,8 @@ public class jIBCTRssReader extends jIBCommandThread {
 
     private List<SyndEntry> lastEntryList = null;
     
+    private File cacheFile = null;
+    
     public jIBCTRssReader(PircBot bot, String commandName, String channel, String rssFeedLink) throws MalformedURLException {
         this(bot, "[commandName] - [Title] [Link]", commandName, channel, new URL(rssFeedLink));
     }
@@ -54,11 +61,32 @@ public class jIBCTRssReader extends jIBCommandThread {
         this(bot, formatString, commandName, channel, new URL(rssFeedLink));
     }
     
-    public jIBCTRssReader(PircBot bot, String formatString, String commandName, String channel, URL rssFeedLink) {
+    @SuppressWarnings("unchecked")
+	public jIBCTRssReader(PircBot bot, String formatString, String commandName, String channel, URL rssFeedLink) {
         super(bot, commandName, channel, 1000*30);
         this.formatString = formatString;
         feedURL = rssFeedLink;
         lastEntryList = new ArrayList<SyndEntry>();
+        
+        // Attempt to read in a cached version of the feed.
+        cacheFile = new File(getCommandName() + ".xml");
+        if(cacheFile.exists()) {
+	        SyndFeedInput input = new SyndFeedInput();
+	        try {
+				SyndFeed feed = input.build(new XmlReader(cacheFile));
+				lastEntryList = feed.getEntries();
+			} catch (IllegalArgumentException ex) {
+	            Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE, null, ex);
+	            bot.log("Error: " + getCommandName() + " " + ex.toString());
+			} catch (FeedException ex) {
+	            Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE, null, ex);
+	            bot.log("Error: " + getCommandName() + " " + ex.toString());
+			} catch (IOException ex) {
+	            Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.INFO, null, ex);
+	            bot.log("Info: " + getCommandName() + " " + ex.toString());
+			}
+        }
+        
     }
 
     protected void loop() {
@@ -96,13 +124,19 @@ public class jIBCTRssReader extends jIBCommandThread {
             Collections.sort(entryList, new SyndEntryComparator());
             
             // Check for new entries.
-            List<SyndEntry> tempEntryList = getNewEntryies(entryList);
+            List<SyndEntry> tempEntryList = getNewEntries(entryList);
             
             if(tempEntryList.size() > 0) {
                 // If any entries remain, send a message to the channel.
                 sendMessage(formatMessage(entryList.get(0)));
 
                 lastEntryList = entryList;
+                
+                // This means the list changed, update the saved file version.
+                Writer writer = new FileWriter(cacheFile, false);
+                SyndFeedOutput output = new SyndFeedOutput();
+                output.output(feed, writer);
+                writer.close();
             }
             
   
@@ -121,7 +155,7 @@ public class jIBCTRssReader extends jIBCommandThread {
         }
     }
 
-    private List<SyndEntry> getNewEntryies(List<SyndEntry> newEntryList) {
+    private List<SyndEntry> getNewEntries(List<SyndEntry> newEntryList) {
         /*
          * So here is the deal. We have two lists.
          * 1. newEntryList
@@ -181,18 +215,31 @@ public class jIBCTRssReader extends jIBCommandThread {
 
 	@Override
 	public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
-		if (this.getIsRunning())
-			this.stop();
-        else
-            /*
-             * We are just restarting the previously stopped command.
-             * But was it actually stopped? This is a curious method. We
-             * are certainly not referencing a new command, but it was
-             * running in an infinite while loop, when stop() is called,
-             * we set a boolean to false, which kills the while loop,
-             * but the member variables will still be the same as when
-             * the commandThread was first initialized.
-             */
-            new Thread(this).start();
+		String[] splitMsg = message.split(" ", 2);
+		if(splitMsg.length > 1) {
+			if(splitMsg[1].equalsIgnoreCase("stop")) {
+				// Stop this command from running.
+				if(this.getIsRunning())
+					this.stop();
+			} else if(splitMsg[1].equalsIgnoreCase("start")) {
+				/* Start this command:
+	             * This is more of a "resume" than a start.
+	             * We still have all of the old information
+	             * cached here, we are just kicking off a new thread.
+	             */
+				if(!this.getIsRunning())
+					new Thread(this).start();
+			} else {
+				// In all other cases just re-output the last entry.
+				// !!!! WARNING !!!! THIS IS VERY BAD.
+				//				     lastEntryList IS NOT THREAD SAFE
+				// 	- this function can be called while loop() is in being
+				//	  executed.  This means that lastEntryList will be accessed
+				//	  by two different threads at the same time.
+				if(lastEntryList != null && lastEntryList.size() > 1) {
+					sendMessage(formatMessage(lastEntryList.get(0)));
+				}
+			}
+		}
 	}
 }
