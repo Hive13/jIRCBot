@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `pk_MessageID` bigint(20) NOT NULL AUTO_INCREMENT,
   `fk_ChannelID` int(11) NOT NULL,
   `tsMsgTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `intMsgType` int(11) NOT NULL,
+  `vcMsgType` varchar(255) NOT NULL,
   `vcUsername` varchar(255) NOT NULL,
   `vcMessage` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`pk_MessageID`),
