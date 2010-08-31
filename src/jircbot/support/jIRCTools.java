@@ -1,7 +1,14 @@
 package jircbot.support;
 // TODO: Document this class.
-import static com.rosaloves.bitlyj.Bitly.*;
+import static com.rosaloves.bitlyj.Bitly.as;
+import static com.rosaloves.bitlyj.Bitly.info;
+import static com.rosaloves.bitlyj.Bitly.shorten;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,10 +16,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jircbot.jIRCBot;
 
 public class jIRCTools {
+	public static final String UserAgentString = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
+	
     /** Username to use for the bit.ly API */
 	public static String bitlyName = "";
 	/** API key to use for the bit.ly API */
@@ -99,6 +110,57 @@ public class jIRCTools {
 	    return result;
 	}
 	
+	public static String getURLTitle(String myURL) {
+		String result = "";
+		try {
+			URL url = new URL(myURL);
+			URLConnection uconn = url.openConnection();
+			if(uconn instanceof HttpURLConnection) {
+				// Set up the request.
+				HttpURLConnection conn = (HttpURLConnection)uconn;
+				conn.setConnectTimeout(10000); 	// 10 seconds
+				conn.setReadTimeout(10000); 	// 10 seconds
+				conn.setRequestProperty("User-agent", UserAgentString);
+				
+				// Send the request.
+				conn.connect();
+				
+				// Get the response.
+				//Map<String, List<String>> responseHeader = conn.getHeaderFields();
+				//int responseCode = conn.getResponseCode();
+				String type = conn.getContentType();
+				String rgxIsHTML = "(text/x?html|application/xhtml+xml)";
+				Pattern p = Pattern.compile(rgxIsHTML);
+				Matcher m = p.matcher(type);
+				if(!m.find()) {
+					result = type; // It is not a webpage.
+				} else {
+					// Now we need to get the text page.
+					Object content = conn.getContent();
+					if(content instanceof String) {
+						String sContent = (String)content;
+						String rgxFindTitle = "<title[^>]*>(.*?)</title>";
+						p = Pattern.compile(rgxFindTitle);
+						m = p.matcher(sContent);
+						if(m.find()) {
+							result = m.group();
+						}
+					}
+				}
+			} else {
+				// This would be FTP I assume.
+				// just fall out w/ a blank title.
+			}
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
 	/**
      * Inserts a new message into the "messages" table of the
      * attached MySQL database.
