@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,15 +45,56 @@ public class jIBCTRssReader extends jIBCommandThread {
         author
     }//*/
     
+	private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+	private final Lock read = readWriteLock.readLock();
+	private final Lock write = readWriteLock.writeLock();
+	
     public final String[] formatItems = { "[commandName]", "[Title]", "[Link]", "[Author]" };
     
     private String formatString = "[commandName] - [Title] [Link]";
     
     private URL feedURL = null;
 
-    private List<SyndEntry> lastEntryList = null;
+    private List<SyndEntry> lastEntryList_private = null;
     
     private File cacheFile = null;
+    
+    private void lastEntryListSet(List<SyndEntry> lastEntryList) {
+    	write.lock();
+    	try {
+    		this.lastEntryList_private = lastEntryList;
+    	} finally {
+    		write.unlock();
+    	}
+    }
+    private SyndEntry lastEntryListGet(int index) {
+    	SyndEntry result = null;
+    	read.lock();
+    	try {
+    		if(lastEntryList_private != null)
+    			result = (SyndEntry) lastEntryList_private.get(index).clone();
+    	} catch (CloneNotSupportedException e) {
+    		// Ok, this is a bit of a cheat, and is not technically threadsafe.
+    		// We return a pointer to the SyndEntry which could lead to errors
+    		// if something else causes that pointer to become invalid.
+			if(lastEntryList_private != null)
+				result = lastEntryList_private.get(index);
+		} finally {
+    		read.unlock();
+    	}
+    	return result;
+    }
+    private int lastEntryListSize() {
+    	int size = -1;
+    	read.lock();
+    	try {
+    		if(lastEntryList_private != null)
+    			size = lastEntryList_private.size();
+    	} finally {
+    		read.unlock();
+    	}
+    	return size;
+    }
     
     public jIBCTRssReader(PircBot bot, String commandName, String channel, String rssFeedLink) throws MalformedURLException {
         this(bot, "[commandName] - [Title] [Link]", commandName, channel, new URL(rssFeedLink));
@@ -66,7 +109,7 @@ public class jIBCTRssReader extends jIBCommandThread {
         super(bot, commandName, channel, 1000*30);
         this.formatString = formatString;
         feedURL = rssFeedLink;
-        lastEntryList = new ArrayList<SyndEntry>();
+        lastEntryList_private = new ArrayList<SyndEntry>();
         
         // Attempt to read in a cached version of the feed.
         cacheFile = new File(getCommandName() + ".xml");
@@ -74,7 +117,7 @@ public class jIBCTRssReader extends jIBCommandThread {
 	        SyndFeedInput input = new SyndFeedInput();
 	        try {
 				SyndFeed feed = input.build(new XmlReader(cacheFile));
-				lastEntryList = feed.getEntries();
+				lastEntryListSet(feed.getEntries());
 			} catch (IllegalArgumentException ex) {
 	            Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE, null, ex);
 	            bot.log("Error: " + getCommandName() + " " + ex.toString());
@@ -112,7 +155,7 @@ public class jIBCTRssReader extends jIBCommandThread {
              */
             // Here we pretend to be the google bot to fake out User-Agent sniffing programs.
             URLConnection conn = feedURL.openConnection();
-            conn.setRequestProperty("User-Agent", "Googlebot/2.1 (+http://www.googlebot.com/bot.html)");
+            conn.setRequestProperty("User-Agent", jIRCTools.UserAgentString);
             
             // Create a feed off of the URL and get the latest news.
             SyndFeedInput input = new SyndFeedInput();
@@ -130,7 +173,7 @@ public class jIBCTRssReader extends jIBCommandThread {
                 // If any entries remain, send a message to the channel.
                 sendMessage(formatMessage(entryList.get(0)));
 
-                lastEntryList = entryList;
+                lastEntryListSet(entryList);
                 
                 // This means the list changed, update the saved file version.
                 Writer writer = new FileWriter(cacheFile, false);
@@ -174,11 +217,11 @@ public class jIBCTRssReader extends jIBCommandThread {
          * Go through newEntryList until item 'i' is < lastEntryList[0].
          * Then remove all from newEntryList until only.
          */
-        if(lastEntryList == null || lastEntryList.size() == 0) {
+        if(lastEntryListSize() <= 0) {
             return newEntryList;
         }
         List<SyndEntry> resultList = new ArrayList<SyndEntry>();
-        SyndEntry lastSyndEntry = lastEntryList.get(0);
+        SyndEntry lastSyndEntry = lastEntryListGet(0);
         Iterator<SyndEntry> i = newEntryList.iterator();
         while(i.hasNext()) {
             SyndEntry curEntry = i.next();
@@ -236,8 +279,8 @@ public class jIBCTRssReader extends jIBCommandThread {
 				// 	- this function can be called while loop() is in being
 				//	  executed.  This means that lastEntryList will be accessed
 				//	  by two different threads at the same time.
-				if(lastEntryList != null && lastEntryList.size() > 1) {
-					sendMessage(formatMessage(lastEntryList.get(0)));
+				if(lastEntryListSize() >= 1) {
+					sendMessage(formatMessage(lastEntryListGet(0)));
 				}
 			}
 		}
