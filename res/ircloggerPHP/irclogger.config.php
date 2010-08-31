@@ -3,7 +3,7 @@
 #
 
 # DB access used by frontend and logger
-db_host = localhost
+db_host = mysql.host.com
 db_user = chanlogger
 db_pass = qF7yWI4Tcnsb4qD
 db_name = channellog
