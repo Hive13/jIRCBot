@@ -5,10 +5,7 @@ import static com.rosaloves.bitlyj.Bitly.info;
 import static com.rosaloves.bitlyj.Bitly.shorten;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -113,52 +110,33 @@ public class jIRCTools {
 	public static String getURLTitle(String myURL) {
 		String result = "";
 		try {
-			URL url = new URL(myURL);
-			URLConnection uconn = url.openConnection();
-			if(uconn instanceof HttpURLConnection) {
-				// Set up the request.
-				HttpURLConnection conn = (HttpURLConnection)uconn;
-				conn.setConnectTimeout(10000); 	// 10 seconds
-				conn.setReadTimeout(10000); 	// 10 seconds
-				conn.setRequestProperty("User-agent", UserAgentString);
-				
-				// Send the request.
-				conn.connect();
-				
-				// Get the response.
-				//Map<String, List<String>> responseHeader = conn.getHeaderFields();
-				//int responseCode = conn.getResponseCode();
-				String type = conn.getContentType();
-				String rgxIsHTML = "(text/x?html|application/xhtml+xml)";
-				Pattern p = Pattern.compile(rgxIsHTML);
-				Matcher m = p.matcher(type);
-				if(!m.find()) {
-					result = type; // It is not a webpage.
-				} else {
-					// Now we need to get the text page.
-					Object content = conn.getContent();
-					if(content instanceof String) {
-						String sContent = (String)content;
-						String rgxFindTitle = "<title[^>]*>(.*?)</title>";
-						p = Pattern.compile(rgxFindTitle);
-						m = p.matcher(sContent);
-						if(m.find()) {
-							result = m.group();
-						}
-					}
-				}
-			} else {
-				// This would be FTP I assume.
-				// just fall out w/ a blank title.
-			}
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+            WebFile website = new WebFile(myURL);
+            String type = website.getMIMEType();
+            
+            String rgxIsHTML = "(text/x?html|application/xhtml+xml)";
+            Pattern p = Pattern.compile(rgxIsHTML);
+            Matcher m = p.matcher(type);
+            if(!m.find()) {
+                result = type; // It is not a webpage.
+            } else {
+                Object content = website.getContent();
+                if(content instanceof String) {
+                    String sContent = ((String)content).replaceAll("[\\n\\r]", "");
+                    String rgxFindTitle = "<title[^>]*>(.*?)</title>";
+                    p = Pattern.compile(rgxFindTitle);
+                    m = p.matcher(sContent);
+                    if(m.find()) {
+                        result = m.group();
+                        result = result.substring(result.indexOf('>')+1, result.lastIndexOf('<')).trim();
+                    }
+                }
+                
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		return result;
 	}
 	/**
