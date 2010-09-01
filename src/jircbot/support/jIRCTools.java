@@ -4,6 +4,7 @@ import static com.rosaloves.bitlyj.Bitly.as;
 import static com.rosaloves.bitlyj.Bitly.info;
 import static com.rosaloves.bitlyj.Bitly.shorten;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.Connection;
@@ -19,9 +20,15 @@ import java.util.regex.Pattern;
 import jircbot.jIRCBot;
 
 public class jIRCTools {
+	/**	When connecting to certain websites, if it thinks the connection
+	 *  is from a bot it will block the connection.  In this case we
+	 *  pretend that we are the google bot.
+	 */
 	public static final String UserAgentString = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
 	
-	public static final String cacheDirectory = "./jIRCBotCache";
+	/** Directory for commands to use as a cache for data. */
+	private static final String cacheDirectoryPath = "./jIRCBotCache";
+	private static final File cacheDirectory = new File(cacheDirectoryPath);
 	
     /** Username to use for the bit.ly API */
 	public static String bitlyName = "";
@@ -52,6 +59,22 @@ public class jIRCTools {
 	    partMsg, 
 	    nickChange, 
 	    quitMsg
+	}
+	
+	/**
+	 * Attempt to get a pointer to the jIRCBot cache directory.
+	 * This method attempts to create the directory first if it
+	 * does not exist, however it does not guarantee that the
+	 * directory will actually exist.
+	 * 
+	 * @return	Returns a pointer to the cache directory that
+	 * 			the bot can read // write too.
+	 */
+	public static File getCacheDirectory() {
+		if(!cacheDirectory.exists()) {
+			cacheDirectory.mkdir();
+		}		
+		return cacheDirectory;
 	}
 	
 	/**
