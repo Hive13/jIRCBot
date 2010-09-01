@@ -112,7 +112,7 @@ public class jIBCTRssReader extends jIBCommandThread {
         lastEntryList_private = new ArrayList<SyndEntry>();
         
         // Attempt to read in a cached version of the feed.
-        cacheFile = new File(getCommandName() + ".xml");
+        cacheFile = new File(jIRCTools.cacheDirectory + "/" + getCommandName() + ".xml");
         if(cacheFile.exists()) {
 	        SyndFeedInput input = new SyndFeedInput();
 	        try {
@@ -176,10 +176,17 @@ public class jIBCTRssReader extends jIBCommandThread {
                 lastEntryListSet(entryList);
                 
                 // This means the list changed, update the saved file version.
-                Writer writer = new FileWriter(cacheFile, false);
-                SyndFeedOutput output = new SyndFeedOutput();
-                output.output(feed, writer);
-                writer.close();
+                File cacheDirectory = new File(jIRCTools.cacheDirectory);
+                if(!cacheDirectory.exists())
+                	cacheDirectory.mkdir();
+                if(!cacheFile.exists())
+                	cacheFile.createNewFile();
+                if(cacheFile.exists()) {
+	                Writer writer = new FileWriter(cacheFile, false);
+	                SyndFeedOutput output = new SyndFeedOutput();
+	                output.output(feed, writer);
+	                writer.close();
+                }
             }
             
   

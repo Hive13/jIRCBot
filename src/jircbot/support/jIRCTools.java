@@ -21,6 +21,8 @@ import jircbot.jIRCBot;
 public class jIRCTools {
 	public static final String UserAgentString = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
 	
+	public static final String cacheDirectory = "./jIRCBotCache";
+	
     /** Username to use for the bit.ly API */
 	public static String bitlyName = "";
 	/** API key to use for the bit.ly API */
