@@ -59,6 +59,7 @@ public class jIBCLinkify extends jIBCommand {
 						}
 		            }
 	            }
+	            urlTitle = urlTitle.replaceAll("([^\\p{ASCII}]|\\n|  )", "");
 	            returnMsg += urlTitle + " [ " + shortURL + " ]; ";
         	}
         }
