@@ -1,0 +1,31 @@
+<?php
+
+require('func.php');
+$conf = loadconfig('irclogger.config.php');
+$dbh = getdbhandle($conf);
+
+$sql = "SELECT DISTINCT DATE(tsMsgTime) as d
+          FROM messages, channel
+         WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '#hive13_test'
+      ORDER BY tsMsgTime DESC";
+$res = mysql_query($sql,$dbh);
+
+$first = true;
+
+header("Content-Type: text/xml");
+echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+while($row = mysql_fetch_array($res, MYSQL_ASSOC)){
+    echo "<url>\n";
+    echo "   <loc>".$conf['baseurl'].'?d='.$row['d']."</loc>\n";
+    echo "   <lastmod>".$row['d']."</lastmod>\n";
+    if($first){
+        echo "   <changefreq>hourly</changefreq>\n";
+        $first = false;
+    }else{
+        echo "   <changefreq>never</changefreq>\n";
+    }
+    echo "</url>\n";
+}
+echo "</urlset>\n"; 
+?>
