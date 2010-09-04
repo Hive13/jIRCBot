@@ -13,15 +13,16 @@ import org.jibble.pircbot.PircBot;
  * that run in the background and can react to externally generated events.
  * @author vincenpt
  */
-public abstract class jIBCommandThread extends jIBCommand implements Runnable {
+public abstract class jIBCommandThread extends jIBCommand {
 
     protected PircBot bot = null;
     protected String channel = "";
-    protected AtomicBoolean isRunning = null;
-
+    
     protected long loopDelay = 1000;
     protected String commandName = "";
 
+    protected Thread childThread = null;
+    protected commandThreadChild childThreadRunnable = null;
     /**
      * Constructor method.
      * @param bot           The bot to which this command belongs.
@@ -57,7 +58,8 @@ public abstract class jIBCommandThread extends jIBCommand implements Runnable {
         this.commandName = commandName;
         this.channel = channel;
         this.loopDelay = delay;
-        this.isRunning = new AtomicBoolean(isRunning);
+        if(isRunning)
+        	startCommandThread();
     }
     
     /**
@@ -77,57 +79,13 @@ public abstract class jIBCommandThread extends jIBCommand implements Runnable {
     }
 
     /**
-     * This method sets the command running and calls the "loop" method after set "delay"
-     * periods.
-     */
-    public void run() {
-        setIsRunning(true); // when run is called, make sure that the running variable is true.
-        bot.log("Started " + getCommandName());
-        while (getIsRunning()) {
-            loop();
-            try {
-                Thread.sleep(loopDelay);
-            } catch (InterruptedException e) {
-                bot.log("WARNING! - commandThread " + getCommandName()
-                        + " interupted.\n" + e.toString());
-            }
-        }
-        bot.log("Stopped " + getCommandName());
-    }
-
-    /**
      * This method is run every "delay" milliseconds.
+     * WARNING! This method WILL be called by asynchronous
+     * 			threads.  Everything this function touches
+     * 			MUST be thread safe.
      */
     protected abstract void loop();
 
-    /**
-     * This method is used to safely stop the commandThread.
-     */
-    public void stop() {
-        bot.log("Stopping " + getCommandName());
-        setIsRunning(false);
-    }
-
-    /**
-     * This method is used to check if the commandThread is still running.
-     * @return  True if the command thread is running.
-     */
-    public boolean getIsRunning() {
-        // WARNING! This method is accessed from multiple threads
-        //          and therefore implements an AtomicBoolean.
-        return isRunning.get();
-    }
-
-    /**
-     * This method safely changes the value of the isRunning private variable.
-     * @param running   New internal status for the thread. True means it is
-     *                  running, false means it is stopped.
-     */
-    private void setIsRunning(boolean running) {
-        // WARNING! This method is accessed from multiple threads
-        //          and therefore implements an AtomicBoolean.
-        isRunning.set(running);
-    }
 
     /**
      * Gets the channel the commandThread is running in.
@@ -152,4 +110,59 @@ public abstract class jIBCommandThread extends jIBCommand implements Runnable {
     public String getSimpleCommandName() {
     	return commandName;
     }
+    
+    public void startCommandThread() {
+    	if(childThread == null || !childThread.isAlive())
+    		if(childThreadRunnable == null)
+    			childThreadRunnable = new commandThreadChild(true, loopDelay);
+    		childThread = new Thread(childThreadRunnable);
+    }
+    
+    public void stopCommandThread() {
+    	if(childThread != null && childThread.isAlive()
+		   && childThreadRunnable != null && childThreadRunnable.getIsRunning()) {
+    		childThreadRunnable.stop();
+    	}
+    }
+    
+    private class commandThreadChild implements Runnable {
+    	private AtomicBoolean isRunning;
+    	private long		  delay;
+    	
+    	public commandThreadChild(boolean isRunning, long delay) {
+    		this.isRunning = new AtomicBoolean(isRunning);
+    		this.delay = delay;
+    	}
+    	
+		public void run() {
+			setIsRunning(true);
+			bot.log("Started " + getCommandName());
+			while(getIsRunning()) {
+				loop();
+				try {
+					Thread.sleep(delay);
+				} catch (InterruptedException e) {
+					bot.log("Warning! - commandThread " + getCommandName()
+							+ " interupted.\n");
+					e.printStackTrace();
+				}
+			}
+			// In case there was some error that has caused us to jump out there.
+			setIsRunning(false); 
+			bot.log("Stopped " + getCommandName());
+		}
+		
+		public void stop() {
+			bot.log("Stopping " + getCommandName());
+			setIsRunning(false);
+		}
+		
+		public boolean getIsRunning() {
+			return isRunning.get();
+		}
+		
+		public void setIsRunning(boolean isRunning) {
+			this.isRunning.set(isRunning);
+		}
+	}
 }
