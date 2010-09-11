@@ -1,4 +1,4 @@
-package jircbot.support;
+package org.hive13.jircbot.support;
 
 import java.util.HashMap;
 import java.util.Iterator;

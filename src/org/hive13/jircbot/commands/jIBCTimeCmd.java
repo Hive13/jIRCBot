@@ -1,13 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package jircbot.commands;
+package org.hive13.jircbot.commands;
 
 import java.util.Date;
 
-import org.jibble.pircbot.PircBot;
+import org.hive13.jircbot.jIRCBot;
 
 /**
  * A simple time command. Tells the bot to give
@@ -17,17 +12,16 @@ import org.jibble.pircbot.PircBot;
  */
 public class jIBCTimeCmd extends jIBCommand {
 
-    public jIBCTimeCmd() {
-    }
-
+    @Override
     public String getCommandName() {
         return "time";
     }
 
     @Override
-    public void runHandleMessage(PircBot bot, String channel, String sender, String message) {
+    public void handleMessage(jIRCBot bot, String channel, String sender,
+            String message) {
         bot.sendMessage(channel, sender + ": The time is now " + (new Date()));
-        
+
     }
 
 }
