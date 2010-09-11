@@ -12,6 +12,7 @@ public class jIBCQuitCmd extends jIBCommand {
     @Override
     public void handleMessage(jIRCBot bot, String channel, String sender,
             String message) {
+        bot.abShouldQuit.set(true);
         bot.quitServer("Cya losers!");
         
     }
