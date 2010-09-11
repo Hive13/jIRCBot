@@ -16,8 +16,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hive13.jircbot.jIRCBot;
+import org.hive13.jircbot.jIRCBot.eLogLevel;
 import org.hive13.jircbot.support.jIRCTools;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -31,16 +34,16 @@ public class jIBCTRssReader extends jIBCommandThread {
     private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock read = readWriteLock.readLock();
     private final Lock write = readWriteLock.writeLock();
-    private final String[] formatItems = { "[commandName]", "[Title]", "[Link]", "[Author]" };
+    private final String[] formatItems = { "commandName", "Title", "Link", "Author" };
 
-    private String  formatString    = "[commandName] - [Title] [Link]";
+    private String  formatString    = "[commandName] - [Title|c50] ( [Link] )";
     private URL     feedURL         = null;
     private File    cacheFile       = null;
     
     private List<SyndEntry> lastEntryList_private = null;
     
     public jIBCTRssReader(jIRCBot bot, String commandName, String channel, String rssFeedLink) throws MalformedURLException {
-        this(bot, commandName, channel, "[commandName] - [Title] [Link]", new URL(rssFeedLink));
+        this(bot, commandName, channel, "[commandName] - [Title|c50] ( [Link] )", new URL(rssFeedLink));
     }
     
     public jIBCTRssReader(jIRCBot bot, String commandName, String channel, String formatString, String rssFeedLink) throws MalformedURLException {
@@ -172,9 +175,69 @@ public class jIBCTRssReader extends jIBCommandThread {
         return message.replaceAll("([^\\p{ASCII}]|\\n|  )", "");
     }
     
+    /* Message: [commandName] - [Title|c60] [Author|r'\(.+\)'] < [Link] >
+     * OutMsg:  [commandName] - [Title|c60] (Jim) < [Link] >
+     * formatItem:      [Author] --> Author
+     * formatItemRep:   jo...@gmail.com (Joe Jim)
+     * 
+     * Split into parameters
+     * 
+     */
     private String formatMessageItem(String message, String formatItem, String formatItemReplacement) {
-    	
-    	return message.replace(formatItem, formatItemReplacement);
+        // Take Message, find \[formatItem[|.+]\]
+        // Split on | to see if there are parameters.
+        // If split.length > 1
+        //      loop through and check:
+        //      first char == c
+        //        Trim the result to c# characters
+        //      first char == r
+        //        run regexReplace and save only characters that match r~
+        // \[commandName(\|[^\]]+)?\]
+        int maxFormatLength = 512;
+        String regex = "\\[" + formatItem + "(\\|[^\\]]+)?\\]";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(message);
+        
+        if(m.find()) {
+            String foundItem = m.group();
+            // Remove the starting [ and trailing ]
+            foundItem = foundItem.substring(1, foundItem.length()-1);
+            
+            String splitFoundItems[] = foundItem.split("\\|");
+            if(splitFoundItems.length > 1) {
+                // We have parameters.
+                for(String par : splitFoundItems) {
+                    if(par.startsWith("c") && par.length() >= 2) {
+                        maxFormatLength = Integer.parseInt(par.substring(1));
+                    } else if (par.startsWith("r") && par.length() > 2) {
+                        regex = par.substring(1);
+                        p = Pattern.compile(regex);
+                        m = p.matcher(formatItemReplacement);
+                        if(m.find()) {
+                            formatItemReplacement = m.group();
+                        } else {
+                            bot.log("RssReader.formatMessageItem( " + message 
+                                    + ", " + formatItem + ", " + formatItemReplacement + ")"
+                                    + "Regex attempt failed to find anything to replace.",
+                                    eLogLevel.info);
+                        }
+                    } else if (par.equals(formatItem)){
+                        // Disregard the parameter if it
+                        // is the formatItem.
+                    } else {
+                        bot.log("RssReader.formatMessageItem - unknown parameter: " + par, 
+                                eLogLevel.warning);
+                    }
+                }
+            }
+            if(formatItemReplacement.length() > maxFormatLength)
+                formatItemReplacement = formatItemReplacement.substring(0, maxFormatLength) + "...";
+            
+            message = message.replace("[" + foundItem + "]", formatItemReplacement);
+        } else {
+            message = message.replace("[" + formatItem + "]", formatItemReplacement);
+        }
+    	return message;
     }
     
     private void lastEntryListSet(List<SyndEntry> lastEntryList) {

@@ -171,14 +171,14 @@ public class jIRCBot extends PircBot {
         try {
             // Add all command threads.
             addCommandThread(new jIBCTRssReader(this, "WikiFeed", channelList.get(0),
-                    "[commandName] - [Title] - [Author] [Link]",
+                    "[commandName] - [Title|c50] - [Author|c20] ( [Link] )",
                     "http://wiki.hive13.org/index.php?title=Special:RecentChanges&feed=rss&hideminor=1"));
             
             addCommandThread(new jIBCTRssReader(this, "Hive13Blog", channelList.get(0),
                     "http://www.hive13.org/?feed=rss2"));
             
             addCommandThread(new jIBCTRssReader(this, "Hive13List", channelList.get(0),
-                    "[commandName] - [Title] - [Author] [Link]",
+                    "[commandName] - [Title|c50] - [Author|c20|r\\(.+\\)] ( [Link] )",
                     "http://groups.google.com/group/cincihackerspace/feed/rss_v2_0_msgs.xml"));
             
             // PTV: Flickr feed has been known to have issues... 
