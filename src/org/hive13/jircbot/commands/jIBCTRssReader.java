@@ -31,7 +31,7 @@ public class jIBCTRssReader extends jIBCommandThread {
     private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock read = readWriteLock.readLock();
     private final Lock write = readWriteLock.writeLock();
-    private final String[] formatItems = { "[commandName]", "[Title]", "[Link]", "[Author]" };;
+    private final String[] formatItems = { "[commandName]", "[Title]", "[Link]", "[Author]" };
 
     private String  formatString    = "[commandName] - [Title] [Link]";
     private URL     feedURL         = null;
@@ -163,12 +163,18 @@ public class jIBCTRssReader extends jIBCommandThread {
 
     private String formatMessage(SyndEntry entry) {
         String message = formatString;
-        message = message.replace(formatItems[0], getSimpleCommandName());
-        message = message.replace(formatItems[1], entry.getTitle());
-        message = message.replace(formatItems[2], "[ " + jIRCTools.generateShortURL(entry.getLink()) + " ]");
-        message = message.replace(formatItems[3], entry.getAuthor());
+        message = formatMessageItem(message, formatItems[0], getSimpleCommandName());
+        message = formatMessageItem(message, formatItems[1], entry.getTitle());
+        message = formatMessageItem(message, formatItems[2], jIRCTools.generateShortURL(entry.getLink()));
+        message = formatMessageItem(message, formatItems[3], entry.getAuthor());
         
-        return message.replace("\n", "");
+        // Return the formatted message stripped of all non-ASCII characters, extra spaces, and new lines.
+        return message.replaceAll("([^\\p{ASCII}]|\\n|  )", "");
+    }
+    
+    private String formatMessageItem(String message, String formatItem, String formatItemReplacement) {
+    	
+    	return message.replace(formatItem, formatItemReplacement);
     }
     
     private void lastEntryListSet(List<SyndEntry> lastEntryList) {
