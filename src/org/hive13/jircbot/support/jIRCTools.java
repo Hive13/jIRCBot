@@ -1,4 +1,4 @@
-package jircbot.support;
+package org.hive13.jircbot.support;
 // TODO: Document this class.
 import static com.rosaloves.bitlyj.Bitly.as;
 import static com.rosaloves.bitlyj.Bitly.info;
@@ -17,7 +17,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jircbot.jIRCBot;
+import org.hive13.jircbot.jIRCBot;
+
 
 public class jIRCTools {
 	/**	When connecting to certain websites, if it thinks the connection

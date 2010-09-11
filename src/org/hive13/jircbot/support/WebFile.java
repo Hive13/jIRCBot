@@ -1,4 +1,4 @@
-package jircbot.support;
+package org.hive13.jircbot.support;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
