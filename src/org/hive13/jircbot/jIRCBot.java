@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jircbot;
+package org.hive13.jircbot;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,24 +18,21 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jircbot.commands.jIBCLinkify;
-import jircbot.commands.jIBCLogParser;
-import jircbot.commands.jIBCPluginList;
-import jircbot.commands.jIBCTRssReader;
-import jircbot.commands.jIBCTTell;
-import jircbot.commands.jIBCommand;
-import jircbot.commands.jIBCommandThread;
-import jircbot.commands.jIBCQuitCmd;
-import jircbot.commands.jIBCTimeCmd;
-
+import org.hive13.jircbot.commands.jIBCLinkify;
+import org.hive13.jircbot.commands.jIBCQuitCmd;
+import org.hive13.jircbot.commands.jIBCTRssReader;
+import org.hive13.jircbot.commands.jIBCTell;
+import org.hive13.jircbot.commands.jIBCTimeCmd;
+import org.hive13.jircbot.commands.jIBCommand;
+import org.hive13.jircbot.commands.jIBCommandThread;
+import org.hive13.jircbot.support.jIRCTools;
+import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
+import org.hive13.jircbot.support.jIRCUser;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
 
-import jircbot.support.jIRCTools;
-import jircbot.support.jIRCUser;
-import jircbot.support.jIRCTools.eMsgTypes;
 
 /**
  * 
@@ -162,27 +159,27 @@ public class jIRCBot extends PircBot {
         // Add commands that parse every single line
         // WARNING!! Be sparing with these commands
         //           their code should be run asynchronously
-        addLineParseCommand(new jIBCTTell());
+        addLineParseCommand(new jIBCTell());
         addLineParseCommand(new jIBCLinkify());
         
         // Add passive commands
         addCommand(new jIBCTimeCmd());
         addCommand(new jIBCQuitCmd());
-        addCommand(new jIBCPluginList(commands));
-        addCommand(new jIBCLogParser());
+        //addCommand(new jIBCPluginList(commands));
+        //addCommand(new jIBCLogParser());
 
         try {
             // Add all command threads.
-            addCommandThread(new jIBCTRssReader(this, "[commandName] - [Title] - [Author] [Link]",
-                    "WikiFeed", channelList.get(0),
+            addCommandThread(new jIBCTRssReader(this, "WikiFeed", channelList.get(0),
+                    "[commandName] - [Title] - [Author] [Link]",
                     "http://wiki.hive13.org/index.php?title=Special:RecentChanges&feed=rss&hideminor=1"));
             
             addCommandThread(new jIBCTRssReader(this, "Hive13Blog", channelList.get(0),
                     "http://www.hive13.org/?feed=rss2"));
             
-            addCommandThread(new jIBCTRssReader(this, "[commandName] - [Title] - [Author] [Link]", 
-            		"Hive13List", channelList.get(0), 
-            		"http://groups.google.com/group/cincihackerspace/feed/rss_v2_0_msgs.xml"));
+            addCommandThread(new jIBCTRssReader(this, "Hive13List", channelList.get(0),
+                    "[commandName] - [Title] - [Author] [Link]",
+                    "http://groups.google.com/group/cincihackerspace/feed/rss_v2_0_msgs.xml"));
             
             // PTV: Flickr feed has been known to have issues... 
             addCommandThread(new jIBCTRssReader(this, "Hive13Flickr", channelList.get(0),
@@ -233,11 +230,11 @@ public class jIRCBot extends PircBot {
             // Check to see if it is a known standard command.
             String[] sCmd = message.split(" ", 2);
             if ((cmd = commands.get(sCmd[0].toLowerCase())) != null ||
-        		(cmd = commands.get(sCmd[0].toLowerCase() + channel)) != null)
+                (cmd = commands.get(sCmd[0].toLowerCase() + channel)) != null)
                 if(sCmd.length == 2)
-                    cmd.handleMessage(this, channel, sender, sCmd[1].trim());
+                    cmd.runCommand(this, channel, sender, sCmd[1].trim());
                 else
-                    cmd.handleMessage(this, channel, sender, "");
+                    cmd.runCommand(this, channel, sender, "");
         }
         
         /* Run the commands that run with every message
@@ -249,7 +246,7 @@ public class jIRCBot extends PircBot {
          */
         Iterator<jIBCommand> i = lineParseCommands.iterator();
         while(i.hasNext()) {
-            i.next().handleMessage(this, channel, sender, message);
+            i.next().runCommand(this, channel, sender, message);
         }
     }
 
@@ -259,6 +256,32 @@ public class jIRCBot extends PircBot {
     @Override
     public void onDisconnect() {
         System.exit(0);
+    }
+    
+    public enum eLogLevel{
+        info,
+        warning,
+        error,
+        severe
+    }
+    
+    public void log(String line, eLogLevel logLevel) { 
+        switch(logLevel) {
+        case info:
+            line = "<Info> " + line;
+            break;
+        case warning:
+            line = "<Warning> " + line;
+            break;
+        case error:
+            line = "<Error> " + line;
+            break;
+        case severe:
+            line = "<Severe Error> " + line;
+            break;
+        }
+        
+        this.log(line);
     }
     
     /**
@@ -412,7 +435,6 @@ public class jIRCBot extends PircBot {
      */
     public void addCommandThread(jIBCommandThread cmd) {
         commands.put(cmd.getCommandName().toLowerCase(), cmd);
-        new Thread(cmd).start();
     }
     
     /**
