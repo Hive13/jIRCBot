@@ -43,7 +43,7 @@ public abstract class jIBCommandThread extends jIBCommand {
     @Override
     public void handleMessage(jIRCBot bot, String channel, String sender,
             String message) {
-        if(channel == this.channel) {
+        if(channel.equals(this.channel)) {
             if(commandThreadChild != null && commandThreadChild.getIsRunning()) {
                 stopCommandThread();
             } else {
