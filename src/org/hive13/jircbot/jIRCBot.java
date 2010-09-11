@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,6 +68,7 @@ public class jIRCBot extends PircBot {
     // List of Authorized usernames
     private final List<String> authedUserList;
     
+    public AtomicBoolean abShouldQuit = new AtomicBoolean(false);
     /*
      * Ok, the userList is a bit hackish at the moment
      * and there is the potential that it will leak some
@@ -255,7 +257,30 @@ public class jIRCBot extends PircBot {
      */
     @Override
     public void onDisconnect() {
-        System.exit(0);
+        if(abShouldQuit.get()) {
+            log("We are shutting down properly!", eLogLevel.info);
+            System.exit(0);
+        } else {
+            log("Accidental disconnect detected, initiating reconnect.", eLogLevel.warning);
+            try {
+                // Connect to the config server
+                connect(serverAddress);
+
+                // Connect to all channels listed in the config.
+                for (Iterator<String> i = channelList.iterator(); i.hasNext();) {
+                    joinChannel(i.next());
+                }
+            } catch (NickAlreadyInUseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IrcException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
     
     public enum eLogLevel{
