@@ -70,6 +70,7 @@ public class jIRCBot extends PircBot {
     private final List<String> authedUserList;
     
     public AtomicBoolean abShouldQuit = new AtomicBoolean(false);
+    
     /*
      * Ok, the userList is a bit hackish at the moment
      * and there is the potential that it will leak some
@@ -255,13 +256,10 @@ public class jIRCBot extends PircBot {
                     joinChannel(i.next());
                 }
             } catch (NickAlreadyInUseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (IrcException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -272,10 +270,6 @@ public class jIRCBot extends PircBot {
         warning,
         error,
         severe
-    }
-    
-    public void log(String line) {
-    	this.log(line, eLogLevel.info);
     }
     
     public void log(String line, eLogLevel logLevel) { 
@@ -333,6 +327,7 @@ public class jIRCBot extends PircBot {
             }
         }
     }
+    
     public void onJoin(String channel, String sender, String login, String hostname) {
         // Do we know about this user?
         if(sender.equals(this.getName())) {
