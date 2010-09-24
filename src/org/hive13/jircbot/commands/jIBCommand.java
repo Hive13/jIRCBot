@@ -2,17 +2,52 @@ package org.hive13.jircbot.commands;
 
 import org.hive13.jircbot.jIRCBot;
 
+/**
+ * A basic framework for implementing commands.
+ * 
+ * @author vincentp
+ *
+ */
 public abstract class jIBCommand {
     
+	/**
+	 * This method returns a unique name for the command.
+	 * 
+	 * @return A unique name for the command.
+	 */
     public abstract String getCommandName();
     
+    /**
+     * This method is called to activate the command.
+     * 
+     * @param bot		The bot that the command will be run against.
+     * @param channel	The channel that this command will run in.
+     * @param sender	The user that caused this command to be activated.
+     * @param message	The parameters (including the commandName) that were
+     * 					received when this command was activated.
+     */
     public void runCommand(jIRCBot bot, String channel, String sender, String message) {
         new Thread(new jIBCommandRunnable(bot, channel, sender, message)).start();
     }
     
+    
+    /**
+     * This method is internal to the commands.  It is handled in a separate thread
+     * so any calls from this method MUST be thread safe.
+     * 
+     * @param bot		The bot that the command will run against.
+     * @param channel	The channel that this command will run in.
+     * @param sender	The user that caused this command to be activated.
+     * @param message	The parameters (including the commandName) that were received
+     * 					when this command was activated.
+     */
     protected abstract void handleMessage(jIRCBot bot, String channel, 
             String sender, String message);
     
+    /**
+     * This class is used to launch off an asynchronous
+     * thread to prevent Commands from blocking the main thread.
+     */
     protected class jIBCommandRunnable implements Runnable {
         private jIRCBot bot;
         private String channel;

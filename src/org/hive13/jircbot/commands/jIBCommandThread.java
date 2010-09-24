@@ -18,10 +18,26 @@ public abstract class jIBCommandThread extends jIBCommand {
     
     protected commandThreadRunnable commandThreadChild  = null;
     
+    /**
+     * Initializes a new CommandThread with a default loopDelay of
+     * 30 seconds.
+     * 
+     * @param bot			Bot that will be running the command thread.
+     * @param commandName	The base name for this command.
+     * @param channel		The channel that this command is active in.
+     */
     public jIBCommandThread(jIRCBot bot, String commandName, String channel) {
         this(bot, commandName, channel, 30000);
     }
     
+    /**
+     * Initializes a new CommandThread.
+     * 
+     * @param bot			Bot that will be running the command thread.
+     * @param commandName	The base name for this command.
+     * @param channel		The channel that this command is active in.
+     * @param loopDelay		The time between calls to 'loop()'
+     */
     public jIBCommandThread(jIRCBot bot, String commandName, String channel,
             long loopDelay) {
         super();
@@ -33,7 +49,7 @@ public abstract class jIBCommandThread extends jIBCommand {
     }
 
     /**
-     * This method is run every "delay" milliseconds.
+     * This method is run every "loopDelay" milliseconds.
      * WARNING! This method WILL be called by asynchronous
      *          threads.  Everything this function touches
      *          MUST be thread safe.
@@ -70,7 +86,11 @@ public abstract class jIBCommandThread extends jIBCommand {
         }
     }
     
-    
+    /**
+     * This method will safely start an instance of the command thread.
+     * If an instance of the commandThread exists but is not running,
+     * it restarts that instance.
+     */
     public void startCommandThread() {
         if(commandThreadChild == null) {
             commandThreadChild = new commandThreadRunnable(loopDelay);
@@ -80,14 +100,19 @@ public abstract class jIBCommandThread extends jIBCommand {
         }
     }
     
+    /**
+     * This method is more of a 'pause' commandThread.  It stops the running
+     * java Thread but does not delete the instance of the commandThread.
+     */
     public void stopCommandThread() {
         if(commandThreadChild != null && commandThreadChild.getIsRunning()) {
             commandThreadChild.stop();
         }
     }
+    
     @Override
     public String getCommandName() {
-        return commandName + channel;
+        return commandName + getChannel();
     }
 
     /**

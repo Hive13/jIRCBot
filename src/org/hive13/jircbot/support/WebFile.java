@@ -31,7 +31,7 @@ public final class WebFile {
         conn.setConnectTimeout( 10000 );    // 10 sec
         conn.setReadTimeout( 10000 );       // 10 sec
         conn.setInstanceFollowRedirects( true );
-        conn.setRequestProperty( "User-agent", jIRCTools.UserAgentString );
+        conn.setRequestProperty( "User-agent", jIRCProperties.getInstance().getUserAgentString() );
  
         // Send the request.
         conn.connect( );

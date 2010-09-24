@@ -21,32 +21,15 @@ import org.hive13.jircbot.jIRCBot;
 
 
 public class jIRCTools {
-	/**	When connecting to certain websites, if it thinks the connection
-	 *  is from a bot it will block the connection.  In this case we
-	 *  pretend that we are the google bot.
-	 */
-	public static final String UserAgentString = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
-	
 	/** Directory for commands to use as a cache for data. */
 	private static final String cacheDirectoryPath = "./jIRCBotCache";
 	private static final File cacheDirectory = new File(cacheDirectoryPath);
-	
-    /** Username to use for the bit.ly API */
-	public static String bitlyName = "";
-	/** API key to use for the bit.ly API */
-	public static String bitlyAPIKey = "";
 
 	/** 
 	 * This must be checked by each JDBC method to ensure
 	 * that the JDBC integration is configured.
 	 */
     public static boolean jdbcEnabled = false;
-    /** JDBC URL to use to connect to the database */
-	public static String jdbcURL = "";
-    /** Username for the MySQL database to connect too */
-	public static String jdbcUser = "";
-    /** Password for the MySQL database user. */
-	public static String jdbcPass = "";
 
     /** 
      * The different types of messages saved in the 
@@ -87,7 +70,9 @@ public class jIRCTools {
 	 * @return         Returns a bit.ly shortened URL
 	 */
 	public static String generateShortURL(String longURL) {
-		return generateShortURL(longURL, bitlyName, bitlyAPIKey);
+		return generateShortURL(longURL, 
+				jIRCProperties.getInstance().getBitlyName(),
+				jIRCProperties.getInstance().getBitlyAPIKey());
 	}
 	
 	/**
@@ -100,7 +85,8 @@ public class jIRCTools {
 	 */
 	public static String generateShortURL(String longURL, String username, String apikey) {
 		String result = "Username or API key are not initialized";
-		if(bitlyName.length() > 0 && bitlyAPIKey.length() > 0)
+		if(jIRCProperties.getInstance().getBitlyName().length() > 0 
+				&& jIRCProperties.getInstance().getBitlyAPIKey().length() > 0)
 			result = as(username, apikey).call(shorten(longURL)).getShortUrl();
 		return result;
 	}
@@ -114,7 +100,9 @@ public class jIRCTools {
 	 * @return         Returns the title of the page the Bit.ly URL links too.
 	 */
 	public static String getShortURLTitle(String shortURL) {
-	    return getShortURLTitle(shortURL, bitlyName, bitlyAPIKey);
+	    return getShortURLTitle(shortURL, 
+	    		jIRCProperties.getInstance().getBitlyName(), 
+	    		jIRCProperties.getInstance().getBitlyAPIKey());
 	}
 	
 	/**
@@ -128,7 +116,8 @@ public class jIRCTools {
 	 */
 	public static String getShortURLTitle(String shortURL, String username, String apikey) {
 	    String result = "Username or API key are not initialized";
-        if(bitlyName.length() > 0 && bitlyAPIKey.length() > 0)
+        if(jIRCProperties.getInstance().getBitlyName().length() > 0 
+        		&& jIRCProperties.getInstance().getBitlyAPIKey().length() > 0)
             result = as(username, apikey).call(info(shortURL)).getTitle();
 	    return result;
 	}
@@ -192,7 +181,10 @@ public class jIRCTools {
                 "( ?, ?, ?, ? )";
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
+            Connection conn = DriverManager.getConnection(
+            		jIRCProperties.getInstance().getJDBCUrl(), 
+            		jIRCProperties.getInstance().getJDBCUser(), 
+            		jIRCProperties.getInstance().getJDBCPass());
             PreparedStatement stmt = conn.prepareStatement(insertStatement);
             stmt.setInt(1, chanID);
             stmt.setString(2, msgType.toString());
@@ -233,7 +225,10 @@ public class jIRCTools {
                 "( ?, ?, ?, ?, ? )";
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
+            Connection conn = DriverManager.getConnection(
+            		jIRCProperties.getInstance().getJDBCUrl(),
+            		jIRCProperties.getInstance().getJDBCUser(),
+            		jIRCProperties.getInstance().getJDBCPass());
             PreparedStatement stmt = conn.prepareStatement(insertStatement);
             stmt.setInt(1, chanID);
             stmt.setString(2, msgType.toString());
@@ -264,7 +259,10 @@ public class jIRCTools {
 	    
 	    try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
+            Connection conn = DriverManager.getConnection(
+            		jIRCProperties.getInstance().getJDBCUrl(), 
+            		jIRCProperties.getInstance().getJDBCUser(),
+            		jIRCProperties.getInstance().getJDBCPass());
             PreparedStatement stmt = conn.prepareStatement(stmtGetChannelID);
             stmt.setString(1, server);
             stmt.setString(2, channel);
@@ -300,7 +298,10 @@ public class jIRCTools {
 	    
 	    try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
+            Connection conn = DriverManager.getConnection(
+            		jIRCProperties.getInstance().getJDBCUrl(), 
+            		jIRCProperties.getInstance().getJDBCUser(),
+            		jIRCProperties.getInstance().getJDBCPass());
             PreparedStatement stmt = conn.prepareStatement(stmtInsertChannel);
             stmt.setString(1, channel);
             stmt.setString(2, server);
