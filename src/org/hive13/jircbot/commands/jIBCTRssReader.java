@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
+import org.hive13.jircbot.support.jIRCProperties;
 import org.hive13.jircbot.support.jIRCTools;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -82,7 +83,7 @@ public class jIBCTRssReader extends jIBCommandThread {
         // TODO Auto-generated method stub
         // Here we pretend to be the google bot to fake out User-Agent sniffing programs.
         URLConnection conn =  feedURL.openConnection();
-        conn.setRequestProperty("User-Agent", jIRCTools.UserAgentString);
+        conn.setRequestProperty("User-Agent", jIRCProperties.getInstance().getUserAgentString());
         
         // Create a feed off of the URL and get the latest news.
         SyndFeedInput input = new SyndFeedInput();

@@ -26,6 +26,7 @@ import org.hive13.jircbot.commands.jIBCTell;
 import org.hive13.jircbot.commands.jIBCTimeCmd;
 import org.hive13.jircbot.commands.jIBCommand;
 import org.hive13.jircbot.commands.jIBCommandThread;
+import org.hive13.jircbot.support.jIRCProperties;
 import org.hive13.jircbot.support.jIRCTools;
 import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 import org.hive13.jircbot.support.jIRCUser;
@@ -107,10 +108,10 @@ public class jIRCBot extends PircBot {
                     ex);
         }
 
-        new jIRCBot(config);
+        new jIRCBot();
     }
 
-    private jIRCBot(Properties config) {
+    private jIRCBot() {
 
         // Initialize lists
         commands = new HashMap<String, jIBCommand>();
@@ -126,30 +127,13 @@ public class jIRCBot extends PircBot {
         authedUserList.add("pvince");
         
         // Grab configuration information.
-        botName = config.getProperty("nick", "Hive13Bot");
-        serverAddress = config.getProperty("server", "irc.freenode.net");
-        
-        // If we have bit.ly information, grab it. This is used
-        // to shorten URLs
-        jIRCTools.bitlyName = config.getProperty("bitlyName", "");
-        jIRCTools.bitlyAPIKey = config.getProperty("bitlyAPI", "");
+        botName = jIRCProperties.getInstance().getBotName();
+        serverAddress = jIRCProperties.getInstance().getServer();
 
-        // If we have jdbc information, grab it. This is used
-        // to log the chat room.
-        jIRCTools.jdbcURL = config.getProperty("jdbcURL", "");
-        jIRCTools.jdbcUser = config.getProperty("jdbcUsername", "");
-        jIRCTools.jdbcPass = config.getProperty("jdbcPassword", "");
-            // If there is no URL or no username, then jdbc will not be enabled.
-        jIRCTools.jdbcEnabled = (jIRCTools.jdbcURL.length() > 0 && jIRCTools.jdbcUser.length() > 0);
-        if(!jIRCTools.jdbcEnabled) {
-            this.log("@@@ ALERT @@@ - JDBC Logging is disabled!");
-        }
-        
         // Parse the list of channels to join.
-        String strChannels = config.getProperty("channels", "#Hive13_test");
-        String splitChannels[] = strChannels.split(",");
-        for (int i = 0; i < splitChannels.length; i++) {
-            String channel = splitChannels[i].trim();
+        String strChannels[] = jIRCProperties.getInstance().getChannels();
+        for (int i = 0; i < strChannels.length; i++) {
+            String channel = strChannels[i].trim();
             if (channel.length() > 0) {
                 channelList.add(channel);
             }
@@ -290,6 +274,10 @@ public class jIRCBot extends PircBot {
         severe
     }
     
+    public void log(String line) {
+    	this.log(line, eLogLevel.info);
+    }
+    
     public void log(String line, eLogLevel logLevel) { 
         switch(logLevel) {
         case info:
@@ -306,7 +294,7 @@ public class jIRCBot extends PircBot {
             break;
         }
         
-        this.log(line);
+        super.log(line);
     }
     
     /**
@@ -377,6 +365,8 @@ public class jIRCBot extends PircBot {
             //             channel from that list.
             //             So I think that makes this take about n^x where we
             //             we have n users and x channels.
+        	//			   The one saving grace of this method is that while n might
+        	//			   be large, x should be small, and in most cases only 1.
             Iterator<Entry<String, jIRCUser>> it = userListEntrySet().iterator();
             while(it.hasNext()) {
                 Entry<String, jIRCUser> e = it.next();

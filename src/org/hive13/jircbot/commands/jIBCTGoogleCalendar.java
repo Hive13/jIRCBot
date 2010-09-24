@@ -1,7 +1,18 @@
 package org.hive13.jircbot.commands;
 
-public class jIBCTGoogleCalendar {
-	public static void main(String[] args) {
+import org.hive13.jircbot.jIRCBot;
+
+public class jIBCTGoogleCalendar extends jIBCommandThread {
+
+	public jIBCTGoogleCalendar(jIRCBot bot, String commandName, String channel) {
+		super(bot, commandName, channel);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void loop() {
+		// TODO Auto-generated method stub
 		
 	}
+
 }
