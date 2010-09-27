@@ -1,0 +1,18 @@
+Below is an example of three different nickserv responses.
+
+17:07 <paul_hive13> info cjdavis
+17:07 -NickServ(NickServ@services.)- Information on cjdavis (account cjdavis):
+17:07 -NickServ(NickServ@services.)- Registered : Jun 22 00:14:39 2008 (2 years, 13 weeks, 6 days, 20:52:48 ago)
+17:07 -NickServ(NickServ@services.)- Last addr  : ~cjdavis@cpe-71-67-99-208.cinci.res.rr.com
+17:07 -NickServ(NickServ@services.)- Last seen  : now
+17:07 -NickServ(NickServ@services.)- Flags      : HideMail
+17:07 -NickServ(NickServ@services.)- *** End of Info ***
+17:07 <paul_hive13> info foxydot
+17:07 -NickServ(NickServ@services.)- Information on foxydot (account foxydot):
+17:07 -NickServ(NickServ@services.)- Registered : Mar 12 20:24:00 2008 (2 years, 28 weeks, 3 days, 00:43:55 ago)
+17:07 -NickServ(NickServ@services.)- Last addr  : ~foxydot@130.245.196.216.DED-DSL.fuse.net
+17:07 -NickServ(NickServ@services.)- Last seen  : Aug 13 22:49:57 2010 (6 weeks, 2 days, 22:17:58 ago)
+17:07 -NickServ(NickServ@services.)- Flags      : HideMail
+17:07 -NickServ(NickServ@services.)- *** End of Info ***
+17:08 <paul_hive13> info chris_h14
+17:08 -NickServ(NickServ@services.)- chris_h14 is not registered.
