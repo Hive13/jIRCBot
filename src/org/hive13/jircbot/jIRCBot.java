@@ -158,23 +158,25 @@ public class jIRCBot extends PircBot {
         try {
             // Add all command threads.
             addCommandThread(new jIBCTRssReader(this, "WikiFeed", channelList.get(0),
-                    "[commandName] - [Title|c50] - [Author|c20] ( [Link] )",
+                    "[commandName]: [Title|c50] ~[Author|c20] ([Link])",
                     "http://wiki.hive13.org/index.php?title=Special:RecentChanges&feed=rss&hideminor=1"));
             
-            addCommandThread(new jIBCTRssReader(this, "Hive13Blog", channelList.get(0),
+            addCommandThread(new jIBCTRssReader(this, "h13Blog", channelList.get(0),
+                    "[commandName]: [Title|c50] ([Link])",
                     "http://www.hive13.org/?feed=rss2"));
             
-            addCommandThread(new jIBCTRssReader(this, "Hive13List", channelList.get(0),
-                    "[commandName] - [Title|c50] - [Author|c20|r\\(.+\\)] ( [Link] )",
+            addCommandThread(new jIBCTRssReader(this, "h13List", channelList.get(0),
+                    "[commandName]: [Title|c50] ~[Author|c20|r\\(.+\\)] ([Link])",
                     "http://groups.google.com/group/cincihackerspace/feed/rss_v2_0_msgs.xml"));
             
             // PTV: Flickr feed has been known to have issues... 
-            addCommandThread(new jIBCTRssReader(this, "Hive13Flickr", channelList.get(0),
+            addCommandThread(new jIBCTRssReader(this, "Flickr", channelList.get(0),
+                    "[commandName]: [Title|c50] ([Link])",
                     "http://api.flickr.com/services/feeds/photos_public.gne?tags=hive13&lang=en-us&format=rss_200",
                     15*60*1000)); // 15 minutes (15 * 60 seconds)
             
-            addCommandThread(new jIBCTRssReader(this, "Hive13Twitter", channelList.get(0),
-                    "[commandName] - [Title|c30] - [Author|c20|r\\(.+\\)] ( [Link] )",
+            addCommandThread(new jIBCTRssReader(this, "Tweet", channelList.get(0),
+                    "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
                     "http://search.twitter.com/search.atom?q=hive13"));
         } catch (MalformedURLException ex) {
             Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
