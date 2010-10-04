@@ -44,16 +44,24 @@ public class jIBCTRssReader extends jIBCommandThread {
     private List<SyndEntry> lastEntryList_private = null;
     
     public jIBCTRssReader(jIRCBot bot, String commandName, String channel, String rssFeedLink) throws MalformedURLException {
-        this(bot, commandName, channel, "[commandName] - [Title|c50] ( [Link] )", new URL(rssFeedLink));
+        this(bot, commandName, channel, "[commandName] - [Title|c50] ( [Link] )", new URL(rssFeedLink), 30*1000);
+    }
+    
+    public jIBCTRssReader(jIRCBot bot, String commandName, String channel, String rssFeedLink, long refreshRate) throws MalformedURLException {
+        this(bot, commandName, channel, "[commandName] - [Title|c50] ( [Link] )", new URL(rssFeedLink), refreshRate);
     }
     
     public jIBCTRssReader(jIRCBot bot, String commandName, String channel, String formatString, String rssFeedLink) throws MalformedURLException {
-        this(bot, commandName, channel, formatString, new URL(rssFeedLink));
+        this(bot, commandName, channel, formatString, new URL(rssFeedLink), 30*1000);
+    }
+    
+    public jIBCTRssReader(jIRCBot bot, String commandName, String channel, String formatString, String rssFeedLink, long refreshRate) throws MalformedURLException {
+        this(bot, commandName, channel, formatString, new URL(rssFeedLink), refreshRate);
     }
     
     @SuppressWarnings("unchecked")
-    public jIBCTRssReader(jIRCBot bot, String commandName, String channel, String formatString, URL feedURL) {
-        super(bot, commandName, channel);
+    public jIBCTRssReader(jIRCBot bot, String commandName, String channel, String formatString, URL feedURL, long refreshRate) {
+        super(bot, commandName, channel, refreshRate);
         this.formatString = formatString;
         this.feedURL = feedURL;
         

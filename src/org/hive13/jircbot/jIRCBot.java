@@ -170,14 +170,15 @@ public class jIRCBot extends PircBot {
             
             // PTV: Flickr feed has been known to have issues... 
             addCommandThread(new jIBCTRssReader(this, "Hive13Flickr", channelList.get(0),
-                    "http://api.flickr.com/services/feeds/photos_public.gne?tags=hive13&lang=en-us&format=rss_200"));
+                    "http://api.flickr.com/services/feeds/photos_public.gne?tags=hive13&lang=en-us&format=rss_200",
+                    15*60*1000)); // 15 minutes (15 * 60 seconds)
             
             addCommandThread(new jIBCTRssReader(this, "Hive13Twitter", channelList.get(0),
                     "http://twitter.com/statuses/user_timeline/39281942.rss"));
         } catch (MalformedURLException ex) {
             Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
                     ex);
-            this.log("Error: jIRCBot()" + ex.toString());
+            log("jIRCBot()" + ex.toString(), eLogLevel.severe);
         }
 
         // Connect to IRC
@@ -265,10 +266,29 @@ public class jIRCBot extends PircBot {
         }
     }
     
+    /**
+     * Various log levels for when the bot is writing to the log.
+     * This is primarily used for formatting the log message.
+     * @author vincentp
+     *
+     */
     public enum eLogLevel{
+    	/** Just an alert message giving a bot status update. */
         info,
+        /** Either a minor error or slightly unexpected event has occurred.
+         *  this is not really serious and the bot will continue normal operations
+         */
         warning,
+        /** A more serious event has occurred.  The bot will probably recover
+         * from this error and continue normal operations, however it is not guaranteed.
+         */
         error,
+        /** A major error has occurred that will effect bot actions and operations.
+         *  This should never occur in the course of bot operation unless it has been
+         *  incorrectly configured or compiled.  The bot can not continue normal operations
+         *  and will probably act very strangely until it is restarted.  This error is 
+         *  thrown when a key process is interrupted or throws an error.
+         */
         severe
     }
     
