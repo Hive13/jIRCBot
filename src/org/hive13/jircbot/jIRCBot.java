@@ -174,7 +174,8 @@ public class jIRCBot extends PircBot {
                     15*60*1000)); // 15 minutes (15 * 60 seconds)
             
             addCommandThread(new jIBCTRssReader(this, "Hive13Twitter", channelList.get(0),
-                    "http://twitter.com/statuses/user_timeline/39281942.rss"));
+                    "[commandName] - [Title|c30] - [Author|c20|r\\(.+\\)] ( [Link] )",
+                    "http://search.twitter.com/search.atom?q=hive13"));
         } catch (MalformedURLException ex) {
             Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
                     ex);
