@@ -140,9 +140,22 @@ public class jIRCBot extends PircBot {
             }
         }
 
+        if(jIRCProperties.getInstance().getJDBCUrl().isEmpty() 
+        		|| jIRCProperties.getInstance().getJDBCUser().isEmpty()
+        		|| jIRCProperties.getInstance().getJDBCPass().isEmpty()) {
+        	jIRCTools.jdbcEnabled = false;
+        } else { 
+        	jIRCTools.jdbcEnabled = true;
+        }
+        
         // Make it so that the bot outputs lots of information when run.
         setVerbose(true);
 
+        if(jIRCTools.jdbcEnabled == false)
+        	this.log("MySQL Chat logging is disabled.", eLogLevel.warning);
+        else
+        	this.log("MySQL Chat logging is enabled.", eLogLevel.info);
+        
         // Add commands that parse every single line
         // WARNING!! Be sparing with these commands
         //           their code should be run asynchronously
