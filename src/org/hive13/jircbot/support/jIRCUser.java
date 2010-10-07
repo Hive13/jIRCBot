@@ -56,7 +56,7 @@ public class jIRCUser {
      * that the user is present in.
      * @param channel   The name of the channel the user has just joined.
      */
-    public void addChannel(String channel) {
+	public void addChannel(String channel) {
         _channels.put(channel, channel);
     }
     
