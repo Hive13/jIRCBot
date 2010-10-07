@@ -308,6 +308,13 @@ public class jIRCBot extends PircBot {
         severe
     }
     
+    /**
+     * This function uses the logLevel to determine how to treat each
+     * message that is passed to it.
+     * 
+     * @param line		Line to write to the log.
+     * @param logLevel	The level of importance to give the message.
+     */
     public void log(String line, eLogLevel logLevel) { 
         switch(logLevel) {
         case info:
@@ -348,15 +355,22 @@ public class jIRCBot extends PircBot {
     }
     
     public void onUserList(String channel, User[] users) {
-        // TODO: This method currently has the potential to allow for duplicate channels in the list.
+    	// This function is called whenever we join a channel, or whenever we initiate
+    	// a "ListUsers" action for a channel.
+    	
+    	// Here we loop through the list of 'users' in the 'channel'.
         for(int i = 0; i < users.length; i++) {
             jIRCUser user;
+            // If we already have an account of this user in another channel...
             if((user = userListGet(users[i].getNick())) != null) {
-                // yes! Update it.
+                // Update that user to also have this channel.
+            	// The jIRCUser class is responsible for ensuring there are no duplicates.
                 user.addChannel(channel);
             }
             else {
-                // no! Add it.
+                // The user was not found in our list of known users.
+            	// So we add it here, then add the current channel
+            	// to the list of channels the user is in.
                 user = new jIRCUser(users[i].getNick());
                 user.addChannel(channel);
                 userListPut(user);
@@ -365,30 +379,38 @@ public class jIRCBot extends PircBot {
     }
     
     public void onJoin(String channel, String sender, String login, String hostname) {
+    	// This function is called whenever a user joins a channel we are also in.
+    	// This function is also called when WE join the channel.
+    	
         // Do we know about this user?
-        if(sender.equals(this.getName())) {
+        if(sender.equals(this.getNick())) {
             // We just joined a channel, get the list of users in this channel.
-            // *UPDATE* This does not work... use the "OnUserList" method.
+            // *UPDATE* This does not work... see the "OnUserList" method.
         } else {
             // This is someone else joining the channel.
             jIRCUser user;
             if((user = userListGet(sender)) != null) {
-                // yes! Update it.
+                // Existing user, update it.
                 user.addChannel(channel);
             }
             else {
-                // no! Add it.
+                // New user, add it.
                 user = new jIRCUser(sender);
                 user.addChannel(channel);
                 userListPut(user);
             }
+            
+            // Write the event to the log.
             jIRCTools.insertMessage(channel, this.getServer(), sender, "", eMsgTypes.joinMsg);
         }
     }
     
     public void onPart(String channel, String sender, String login, String hostname) {
+    	// This function is called when a user leaves a channel we are in.
+    	// This function is also called when WE leave a channel.
+    	
         // Did we just leave the channel?
-        if(sender.equals(this.getName())) {
+        if(sender.equals(this.getNick())) {
             // Yes, remove the list of users we know in this channel.
             //  ** NOTE ** This is going to be horribly in-efficient.
             //             We need to get each user, then go through
@@ -396,8 +418,8 @@ public class jIRCBot extends PircBot {
             //             channel from that list.
             //             So I think that makes this take about n^x where we
             //             we have n users and x channels.
-        	//			   The one saving grace of this method is that while n might
-        	//			   be large, x should be small, and in most cases only 1.
+        	//			   The one saving grace of this method is that while 'n' might
+        	//			   be large, 'x' should be small, and in most cases only 1.
             Iterator<Entry<String, jIRCUser>> it = userListEntrySet().iterator();
             while(it.hasNext()) {
                 Entry<String, jIRCUser> e = it.next();
@@ -419,13 +441,21 @@ public class jIRCBot extends PircBot {
                 if(user.getChannelCount() == 0)
                    userListRemove(sender);
             }
+            
+            // Log this user leaving the channel.
             jIRCTools.insertMessage(channel, this.getServer(), sender, "", eMsgTypes.partMsg);
         }
     }
+    
     public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
+    	// This is a User quitting the server entirely.
+    	// This could be US quitting the server entirely.
+    	
         // This could be us, but if we quit, who cares?
+    	// Find the user that is leaving.
         jIRCUser user;
         if((user = userListRemove(sourceNick)) != null) {
+        	// Then log the user quitting in all channels that the user was in.
             Iterator<String> i = user.getChannelIterator();
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), sourceNick, reason, eMsgTypes.quitMsg);
@@ -434,12 +464,18 @@ public class jIRCBot extends PircBot {
     }
     
     public void onNickChange(String oldNick, String login, String hostname, String newNick) {
+    	// This is a User changing their Nick.
+    	// This could be US changing our Nick, but who cares if we change our nick?
+    	
+    	// Remove the old username from the list of known users.
         jIRCUser user;
         if((user = userListRemove(oldNick)) != null) {
+        	// Log the change in name.
             Iterator<String> i = user.getChannelIterator();
             while(i.hasNext()) {
                 jIRCTools.insertMessage(i.next(), this.getServer(), oldNick, newNick, eMsgTypes.nickChange);
             }
+            // Change the users name, and re-add him to the list of users.
             user.setUsername(newNick);
             userListPut(user);
         }

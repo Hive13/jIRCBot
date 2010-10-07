@@ -122,6 +122,15 @@ public class jIRCTools {
 	    return result;
 	}
 	
+	/**
+	 * When passed the URL for a webpage this function
+	 * attempts to determine the title of the webpage if
+	 * it is an HTML page, if it is not an HTML page it
+	 * determines the MIME datatype and returns that.
+	 * 
+	 * @param myURL	URL of the page to find the title for.
+	 * @return		Returns the title of the webpage.
+	 */
 	public static String getURLTitle(String myURL) {
 		String result = "";
 		try {
