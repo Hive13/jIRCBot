@@ -52,7 +52,6 @@ public abstract class jIBCommandThread extends jIBCommand {
 		this.commandName = commandName;
 		this.channel = channel;
 		this.loopDelay = loopDelay;
-		startCommandThread();
 	}
 
 	/**
