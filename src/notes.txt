@@ -1,6 +1,6 @@
 Below is an example of three different nickserv responses.
 
-17:07 <paul_hive13> info cjdavis
+~~~ info cjdavis
 17:07 -NickServ(NickServ@services.)- Information on cjdavis (account cjdavis):
 17:07 -NickServ(NickServ@services.)- Registered : Jun 22 00:14:39 2008 (2 years, 13 weeks, 6 days, 20:52:48 ago)
 17:07 -NickServ(NickServ@services.)- Last addr  : ~cjdavis@cpe-71-67-99-208.cinci.res.rr.com
@@ -8,7 +8,7 @@ Below is an example of three different nickserv responses.
 17:07 -NickServ(NickServ@services.)- Flags      : HideMail
 17:07 -NickServ(NickServ@services.)- *** End of Info ***
 
-17:07 <paul_hive13> info foxydot
+~~~ info foxydot
 17:07 -NickServ(NickServ@services.)- Information on foxydot (account foxydot):
 17:07 -NickServ(NickServ@services.)- Registered : Mar 12 20:24:00 2008 (2 years, 28 weeks, 3 days, 00:43:55 ago)
 17:07 -NickServ(NickServ@services.)- Last addr  : ~foxydot@130.245.196.216.DED-DSL.fuse.net
@@ -16,5 +16,126 @@ Below is an example of three different nickserv responses.
 17:07 -NickServ(NickServ@services.)- Flags      : HideMail
 17:07 -NickServ(NickServ@services.)- *** End of Info ***
 
-17:08 <paul_hive13> info chris_h14
+~~~ info chris_h14
 17:08 -NickServ(NickServ@services.)- chris_h14 is not registered.
+
+~~~ info paul_hive13
+14:09 -NickServ(NickServ@services.)- Information on Paul_hive13 (account pvince):
+14:09 -NickServ(NickServ@services.)- Registered : Jun 09 23:06:34 2009 (1 year, 17 weeks, 1 day, 19:02:52 ago)
+14:09 -NickServ(NickServ@services.)- User reg.  : May 30 04:46:27 2009 (1 year, 18 weeks, 5 days, 13:22:59 ago)
+14:09 -NickServ(NickServ@services.)- Last addr  : ~pvince@www.hive13.org
+14:09 -NickServ(NickServ@services.)- Last seen  : now
+14:09 -NickServ(NickServ@services.)- Flags      : HideMail
+14:09 -NickServ(NickServ@services.)- *** End of Info ***
+
+Log from the test:
+~~~PRIVMSG nickserv :info xio2
+xio2 is not registered.
+~~~PRIVMSG nickserv :info davemenninger
+Information on davemenninger (account davemenninger):
+Registered : Jun 04 01:28:38 2009 (1 year, 18 weeks, 0 days, 17:37:06 ago)
+Last addr  : ~davemenni@www.hive13.org
+Last seen  : Apr 02 22:10:14 2010 (26 weeks, 6 days, 20:55:30 ago)
+Flags      : HideMail
+*** End of Info ***
+~~~PRIVMSG nickserv :info cjdavis
+Information on cjdavis (account cjdavis):
+~~~PRIVMSG nickserv :info paul_hive13
+Registered : Jun 22 00:14:39 2008 (2 years, 15 weeks, 3 days, 18:51:06 ago)
+Last addr  : ~cjdavis@cpe-71-67-99-208.cinci.res.rr.com
+Last seen  : now
+Flags      : HideMail
+*** End of Info ***
+Information on Paul_hive13 (account pvince):
+Registered : Jun 09 23:06:34 2009 (1 year, 17 weeks, 1 day, 19:59:12 ago)
+User reg.  : May 30 04:46:27 2009 (1 year, 18 weeks, 5 days, 14:19:19 ago)
+Last addr  : ~pvince@www.hive13.org
+Last seen  : now
+Flags      : HideMail
+*** End of Info ***
+~~~PRIVMSG nickserv :info Hive13Bot
+Hive13Bot is not registered.
+
+Second Test
+~~~PRIVMSG nickserv :info paul_hive13
+Information on Paul_hive13 (account pvince):
+Registered : Jun 09 23:06:34 2009 (1 year, 17 weeks, 1 day, 20:13:42 ago)
+User reg.  : May 30 04:46:27 2009 (1 year, 18 weeks, 5 days, 14:33:49 ago)
+Last addr  : ~pvince@www.hive13.org
+Last seen  : now
+Flags      : HideMail
+*** End of Info ***
+
+~~~PRIVMSG nickserv :info Hive13Bot
+Hive13Bot is not registered.
+
+~~~PRIVMSG nickserv :info int0x80_
+int0x80_ is not registered.
+
+~~~PRIVMSG nickserv :info nauseaboy
+Information on nauseaboy (account nauseaboy):
+Registered : Jan 17 03:13:29 2006 (4 years, 37 weeks, 6 days, 16:06:50 ago)
+Last addr  : ~nauseaboy@li62-171.members.linode.com
+Last seen  : now
+Email      : noemail
+*** End of Info ***
+
+~~~PRIVMSG nickserv :info cjdavis
+Information on cjdavis (account cjdavis):
+Registered : Jun 22 00:14:39 2008 (2 years, 15 weeks, 3 days, 19:05:41 ago)
+Last addr  : ~cjdavis@cpe-71-67-99-208.cinci.res.rr.com
+Last seen  : now
+Flags      : HideMail
+*** End of Info ***
+
+~~~PRIVMSG nickserv :info Hodapp
+Information on Hodapp (account Hodapp):
+Registered : Jun 22 19:13:01 2007 (3 years, 15 weeks, 4 days, 00:07:20 ago)
+Last addr  : ~hodapp@pohl.ececs.uc.edu
+Last seen  : now
+Flags      : HideMail
+*** End of Info ***
+
+~~~PRIVMSG nickserv :info firstohit
+firstohit is not registered.
+
+~~~PRIVMSG nickserv :info peters-tx
+Information on peters-tx (account peters-tx):
+Registered : Dec 27 15:31:03 2006 (3 years, 40 weeks, 6 days, 03:49:20 ago)
+Last addr  : ~p@dsl081-112-039.dfw1.dsl.speakeasy.net
+Last seen  : now
+Flags      : HideMail
+*** End of Info ***
+
+~~~PRIVMSG nickserv :info chris_h14
+chris_h14 is not registered.
+
+~~~PRIVMSG nickserv :info davemenninger
+Information on davemenninger (account davemenninger):
+Registered : Jun 04 01:28:38 2009 (1 year, 18 weeks, 0 days, 17:51:47 ago)
+Last addr  : ~davemenni@www.hive13.org
+Last seen  : Apr 02 22:10:14 2010 (26 weeks, 6 days, 21:10:11 ago)
+Flags      : HideMail
+*** End of Info ***
+
+~~~PRIVMSG nickserv :info HiveBot
+HiveBot is not registered.
+
+~~~PRIVMSG nickserv :info xio2
+xio2 is not registered.
+
+~~~PRIVMSG nickserv :info reportingsjr
+Information on reportingsjr (account reportingsjr):
+Registered : Feb 21 01:33:41 2007 (3 years, 32 weeks, 6 days, 17:46:47 ago)
+Last addr  : ~Jon@pysoy/developer/JonNeal
+Last seen  : now
+Flags      : HideMail
+*** End of Info ***
+
+~~~PRIVMSG nickserv :info rogueclown
+Information on RogueClown (account RogueClown):
+Registered : Apr 11 20:56:23 2008 (2 years, 25 weeks, 4 days, 22:24:06 ago)
+Last addr  : ~rogueclow@64.246.96.33
+Last seen  : now
+Flags      : HideMail
+*** End of Info ***

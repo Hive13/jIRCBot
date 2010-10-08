@@ -144,19 +144,23 @@ public class jIBCTRssReader extends jIBCommandThread {
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE,
 					null, ex);
-			bot.log("Error: " + getCommandName() + " " + ex.toString());
+			bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
 		} catch (IllegalArgumentException ex) {
 			Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE,
 					null, ex);
-			bot.log("Error: " + getCommandName() + " " + ex.toString());
+			bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
 		} catch (FeedException ex) {
 			Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE,
 					null, ex);
-			bot.log("Error: " + getCommandName() + " " + ex.toString());
+			bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
 		} catch (IOException ex) {
 			Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE,
 					null, ex);
-			bot.log("Error: " + getCommandName() + " " + ex.toString());
+			bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
+		} catch (Exception ex) {
+			Logger.getLogger(jIBCTRssReader.class.getName()).log(Level.SEVERE,
+					null, ex);
+			bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
 		}
 
 	}
