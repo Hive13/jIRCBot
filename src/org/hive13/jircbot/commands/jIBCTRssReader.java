@@ -43,7 +43,7 @@ public class jIBCTRssReader extends jIBCommandThread {
 	private File cacheFile = null;
 
 	private List<SyndEntry> lastEntryList_private = null;
-
+	
 	public jIBCTRssReader(jIRCBot bot, String commandName, String channel,
 			String rssFeedLink) throws MalformedURLException {
 		this(bot, commandName, channel,
@@ -101,10 +101,12 @@ public class jIBCTRssReader extends jIBCommandThread {
 				bot.log("Info: " + getCommandName() + " " + ex.toString());
 			}
 		}
+		this.startCommandThread();
 	}
 
 	@Override
 	public void loop() {
+		
 		try {
 			// TODO Auto-generated method stub
 			// Here we pretend to be the google bot to fake out User-Agent
