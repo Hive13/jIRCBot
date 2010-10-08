@@ -2,6 +2,9 @@ package org.hive13.jircbot.support;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 public class jIRCProperties {
@@ -11,7 +14,8 @@ public class jIRCProperties {
 	private String defaultBotName 	= "Hive13Bot";
 	private String defaultServer 	= "irc.freenode.net";
 	private String defaultChannels 	= "#Hive13_test";
-
+	private String parsedChannels[] = null;
+	
 	private String defaultBitlyName = "";
 	private String defaultBitlyKey 	= "";
 
@@ -20,6 +24,11 @@ public class jIRCProperties {
 	private String defaultJDBCPass 	= "";
 
 	private String defaultUserAgent = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
+	
+	private String defaultNickServ	= "nickserv";
+	private String AuthUserlist	    = "";
+	
+	private List<String> parsedAuthList = null;
 
 	protected jIRCProperties() {
 		config = new Properties();
@@ -50,12 +59,17 @@ public class jIRCProperties {
 	}
 
 	public String[] getChannels() {
-		String channels = getProp("channels", defaultChannels);
-		String splitChannels[] = channels.split(",");
-		for (int i = 0; i < splitChannels.length; i++) {
-			splitChannels[i] = splitChannels[i].trim();
+		// Since we only read the properties once, it does not make sense
+		// to repeatedly re-parse the channel string.
+		if(parsedChannels == null) {
+			String channels = getProp("channels", defaultChannels);
+			String splitChannels[] = channels.split(",");
+			for (int i = 0; i < splitChannels.length; i++) {
+				splitChannels[i] = splitChannels[i].trim();
+			}
+			parsedChannels = splitChannels;
 		}
-		return splitChannels;
+		return parsedChannels;
 	}
 
 	/** Username to use for the bit.ly API */
@@ -90,5 +104,32 @@ public class jIRCProperties {
 	 */
 	public String getUserAgentString() {
 		return getProp("userAgentString", defaultUserAgent);
+	}
+	
+	/**
+	 * It is possible that on different servers different
+	 * usernames may be used for the bot that handles
+	 * authenticating users.
+	 * 
+	 * However, the bot will still need to follow the
+	 * message format used by the bot on the Freenode.net
+	 * network.
+	 */
+	public String getNickServUsername() {
+		return getProp("NickServUsername", defaultNickServ);
+	}
+	
+	/**
+	 * Find the list of users that are to be authorized.
+	 */
+	public List<String> getAuthUserList() {
+		// Since we only read the properties once, it does not make sense
+		// to repeatedly re-parse the channel string.
+		if(parsedAuthList == null) {
+			String users = getProp("AuthUserList", AuthUserlist);
+			String splitUsers[] = users.split(", ?");
+			parsedAuthList = new ArrayList<String>(Arrays.asList(splitUsers));
+		}
+		return parsedAuthList;
 	}
 }

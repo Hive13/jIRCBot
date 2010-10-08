@@ -29,6 +29,7 @@ import org.hive13.jircbot.commands.jIBCommandThread;
 import org.hive13.jircbot.support.jIRCProperties;
 import org.hive13.jircbot.support.jIRCTools;
 import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
+import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 import org.hive13.jircbot.support.jIRCUser;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
@@ -62,9 +63,7 @@ public class jIRCBot extends PircBot {
 	// List of channels to join
 	private final List<String> channelList;
 
-	// List of Authorized usernames
-	private final List<String> authedUserList;
-
+	// Flag used to tell if the bot was actually told to quit vs. it timing out.
 	public AtomicBoolean abShouldQuit = new AtomicBoolean(false);
 
 	/*
@@ -117,9 +116,6 @@ public class jIRCBot extends PircBot {
 		userList = new HashMap<String, jIRCUser>();
 		userListMutex = new Semaphore(1);
 
-		authedUserList = new ArrayList<String>();
-		authedUserList.add("pvince");
-
 		// Grab configuration information.
 		botName = jIRCProperties.getInstance().getBotName();
 		serverAddress = jIRCProperties.getInstance().getServer();
@@ -160,9 +156,9 @@ public class jIRCBot extends PircBot {
 		addCommand(new jIBCQuitCmd());
 		// addCommand(new jIBCPluginList(commands));
 		// addCommand(new jIBCLogParser());
-
 		try {
 			// Add all command threads.
+			
 			addCommandThread(new jIBCTRssReader(
 					this,
 					"WikiFeed",
@@ -195,7 +191,7 @@ public class jIRCBot extends PircBot {
 					"Tweet",
 					channelList.get(0),
 					"[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
-					"http://search.twitter.com/search.atom?q=hive13"));
+					"http://search.twitter.com/search.atom?q=hive13"));		
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
 					ex);
@@ -394,6 +390,9 @@ public class jIRCBot extends PircBot {
 				user = new jIRCUser(users[i].getNick());
 				user.addChannel(channel);
 				userListPut(user);
+				
+				// Start Auth for the user
+				startAuthForUser(user);
 			}
 		}
 	}
@@ -421,6 +420,8 @@ public class jIRCBot extends PircBot {
 				userListPut(user);
 			}
 
+			// Initiate check for credentials
+			startAuthForUser(user);
 			// Write the event to the log.
 			jIRCTools.insertMessage(channel, this.getServer(), sender, "",
 					eMsgTypes.joinMsg);
@@ -525,16 +526,56 @@ public class jIRCBot extends PircBot {
 	 * accessor & mutator methods for it.
 	 */
 	public void startAuthForUser(jIRCUser user) {
-		this.sendMessage("paul_hive13", "info " + user.getUsername());
+		// Essentially sends the following to the nickserv bot:
+		// /msg nickserv info TargetUsername
+		this.sendMessage(jIRCProperties.getInstance().getNickServUsername(),
+				"info " + user.getUsername());
+		
 	}
 
-	public void onPrivateMessage(String sender, String login, String hostname,
-			String message) {
+	private jIRCUser targetUser = null;
+	private boolean targetUserLoggedIn = false;
+	public void onNotice(String sourceNick, String sourceLogin, 
+			String sourceHostname, String target, String notice) {
 		/*
-		 * Ok, this is going to be interesting, and I think in retrospect all of
-		 * that work I did to make sure that userList was thread safe might have
-		 * been a waste of time.
+		 * Messages will be returned from the nickserv in groups.
+		 * 
+		 * Each group will be for a user.
+		 * 
+		 * 	Information on peters-tx (account peters-tx):
+			Registered : Dec 27 15:31:03 2006 (3 years, 40 weeks, 6 days, 03:49:20 ago)
+			Last addr  : ~p@dsl081-112-039.dfw1.dsl.speakeasy.net
+			Last seen  : now
+			Flags      : HideMail
+			*** End of Info ***
 		 */
+		if(sourceNick.equalsIgnoreCase(jIRCProperties.getInstance().getNickServUsername())) {
+			// Check if the response is w/ regards to a user I asked about.
+			if(notice.startsWith("Information")) {
+				// Find the user referred to in this response.
+				int indexOfUsername = notice.lastIndexOf(" ") + 2;
+				String username = notice.substring(indexOfUsername, notice.length() - 3);
+				if(jIRCProperties.getInstance().getAuthUserList().contains(username.toLowerCase())) {
+					int endIndexOfNick = notice.indexOf(" (") - 1;
+					String nick = notice.substring(16, endIndexOfNick);
+					targetUser = userListGet(nick.toLowerCase());					
+				}
+				// Set a flag indicating what user we are currently parsing.
+			} else if(notice.startsWith("Last seen") && targetUser != null) { // and we are currently parsing
+			    // Make sure it is set to "Now"
+				String isLoggedInNow = notice.substring(13);
+				targetUserLoggedIn = isLoggedInNow.equals("now");
+				if(targetUserLoggedIn) {
+					targetUser.setAuthorized(eAuthLevels.operator);
+					log("Just Auth'ed " + targetUser.getUsername(), eLogLevel.info);
+					
+					targetUser = null;
+				}
+			} else if(notice.startsWith("***")) {
+				// End parsing, Validate User credentials.
+				targetUser = null;
+			}
+		}
 	}
 
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
