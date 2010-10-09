@@ -1,6 +1,8 @@
 package org.hive13.jircbot.commands;
 
 import org.hive13.jircbot.jIRCBot;
+import org.hive13.jircbot.jIRCBot.eLogLevel;
+import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 /**
  * A basic framework for implementing commands.
@@ -9,6 +11,19 @@ import org.hive13.jircbot.jIRCBot;
  *
  */
 public abstract class jIBCommand {
+    protected eAuthLevels reqAuthLevel;
+    
+    public jIBCommand() {
+        this(eAuthLevels.unauthorized);
+    }
+    
+    public jIBCommand(eAuthLevels reqAuthLevel) {
+        this.reqAuthLevel = reqAuthLevel;
+    }
+    
+    public eAuthLevels getReqAuthLevel() {
+        return reqAuthLevel;
+    }
     
 	/**
 	 * This method returns a unique name for the command.
@@ -27,7 +42,14 @@ public abstract class jIBCommand {
      * 					received when this command was activated.
      */
     public void runCommand(jIRCBot bot, String channel, String sender, String message) {
-        new Thread(new jIBCommandRunnable(bot, channel, sender, message)).start();
+        eAuthLevels userAuthLevel = bot.userListGet(sender).getAuthLevel();
+        if(userAuthLevel.ordinal() >= getReqAuthLevel().ordinal())
+            new Thread(new jIBCommandRunnable(bot, channel, sender, message)).start();
+        else {
+            bot.sendMessage(sender, "You do not have permission to activate this command.");
+            bot.log(sender + " just tried to use " + getCommandName() 
+                    + " but their AuthLevel is only " + userAuthLevel, eLogLevel.warning);
+        }
     }
     
     

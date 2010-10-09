@@ -11,6 +11,9 @@ import java.util.Iterator;
  *
  */
 public class jIRCUser {
+    // As an internal note, make sure that as the enum
+    // gets larger, it gets more permissive.
+    // AKA, Admin (enum 3) has more powers than operator (enum 2)
     /**
      * Specifies the different levels of authorization
      * that are possible.
