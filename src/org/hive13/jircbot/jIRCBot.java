@@ -568,7 +568,7 @@ public class jIRCBot extends PircBot {
 			       (inAdminList = jIRCProperties.getInstance().getAdminUserList().contains(username.toLowerCase()))) {
 					int endIndexOfNick = notice.indexOf(" (") - 1;
 					String nick = notice.substring(16, endIndexOfNick);
-					targetUser = userListGet(nick.toLowerCase());	
+					targetUser = userListGet(nick);	
 					if(inOpList)
 					    targetPendingAuthLevel = eAuthLevels.operator;
 					else if (inAdminList)
@@ -637,7 +637,7 @@ public class jIRCBot extends PircBot {
 		jIRCUser result = null;
 		try {
 			userListMutex.acquire();
-			result = userList.get(username);
+			result = userList.get(username.toLowerCase());
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
 					.log(Level.SEVERE, null, e);
@@ -658,7 +658,7 @@ public class jIRCBot extends PircBot {
 	public void userListPut(jIRCUser user) {
 		try {
 			userListMutex.acquire();
-			userList.put(user.getUsername(), user);
+			userList.put(user.getUsername().toLowerCase(), user);
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
 					.log(Level.SEVERE, null, e);
@@ -679,7 +679,7 @@ public class jIRCBot extends PircBot {
 		jIRCUser result = null;
 		try {
 			userListMutex.acquire();
-			result = userList.remove(username);
+			result = userList.remove(username.toLowerCase());
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
 					.log(Level.SEVERE, null, e);
