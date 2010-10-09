@@ -1,8 +1,16 @@
 package org.hive13.jircbot.commands;
 
 import org.hive13.jircbot.jIRCBot;
+import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 public class jIBCQuitCmd extends jIBCommand {
+    
+    /**
+     * @param reqAuthLevel
+     */
+    public jIBCQuitCmd() {
+        super(eAuthLevels.admin);
+    }
 
     @Override
     public String getCommandName() {

@@ -422,6 +422,7 @@ public class jIRCBot extends PircBot {
 
 			// Initiate check for credentials
 			startAuthForUser(user);
+			
 			// Write the event to the log.
 			jIRCTools.insertMessage(channel, this.getServer(), sender, "",
 					eMsgTypes.joinMsg);
@@ -533,8 +534,12 @@ public class jIRCBot extends PircBot {
 		
 	}
 
+	// I am reasonably sure that this function will not be called asynchronously
+	// However I am not certain.
 	private jIRCUser targetUser = null;
 	private boolean targetUserLoggedIn = false;
+	private eAuthLevels targetPendingAuthLevel = eAuthLevels.unauthorized;
+	
 	public void onNotice(String sourceNick, String sourceLogin, 
 			String sourceHostname, String target, String notice) {
 		/*
@@ -555,10 +560,19 @@ public class jIRCBot extends PircBot {
 				// Find the user referred to in this response.
 				int indexOfUsername = notice.lastIndexOf(" ") + 2;
 				String username = notice.substring(indexOfUsername, notice.length() - 3);
-				if(jIRCProperties.getInstance().getAuthUserList().contains(username.toLowerCase())) {
+				
+				boolean inOpList = false;
+				boolean inAdminList = false;
+				
+				if((inOpList = jIRCProperties.getInstance().getOpUserList().contains(username.toLowerCase())) ||
+			       (inAdminList = jIRCProperties.getInstance().getAdminUserList().contains(username.toLowerCase()))) {
 					int endIndexOfNick = notice.indexOf(" (") - 1;
 					String nick = notice.substring(16, endIndexOfNick);
-					targetUser = userListGet(nick.toLowerCase());					
+					targetUser = userListGet(nick.toLowerCase());	
+					if(inOpList)
+					    targetPendingAuthLevel = eAuthLevels.operator;
+					else if (inAdminList)
+					    targetPendingAuthLevel = eAuthLevels.admin;
 				}
 				// Set a flag indicating what user we are currently parsing.
 			} else if(notice.startsWith("Last seen") && targetUser != null) { // and we are currently parsing
@@ -566,8 +580,9 @@ public class jIRCBot extends PircBot {
 				String isLoggedInNow = notice.substring(13);
 				targetUserLoggedIn = isLoggedInNow.equals("now");
 				if(targetUserLoggedIn) {
-					targetUser.setAuthorized(eAuthLevels.operator);
-					log("Just Auth'ed " + targetUser.getUsername(), eLogLevel.info);
+					targetUser.setAuthorized(targetPendingAuthLevel);
+					log("Just Auth'ed " + targetUser.getUsername() +
+					        " with level " + targetPendingAuthLevel, eLogLevel.info);
 					
 					targetUser = null;
 				}

@@ -26,10 +26,12 @@ public class jIRCProperties {
 	private String defaultUserAgent = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
 	
 	private String defaultNickServ	= "nickserv";
-	private String AuthUserlist	    = "";
+	private String defaultOpUserList	   = "";
+	private String defaultAdminUserList    = "";
 	
-	private List<String> parsedAuthList = null;
-
+	private List<String> parsedOpList = null;
+	private List<String> parsedAdminList = null;
+	
 	protected jIRCProperties() {
 		config = new Properties();
 		try {
@@ -118,18 +120,32 @@ public class jIRCProperties {
 	public String getNickServUsername() {
 		return getProp("NickServUsername", defaultNickServ);
 	}
-	
-	/**
-	 * Find the list of users that are to be authorized.
-	 */
-	public List<String> getAuthUserList() {
-		// Since we only read the properties once, it does not make sense
-		// to repeatedly re-parse the channel string.
-		if(parsedAuthList == null) {
-			String users = getProp("AuthUserList", AuthUserlist);
-			String splitUsers[] = users.split(", ?");
-			parsedAuthList = new ArrayList<String>(Arrays.asList(splitUsers));
-		}
-		return parsedAuthList;
-	}
+
+    /**
+     * Find the list of users that are to be authorized.
+     */
+    public List<String> getOpUserList() {
+        // Since we only read the properties once, it does not make sense
+        // to repeatedly re-parse the channel string.
+        if(parsedOpList == null) {
+            String users = getProp("OpUserList", defaultOpUserList);
+            String splitUsers[] = users.split(", ?");
+            parsedOpList = new ArrayList<String>(Arrays.asList(splitUsers));
+        }
+        return parsedOpList;
+    }
+
+    /**
+     * Find the list of users that are to be authorized.
+     */
+    public List<String> getAdminUserList() {
+        // Since we only read the properties once, it does not make sense
+        // to repeatedly re-parse the channel string.
+        if(parsedAdminList == null) {
+            String users = getProp("AdminUserList", defaultAdminUserList);
+            String splitUsers[] = users.split(", ?");
+            parsedAdminList = new ArrayList<String>(Arrays.asList(splitUsers));
+        }
+        return parsedAdminList;
+    }
 }
