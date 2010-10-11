@@ -664,7 +664,9 @@ public class jIRCBot extends PircBot {
 		jIRCUser result = null;
 		try {
 			userListMutex.acquire();
-			result = new jIRCUser(userList.get(username.toLowerCase()));
+			jIRCUser temp = userList.get(username.toLowerCase());
+			if(temp != null)
+				result = new jIRCUser(temp);
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
 					.log(Level.SEVERE, null, e);
@@ -706,7 +708,9 @@ public class jIRCBot extends PircBot {
 		jIRCUser result = null;
 		try {
 			userListMutex.acquire();
-			result = new jIRCUser(userList.remove(username.toLowerCase()));
+			jIRCUser temp = userList.remove(username.toLowerCase());
+			if(temp != null)
+				result = new jIRCUser(temp);
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
 					.log(Level.SEVERE, null, e);
