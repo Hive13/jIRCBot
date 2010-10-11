@@ -133,7 +133,7 @@ public class jIRCProperties {
         // Since we only read the properties once, it does not make sense
         // to repeatedly re-parse the channel string.
         if(parsedOpList == null) {
-            String users = getProp("OpUserList", defaultOpUserList);
+            String users = getProp("OpUserList", defaultOpUserList).toLowerCase();
             String splitUsers[] = users.split(", ?");
             parsedOpList = new ArrayList<String>(Arrays.asList(splitUsers));
         }
@@ -147,7 +147,7 @@ public class jIRCProperties {
         // Since we only read the properties once, it does not make sense
         // to repeatedly re-parse the channel string.
         if(parsedAdminList == null) {
-            String users = getProp("AdminUserList", defaultAdminUserList);
+            String users = getProp("AdminUserList", defaultAdminUserList).toLowerCase();
             String splitUsers[] = users.split(", ?");
             parsedAdminList = new ArrayList<String>(Arrays.asList(splitUsers));
         }
