@@ -48,6 +48,16 @@ public class jIRCUser {
     private HashMap<String, String> _channels;
     private eAuthLevels _authLevel;
     
+    public jIRCUser(jIRCUser copyFrom) {
+    	_channels = new HashMap<String, String>();
+    	Iterator<String> chanIt = copyFrom.getChannelIterator();
+    	while(chanIt.hasNext())
+    		addChannel(chanIt.next());
+    	
+    	this._username = new String(copyFrom.getUsername());
+    	setAuthorized(copyFrom.getAuthLevel());
+    }
+    
     public jIRCUser(String username) {
         _channels = new HashMap<String, String>();
         this._username = username;

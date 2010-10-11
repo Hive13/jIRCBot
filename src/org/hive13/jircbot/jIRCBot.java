@@ -381,18 +381,19 @@ public class jIRCBot extends PircBot {
 		for (int i = 0; i < users.length; i++) {
 			jIRCUser user;
 			// If we already have an account of this user in another channel...
-			if ((user = userListGet(users[i].getNick())) != null) {
+			if ((user = userListGetSafe(users[i].getNick())) != null) {
 				// Update that user to also have this channel.
 				// The jIRCUser class is responsible for ensuring there are no
 				// duplicates.
 				user.addChannel(channel);
+				userListPutSafe(user);
 			} else {
 				// The user was not found in our list of known users.
 				// So we add it here, then add the current channel
 				// to the list of channels the user is in.
 				user = new jIRCUser(users[i].getNick());
 				user.addChannel(channel);
-				userListPut(user);
+				userListPutSafe(user);
 				
 				// Start Auth for the user
 				startAuthForUser(user);
@@ -414,14 +415,15 @@ public class jIRCBot extends PircBot {
 		} else {
 			// This is someone else joining the channel.
 			jIRCUser user;
-			if ((user = userListGet(sender)) != null) {
+			if ((user = userListGetSafe(sender)) != null) {
 				// Existing user, update it.
 				user.addChannel(channel);
+				userListPutSafe(user);
 			} else {
 				// New user, add it.
 				user = new jIRCUser(sender);
 				user.addChannel(channel);
-				userListPut(user);
+				userListPutSafe(user);
 			}
 
 			// Initiate check for credentials
@@ -459,17 +461,19 @@ public class jIRCBot extends PircBot {
 
 				// If that was the only channel, remove the item.
 				if (user.getChannelCount() == 0)
-					userListRemove(e.getKey());
+					userListRemoveSafe(e.getKey());
 			}
 		} else {
 			// No, it was someone else.
 			jIRCUser user;
-			if ((user = userListGet(sender)) != null) {
+			if ((user = userListGetSafe(sender)) != null) {
 				user.removeChannel(channel);
 
-				// Was this the only channel the user as in?
+				// Was this the only channel the user was in?
 				if (user.getChannelCount() == 0)
-					userListRemove(sender);
+					userListRemoveSafe(sender);
+				else
+					userListPutSafe(user);
 			}
 
 			// Log this user leaving the channel.
@@ -486,7 +490,7 @@ public class jIRCBot extends PircBot {
 		// This could be us, but if we quit, who cares?
 		// Find the user that is leaving.
 		jIRCUser user;
-		if ((user = userListRemove(sourceNick)) != null) {
+		if ((user = userListRemoveSafe(sourceNick)) != null) {
 			// Then log the user quitting in all channels that the user was in.
 			Iterator<String> i = user.getChannelIterator();
 			while (i.hasNext()) {
@@ -504,16 +508,17 @@ public class jIRCBot extends PircBot {
 
 		// Remove the old username from the list of known users.
 		jIRCUser user;
-		if ((user = userListRemove(oldNick)) != null) {
+		if ((user = userListRemoveSafe(oldNick)) != null) {
+			// Change the users name, and re-add him to the list of users.
+			user.setUsername(newNick);
+			userListPutSafe(user);
+			
 			// Log the change in name.
 			Iterator<String> i = user.getChannelIterator();
 			while (i.hasNext()) {
 				jIRCTools.insertMessage(i.next(), this.getServer(), oldNick,
 						newNick, eMsgTypes.nickChange);
 			}
-			// Change the users name, and re-add him to the list of users.
-			user.setUsername(newNick);
-			userListPut(user);
 		}
 	}
 
@@ -572,7 +577,7 @@ public class jIRCBot extends PircBot {
 			       (inAdminList = jIRCProperties.getInstance().getAdminUserList().contains(username.toLowerCase()))) {
 					int endIndexOfNick = notice.indexOf(" (") - 1;
 					String nick = notice.substring(16, endIndexOfNick);
-					targetUser = userListGet(nick);	
+					targetUser = userListGetSafe(nick);	
 					if(inOpList)
 					    targetPendingAuthLevel = eAuthLevels.operator;
 					else if (inAdminList)
@@ -585,6 +590,8 @@ public class jIRCBot extends PircBot {
 				targetUserLoggedIn = isLoggedInNow.equals("now");
 				if(targetUserLoggedIn) {
 				    setUserAuthLevel(targetUser, targetPendingAuthLevel);
+				    userListPutSafe(targetUser);
+				    
 					log("Just Auth'ed " + targetUser.getUsername() +
 					        " with level " + targetPendingAuthLevel, eLogLevel.info);
 					
@@ -636,7 +643,7 @@ public class jIRCBot extends PircBot {
 	public void addLineParseCommand(jIBCommand cmd) {
 		lineParseCommands.add(cmd);
 	}
-
+	
 	/**
 	 * Safely returns the jIRCUser associated with the passed in username from
 	 * the userList.
@@ -645,11 +652,11 @@ public class jIRCBot extends PircBot {
 	 *            Key for the userList variable.
 	 * @return The jIRCUser associated with the passed in username.
 	 */
-	public jIRCUser userListGet(String username) {
+	public jIRCUser userListGetSafe(String username) {
 		jIRCUser result = null;
 		try {
 			userListMutex.acquire();
-			result = userList.get(username.toLowerCase());
+			result = new jIRCUser(userList.get(username.toLowerCase()));
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
 					.log(Level.SEVERE, null, e);
@@ -660,17 +667,17 @@ public class jIRCBot extends PircBot {
 
 		return result;
 	}
-
+	
 	/**
 	 * Safely adds the passed in user to the userList.
 	 * 
 	 * @param user
 	 *            jIRCUser to add to the userList.
 	 */
-	public void userListPut(jIRCUser user) {
+	public void userListPutSafe(jIRCUser user) {
 		try {
 			userListMutex.acquire();
-			userList.put(user.getUsername().toLowerCase(), user);
+			userList.put(user.getUsername().toLowerCase(), new jIRCUser(user));
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
 					.log(Level.SEVERE, null, e);
@@ -687,11 +694,11 @@ public class jIRCBot extends PircBot {
 	 *            Username of the user to remove.
 	 * @return The removed jIRCUser.
 	 */
-	public jIRCUser userListRemove(String username) {
+	public jIRCUser userListRemoveSafe(String username) {
 		jIRCUser result = null;
 		try {
 			userListMutex.acquire();
-			result = userList.remove(username.toLowerCase());
+			result = new jIRCUser(userList.remove(username.toLowerCase()));
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
 					.log(Level.SEVERE, null, e);
@@ -702,13 +709,17 @@ public class jIRCBot extends PircBot {
 
 		return result;
 	}
-
+	
 	/**
 	 * Safely wraps the userList.EntrySet() method.
 	 * 
 	 * @return The set of Keys & entries for userList.
 	 */
 	public Set<Entry<String, jIRCUser>> userListEntrySet() {
+		// TODO: This is not actually safe. Sure only one thread
+		//		 will be in this function at a time, but once we return
+		//		 the entry set, a second function could hop in one of these
+		//		 functions and muck it up.
 		Set<Entry<String, jIRCUser>> result = null;
 		try {
 			userListMutex.acquire();
