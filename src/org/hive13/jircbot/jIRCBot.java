@@ -608,10 +608,15 @@ public class jIRCBot extends PircBot {
 	    user.setAuthorized(authLevel);
 	    if(authLevel.ordinal() >= eAuthLevels.operator.ordinal()) {
 	        Iterator<String> channels = user.getChannelIterator();
-	        while(channels.hasNext())
-	            op(channels.next(), user.getUsername());
+	        while(channels.hasNext()) {
+	        	String channel = channels.next();
+	        	User pIRCUser = this.getUser(channel, user.getUsername());
+	        	if(pIRCUser != null && !pIRCUser.isOp())
+	        		op(channel, user.getUsername());	// If the user is already an Op, ignore them.
+	        }
 	    }
 	}
+	
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Utility functions for member variables.
 	/**
