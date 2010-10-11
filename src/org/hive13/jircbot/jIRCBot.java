@@ -59,7 +59,8 @@ public class jIRCBot extends PircBot {
 	private String serverAddress = "";
 	// Username to use
 	private String botName = "";
-
+	// Password to use.
+	private String botPass = "";
 	// List of channels to join
 	private final List<String> channelList;
 
@@ -118,6 +119,8 @@ public class jIRCBot extends PircBot {
 
 		// Grab configuration information.
 		botName = jIRCProperties.getInstance().getBotName();
+		botPass = jIRCProperties.getInstance().getBotPass();
+		
 		serverAddress = jIRCProperties.getInstance().getServer();
 
 		// Parse the list of channels to join.
@@ -203,7 +206,7 @@ public class jIRCBot extends PircBot {
 		setName(botName);
 		try {
 			// Connect to the config server
-			connect(serverAddress);
+			connect(serverAddress, 6667, botPass);
 
 			// Connect to all channels listed in the config.
 			for (Iterator<String> i = channelList.iterator(); i.hasNext();) {
@@ -407,6 +410,7 @@ public class jIRCBot extends PircBot {
 		if (sender.equals(this.getNick())) {
 			// We just joined a channel, get the list of users in this channel.
 			// *UPDATE* This does not work... see the "OnUserList" method.
+		    this.sendMessage("chanserv", "op #hive13");
 		} else {
 			// This is someone else joining the channel.
 			jIRCUser user;
@@ -580,7 +584,7 @@ public class jIRCBot extends PircBot {
 				String isLoggedInNow = notice.substring(13);
 				targetUserLoggedIn = isLoggedInNow.equals("now");
 				if(targetUserLoggedIn) {
-					targetUser.setAuthorized(targetPendingAuthLevel);
+				    setUserAuthLevel(targetUser, targetPendingAuthLevel);
 					log("Just Auth'ed " + targetUser.getUsername() +
 					        " with level " + targetPendingAuthLevel, eLogLevel.info);
 					
@@ -593,6 +597,14 @@ public class jIRCBot extends PircBot {
 		}
 	}
 
+	public void setUserAuthLevel(jIRCUser user, eAuthLevels authLevel) {
+	    user.setAuthorized(authLevel);
+	    if(authLevel.ordinal() >= eAuthLevels.operator.ordinal()) {
+	        Iterator<String> channels = user.getChannelIterator();
+	        while(channels.hasNext())
+	            op(channels.next(), user.getUsername());
+	    }
+	}
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Utility functions for member variables.
 	/**

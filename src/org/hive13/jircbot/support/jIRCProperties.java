@@ -12,6 +12,7 @@ public class jIRCProperties {
 
 	private Properties config;
 	private String defaultBotName 	= "Hive13Bot";
+	private String defaultBotPass   = "";
 	private String defaultServer 	= "irc.freenode.net";
 	private String defaultChannels 	= "#Hive13_test";
 	private String parsedChannels[] = null;
@@ -53,8 +54,12 @@ public class jIRCProperties {
 	}
 
 	public String getBotName() {
-		return getProp("nick", defaultBotName);
-	}
+        return getProp("nick", defaultBotName);
+    }
+	
+	public String getBotPass() {
+        return getProp("pass", defaultBotPass);
+    }
 
 	public String getServer() {
 		return getProp("server", defaultServer);
