@@ -410,8 +410,11 @@ public class jIRCBot extends PircBot {
 		// Do we know about this user?
 		if (sender.equals(this.getNick())) {
 			// We just joined a channel, get the list of users in this channel.
-			// *UPDATE* This does not work... see the "OnUserList" method.
-		    this.sendMessage("chanserv", "op #hive13");
+			// *UPDATE* ^ This does not work... see the "OnUserList" method.
+			
+			// We just joined a channel, attempt to give ourselves OP status.
+			// TODO: Make chanserv a property variable.
+		    this.sendMessage("chanserv", "op " + channel);
 		} else {
 			// This is someone else joining the channel.
 			jIRCUser user;
