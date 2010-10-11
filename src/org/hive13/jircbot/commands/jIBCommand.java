@@ -42,7 +42,7 @@ public abstract class jIBCommand {
      * 					received when this command was activated.
      */
     public void runCommand(jIRCBot bot, String channel, String sender, String message) {
-        eAuthLevels userAuthLevel = bot.userListGet(sender).getAuthLevel();
+        eAuthLevels userAuthLevel = bot.userListGetSafe(sender).getAuthLevel();
         if(userAuthLevel.ordinal() >= getReqAuthLevel().ordinal())
             new Thread(new jIBCommandRunnable(bot, channel, sender, message)).start();
         else {

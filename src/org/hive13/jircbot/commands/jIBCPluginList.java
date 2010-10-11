@@ -21,10 +21,12 @@ public class jIBCPluginList extends jIBCommand {
     @Override
     protected void handleMessage(jIRCBot bot, String channel, String sender,
             String message) {
+    	// Find sender's Auth Level
         String resultMsg = sender + ": ";
         Iterator<jIBCommand> i = commands.values().iterator();
         while(i.hasNext()) {
-            resultMsg += i.next().getCommandName();
+        	jIBCommand curCmd = i.next();
+            resultMsg += curCmd.getCommandName();
             if(i.hasNext())
                 resultMsg += ", ";
         }
