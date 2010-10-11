@@ -2859,6 +2859,21 @@ public abstract class PircBot implements ReplyConstants {
         return userArray;
     }
     
+    /**
+     * Remove a user from the specified channel in our memory.
+     */
+    public final User getUser(String channel, String nick) {
+        channel = channel.toLowerCase();
+        User user = new User("", nick);
+        synchronized (_channels) {
+            Hashtable<?, ?> users = (Hashtable<?, ?>) _channels.get(channel);
+            if (users != null) {
+            	User tempUser = (User) users.get(user);
+                return new User(tempUser.getPrefix(), tempUser.getNick());
+            }
+        }
+        return null;
+    }
     
     /**
      * Returns an array of all channels that we are in.  Note that if you
