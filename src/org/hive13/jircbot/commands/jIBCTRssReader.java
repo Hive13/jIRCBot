@@ -23,6 +23,7 @@ import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
 import org.hive13.jircbot.support.jIRCProperties;
 import org.hive13.jircbot.support.jIRCTools;
+import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -75,7 +76,7 @@ public class jIBCTRssReader extends jIBCommandThread {
 	@SuppressWarnings("unchecked")
 	public jIBCTRssReader(jIRCBot bot, String commandName, String channel,
 			String formatString, URL feedURL, long refreshRate) {
-		super(bot, commandName, channel, refreshRate);
+		super(bot, commandName, channel, refreshRate, eAuthLevels.operator);
 		this.formatString = formatString;
 		this.feedURL = feedURL;
 

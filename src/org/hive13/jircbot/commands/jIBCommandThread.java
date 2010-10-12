@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
+import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 /**
  * This abstract class framework is used for implementing asynchronous commands
@@ -30,7 +31,7 @@ public abstract class jIBCommandThread extends jIBCommand {
 	 *            The channel that this command is active in.
 	 */
 	public jIBCommandThread(jIRCBot bot, String commandName, String channel) {
-		this(bot, commandName, channel, 30000);
+		this(bot, commandName, channel, 30000, eAuthLevels.unauthorized);
 	}
 
 	/**
@@ -44,10 +45,13 @@ public abstract class jIBCommandThread extends jIBCommand {
 	 *            The channel that this command is active in.
 	 * @param loopDelay
 	 *            The time between calls to 'loop()'
+	 * @param authLevel
+	 * 			  The level of authentication required to run
+	 * 			  this command.
 	 */
 	public jIBCommandThread(jIRCBot bot, String commandName, String channel,
-			long loopDelay) {
-		super();
+			long loopDelay, eAuthLevels authLevel) {
+		super(authLevel);
 		this.bot = bot;
 		this.commandName = commandName;
 		this.channel = channel;
@@ -72,7 +76,7 @@ public abstract class jIBCommandThread extends jIBCommand {
 			}
 		} else {
 			this.bot.log("commandThread - handleMessage called for channel: "
-					+ channel + " when ct is actually in " + this.channel,
+					+ channel + " when cmdThrd is actually in " + this.channel,
 					eLogLevel.warning);
 		}
 	}
