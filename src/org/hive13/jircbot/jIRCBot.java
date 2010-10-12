@@ -120,7 +120,7 @@ public class jIRCBot extends PircBot {
 		// Grab configuration information.
 		botName = jIRCProperties.getInstance().getBotName();
 		botPass = jIRCProperties.getInstance().getBotPass();
-		
+
 		serverAddress = jIRCProperties.getInstance().getServer();
 
 		// Parse the list of channels to join.
@@ -161,7 +161,7 @@ public class jIRCBot extends PircBot {
 		// addCommand(new jIBCLogParser());
 		try {
 			// Add all command threads.
-			
+
 			addCommandThread(new jIBCTRssReader(
 					this,
 					"WikiFeed",
@@ -194,7 +194,7 @@ public class jIRCBot extends PircBot {
 					"Tweet",
 					channelList.get(0),
 					"[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
-					"http://search.twitter.com/search.atom?q=hive13"));		
+					"http://search.twitter.com/search.atom?q=hive13"));
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
 					ex);
@@ -234,7 +234,6 @@ public class jIRCBot extends PircBot {
 		// Find out if the message was directed as a command.
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, "");
-
 			jIBCommand cmd;
 			// Check to see if it is a known standard command.
 			String[] sCmd = message.split(" ", 2);
@@ -394,7 +393,7 @@ public class jIRCBot extends PircBot {
 				user = new jIRCUser(users[i].getNick());
 				user.addChannel(channel);
 				userListPutSafe(user);
-				
+
 				// Start Auth for the user
 				startAuthForUser(user);
 			}
@@ -411,10 +410,10 @@ public class jIRCBot extends PircBot {
 		if (sender.equals(this.getNick())) {
 			// We just joined a channel, get the list of users in this channel.
 			// *UPDATE* ^ This does not work... see the "OnUserList" method.
-			
+
 			// We just joined a channel, attempt to give ourselves OP status.
 			// TODO: Make chanserv a property variable.
-		    this.sendMessage("chanserv", "op " + channel);
+			this.sendMessage("chanserv", "op " + channel);
 		} else {
 			// This is someone else joining the channel.
 			jIRCUser user;
@@ -431,7 +430,7 @@ public class jIRCBot extends PircBot {
 
 			// Initiate check for credentials
 			startAuthForUser(user);
-			
+
 			// Write the event to the log.
 			jIRCTools.insertMessage(channel, this.getServer(), sender, "",
 					eMsgTypes.joinMsg);
@@ -515,7 +514,7 @@ public class jIRCBot extends PircBot {
 			// Change the users name, and re-add him to the list of users.
 			user.setUsername(newNick);
 			userListPutSafe(user);
-			
+
 			// Log the change in name.
 			Iterator<String> i = user.getChannelIterator();
 			while (i.hasNext()) {
@@ -543,7 +542,7 @@ public class jIRCBot extends PircBot {
 		// /msg nickserv info TargetUsername
 		this.sendMessage(jIRCProperties.getInstance().getNickServUsername(),
 				"info " + user.getUsername());
-		
+
 	}
 
 	// I am reasonably sure that this function will not be called asynchronously
@@ -551,56 +550,55 @@ public class jIRCBot extends PircBot {
 	private jIRCUser targetUser = null;
 	private boolean targetUserLoggedIn = false;
 	private eAuthLevels targetPendingAuthLevel = eAuthLevels.unauthorized;
-	
-	public void onNotice(String sourceNick, String sourceLogin, 
+
+	public void onNotice(String sourceNick, String sourceLogin,
 			String sourceHostname, String target, String notice) {
 		/*
 		 * Messages will be returned from the nickserv in groups.
 		 * 
 		 * Each group will be for a user.
-		 * 
-		 * 	Information on peters-tx (account peters-tx):
-			Registered : Dec 27 15:31:03 2006 (3 years, 40 weeks, 6 days, 03:49:20 ago)
-			Last addr  : ~p@dsl081-112-039.dfw1.dsl.speakeasy.net
-			Last seen  : now
-			Flags      : HideMail
-			*** End of Info ***
 		 */
-		if(sourceNick.equalsIgnoreCase(jIRCProperties.getInstance().getNickServUsername())) {
+		if (sourceNick.equalsIgnoreCase(jIRCProperties.getInstance()
+				.getNickServUsername())) {
 			// Check if the response is w/ regards to a user I asked about.
-			if(notice.startsWith("Information")) {
+			if (notice.startsWith("Information")) {
 				// Find the user referred to in this response.
 				int indexOfUsername = notice.lastIndexOf(" ") + 2;
-				String username = notice.substring(indexOfUsername, notice.length() - 3);
-				
+				String username = notice.substring(indexOfUsername,
+						notice.length() - 3);
+
 				boolean inOpList = false;
 				boolean inAdminList = false;
-				
-				if((inOpList = jIRCProperties.getInstance().getOpUserList().contains(username.toLowerCase())) ||
-			       (inAdminList = jIRCProperties.getInstance().getAdminUserList().contains(username.toLowerCase()))) {
+
+				if ((inOpList = jIRCProperties.getInstance().getOpUserList()
+						.contains(username.toLowerCase()))
+						|| (inAdminList = jIRCProperties.getInstance()
+								.getAdminUserList()
+								.contains(username.toLowerCase()))) {
 					int endIndexOfNick = notice.indexOf(" (") - 1;
 					String nick = notice.substring(16, endIndexOfNick);
-					targetUser = userListGetSafe(nick);	
-					if(inOpList)
-					    targetPendingAuthLevel = eAuthLevels.operator;
+					targetUser = userListGetSafe(nick);
+					if (inOpList)
+						targetPendingAuthLevel = eAuthLevels.operator;
 					else if (inAdminList)
-					    targetPendingAuthLevel = eAuthLevels.admin;
+						targetPendingAuthLevel = eAuthLevels.admin;
 				}
 				// Set a flag indicating what user we are currently parsing.
-			} else if(notice.startsWith("Last seen") && targetUser != null) { // and we are currently parsing
-			    // Make sure it is set to "Now"
+			} else if (notice.startsWith("Last seen") && targetUser != null) {
+				// Make sure it is set to "Now"
 				String isLoggedInNow = notice.substring(13);
 				targetUserLoggedIn = isLoggedInNow.equals("now");
-				if(targetUserLoggedIn) {
-				    setUserAuthLevel(targetUser, targetPendingAuthLevel);
-				    userListPutSafe(targetUser);
-				    
-					log("Just Auth'ed " + targetUser.getUsername() +
-					        " with level " + targetPendingAuthLevel, eLogLevel.info);
-					
+				if (targetUserLoggedIn) {
+					setUserAuthLevel(targetUser, targetPendingAuthLevel);
+					userListPutSafe(targetUser);
+
+					log("Just Auth'ed " + targetUser.getUsername()
+							+ " with level " + targetPendingAuthLevel,
+							eLogLevel.info);
+
 					targetUser = null;
 				}
-			} else if(notice.startsWith("***")) {
+			} else if (notice.startsWith("***")) {
 				// End parsing, Validate User credentials.
 				targetUser = null;
 			}
@@ -608,18 +606,19 @@ public class jIRCBot extends PircBot {
 	}
 
 	public void setUserAuthLevel(jIRCUser user, eAuthLevels authLevel) {
-	    user.setAuthorized(authLevel);
-	    if(authLevel.ordinal() >= eAuthLevels.operator.ordinal()) {
-	        Iterator<String> channels = user.getChannelIterator();
-	        while(channels.hasNext()) {
-	        	String channel = channels.next();
-	        	User pIRCUser = this.getUser(channel, user.getUsername());
-	        	if(pIRCUser != null && !pIRCUser.isOp())
-	        		op(channel, user.getUsername());	// If the user is already an Op, ignore them.
-	        }
-	    }
+		user.setAuthorized(authLevel);
+		if (authLevel.ordinal() >= eAuthLevels.operator.ordinal()) {
+			Iterator<String> channels = user.getChannelIterator();
+			while (channels.hasNext()) {
+				String channel = channels.next();
+				User pIRCUser = this.getUser(channel, user.getUsername());
+				if (pIRCUser != null && !pIRCUser.isOp())
+					op(channel, user.getUsername()); // If the user is already
+													 // an Op, ignore them.
+			}
+		}
 	}
-	
+
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Utility functions for member variables.
 	/**
@@ -651,7 +650,7 @@ public class jIRCBot extends PircBot {
 	public void addLineParseCommand(jIBCommand cmd) {
 		lineParseCommands.add(cmd);
 	}
-	
+
 	/**
 	 * Safely returns the jIRCUser associated with the passed in username from
 	 * the userList.
@@ -665,7 +664,7 @@ public class jIRCBot extends PircBot {
 		try {
 			userListMutex.acquire();
 			jIRCUser temp = userList.get(username.toLowerCase());
-			if(temp != null)
+			if (temp != null)
 				result = new jIRCUser(temp);
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
@@ -677,7 +676,7 @@ public class jIRCBot extends PircBot {
 
 		return result;
 	}
-	
+
 	/**
 	 * Safely adds the passed in user to the userList.
 	 * 
@@ -709,7 +708,7 @@ public class jIRCBot extends PircBot {
 		try {
 			userListMutex.acquire();
 			jIRCUser temp = userList.remove(username.toLowerCase());
-			if(temp != null)
+			if (temp != null)
 				result = new jIRCUser(temp);
 		} catch (InterruptedException e) {
 			Logger.getLogger(jIRCBot.class.getName())
@@ -721,7 +720,7 @@ public class jIRCBot extends PircBot {
 
 		return result;
 	}
-	
+
 	/**
 	 * Safely wraps the userList.EntrySet() method.
 	 * 
@@ -729,9 +728,9 @@ public class jIRCBot extends PircBot {
 	 */
 	public Set<Entry<String, jIRCUser>> userListEntrySet() {
 		// TODO: This is not actually safe. Sure only one thread
-		//		 will be in this function at a time, but once we return
-		//		 the entry set, a second function could hop in one of these
-		//		 functions and muck it up.
+		// will be in this function at a time, but once we return
+		// the entry set, a second function could hop in one of these
+		// functions and muck it up.
 		Set<Entry<String, jIRCUser>> result = null;
 		try {
 			userListMutex.acquire();
