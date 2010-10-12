@@ -24,6 +24,11 @@ public class jIBCLinkify extends jIBCommand {
     }
 
     @Override
+    public String getHelp() {
+    	return "This command does not support this functionality.";
+    }
+    
+    @Override
     public void handleMessage(jIRCBot bot, String channel, String sender,
             String message) {
         // (http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\[\]\(\)\w\-\.,@?^=%&amp;:/~\+#]*[\[\]\(\)\w\-\@?^=%&amp;/~\+#])

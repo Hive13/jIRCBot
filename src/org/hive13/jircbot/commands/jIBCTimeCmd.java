@@ -17,6 +17,9 @@ public class jIBCTimeCmd extends jIBCommand {
         return "time";
     }
 
+    public String getHelp() {
+    	return "Seriously?";
+    }
     @Override
     public void handleMessage(jIRCBot bot, String channel, String sender,
             String message) {

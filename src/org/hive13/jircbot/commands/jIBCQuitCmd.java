@@ -4,7 +4,7 @@ import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 public class jIBCQuitCmd extends jIBCommand {
-    
+	
     /**
      * @param reqAuthLevel
      */
@@ -17,6 +17,10 @@ public class jIBCQuitCmd extends jIBCommand {
         return "quit";
     }
 
+    public String getHelp() {
+    	return "This command safely shuts the bot down. Ex. !" + getCommandName();
+    }
+    
     @Override
     public void handleMessage(jIRCBot bot, String channel, String sender,
             String message) {
