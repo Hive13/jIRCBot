@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.hive13.jircbot.commands.jIBCLinkify;
+import org.hive13.jircbot.commands.jIBCPluginList;
 import org.hive13.jircbot.commands.jIBCQuitCmd;
 import org.hive13.jircbot.commands.jIBCTRssReader;
 import org.hive13.jircbot.commands.jIBCTell;
@@ -157,7 +158,7 @@ public class jIRCBot extends PircBot {
 		// Add passive commands
 		addCommand(new jIBCTimeCmd());
 		addCommand(new jIBCQuitCmd());
-		// addCommand(new jIBCPluginList(commands));
+		addCommand(new jIBCPluginList(commands, lineParseCommands));
 		// addCommand(new jIBCLogParser());
 		try {
 			// Add all command threads.
@@ -246,7 +247,7 @@ public class jIRCBot extends PircBot {
 		}
 
 		/*
-		 * Run the commands that run with every message It is especially
+		 * Run the commands that run with every message. It is especially
 		 * important to make sure that these commands are thread safe. All
 		 * commands are run as new threads, however these commands have a
 		 * greater potential to still be running if several messages come in

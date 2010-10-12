@@ -14,6 +14,10 @@ public class jIBCLinkify extends jIBCommand {
     public final boolean    WAIT_FOR_TITLE  = true;
     public final int        WAIT_FOR_TITLE_TIMEOUT  = 5000;
     
+    public jIBCLinkify() {
+    	hideCommand = true;
+    }
+    
     @Override
     public String getCommandName() {
         return "Linkify";

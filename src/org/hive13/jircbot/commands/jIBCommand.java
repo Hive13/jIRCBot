@@ -13,6 +13,15 @@ import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 public abstract class jIBCommand {
     protected eAuthLevels reqAuthLevel;
     
+    /**
+     * This member variable is of pretty limited use.
+     * It basically exists for commands that we might
+     * use on the backend (like Linkify) which the
+     * user does not need to ever know about, but are
+     * actually implemented as commands.
+     */
+    protected boolean hideCommand = false;
+    
     public jIBCommand() {
         this(eAuthLevels.unauthorized);
     }
@@ -25,6 +34,9 @@ public abstract class jIBCommand {
         return reqAuthLevel;
     }
     
+    public boolean isHidden() {
+    	return hideCommand;
+    }
 	/**
 	 * This method returns a unique name for the command.
 	 * 
