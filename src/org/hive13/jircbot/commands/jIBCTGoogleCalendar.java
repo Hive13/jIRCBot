@@ -9,6 +9,9 @@ public class jIBCTGoogleCalendar extends jIBCommandThread {
 		// TODO Auto-generated constructor stub
 	}
 
+	public String getHelp() {
+		return "Not Yet Implemented";
+	}
 	@Override
 	public void loop() {
 		// TODO Auto-generated method stub

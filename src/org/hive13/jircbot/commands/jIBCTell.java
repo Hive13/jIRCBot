@@ -30,6 +30,13 @@ public class jIBCTell extends jIBCommand {
 		return "tell";
 	}
 
+	public String getHelp() {
+		return "This command stores a message for a user.  The next time" +
+				" that user sends a message in the chat room I will send" +
+				" them the messages stored for them. Ex. !" + getCommandName() +
+				" jimboJones Remember to bring that thing with you.";
+	}
+	
 	@Override
 	public void handleMessage(jIRCBot bot, String channel, String sender,
 			String message) {
@@ -49,11 +56,11 @@ public class jIBCTell extends jIBCommand {
 					// Tell the sender that the 'tell' was added for 'target
 					// user'
 					bot.sendMessage(sender, "I will tell " + splitMsg[1]
-							+ " the next time he talks in channel.");
+							+ " the next time they talks in channel.");
 				} else {
 					bot.sendMessage(sender, splitMsg[1]
 							+ " already has the max (" + MAX_MSG_QUEUE
-							+ ") number of messages saved for him.");
+							+ ") number of messages saved for them.");
 				}
 			} else {
 				bot.sendMessage(sender,

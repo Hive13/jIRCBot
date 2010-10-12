@@ -168,6 +168,20 @@ public class jIBCTRssReader extends jIBCommandThread {
 
 	}
 
+	public String getHelp() {
+		return "Not Done Yet"; //TODO: Implement this.
+	}
+	@Override
+	public void handleMessage(jIRCBot bot, String channel, String sender,
+			String message) {
+		if(message.equals("")) {
+			
+		} else {
+			// If we did not handle the message, pass it on up.
+			super.handleMessage(bot, channel, sender, message);
+		}
+	}
+	
 	private List<SyndEntry> getNewEntries(List<SyndEntry> entryList) {
 		/*
 		 * So here is the deal. We have two lists. 1. newEntryList 2.

@@ -21,6 +21,10 @@ public class jIBCLogParser extends jIBCommand {
 		return "logParser";
 	}
 
+	public String getHelp() {
+		return "This command is non-functional.";
+	}
+	
 	protected void handleMessage(jIRCBot bot, String channel, String sender,
 			String message) {
 		bot.sendMessage(channel, "Starting to parse log...");
