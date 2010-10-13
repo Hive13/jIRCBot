@@ -9,6 +9,10 @@ public class jIBCOp extends jIBCommand {
         super(eAuthLevels.operator);
     }
     
+    public String getHelp() {
+        return "";
+    }
+    
     @Override
     public String getCommandName() {
         return "Op";
