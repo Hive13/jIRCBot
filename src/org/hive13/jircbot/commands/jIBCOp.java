@@ -7,12 +7,11 @@ import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 public class jIBCOp extends jIBCommand {
 
-	public jIBCOp() {
-		super(eAuthLevels.operator);
-	}
-
 	public String getHelp() {
-		return "This command gives other users operator privledges."
+		return "This command has two uses.  If you are not an operator" +
+				" but think you are on the approved list then the following" +
+				" command will recheck your authorization: !op . If you are" +
+				" a channel operator then this command can op other users."
 				+ " Ex. !op Username";
 	}
 
@@ -28,32 +27,38 @@ public class jIBCOp extends jIBCommand {
 		String[] splitMsg = message.trim().split(" ", 2);
 		message = splitMsg[0];
 
-		jIRCUser temp = bot.userListGetSafe(message);
-		if (temp != null) {
-			boolean opped = false;
-			// Check to make sure we are not downgrading someone from admin.
-			if (temp.getAuthLevel().ordinal() < eAuthLevels.operator.ordinal()) {
-				temp.setAuthorized(eAuthLevels.operator);
-				bot.userListPutSafe(temp);
-				opped = true;
-			}
-			// Check to make sure the target user is not already opped.
-			if (!bot.getUser(channel, message).isOp()) {
-				bot.op(channel, message);
-				opped = true;
-			}
-
-			// If any action was actually performed, alert the user and log the
-			// event.
-			if (opped) {
-				bot.sendMessage(message, sender
-						+ " granted you operator priviledges.");
-				bot.log(sender + " granted " + message
-						+ " operator priviledges.", eLogLevel.info);
-			}
+		
+		jIRCUser temp = bot.userListGetSafe(sender);
+		if(temp.getAuthLevel().ordinal() < eAuthLevels.operator.ordinal()) {
+			bot.startAuthForUser(temp);
 		} else {
-			bot.sendMessage(sender, "Could not find user (" + message + "). "
-					+ getHelp());
+			temp = bot.userListGetSafe(message);
+			if (temp != null) {
+				boolean opped = false;
+				// Check to make sure we are not downgrading someone from admin.
+				if (temp.getAuthLevel().ordinal() < eAuthLevels.operator.ordinal()) {
+					temp.setAuthorized(eAuthLevels.operator);
+					bot.userListPutSafe(temp);
+					opped = true;
+				}
+				// Check to make sure the target user is not already opped.
+				if (!bot.getUser(channel, message).isOp()) {
+					bot.op(channel, message);
+					opped = true;
+				}
+	
+				// If any action was actually performed, alert the user and log the
+				// event.
+				if (opped) {
+					bot.sendMessage(message, sender
+							+ " granted you operator priviledges.");
+					bot.log(sender + " granted " + message
+							+ " operator priviledges.", eLogLevel.info);
+				}
+			} else {
+				bot.sendMessage(sender, "Could not find user (" + message + "). "
+						+ getHelp());
+			}
 		}
 	}
 
