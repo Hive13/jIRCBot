@@ -5,6 +5,11 @@ import java.util.regex.Pattern;
 
 /**
  * Get a web file.
+ * 
+ * This class is totally hijacked from here:
+ * http://nadeausoftware.com/node/73
+ * 
+ * I have made very limited changes, if any to this class.
  */
 public final class WebFile {
     // Saved response.
