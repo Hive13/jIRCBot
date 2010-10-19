@@ -147,7 +147,8 @@ public class jIRCTools {
 				if (content instanceof String) {
 					String sContent = ((String) content).replaceAll("[\\n\\r]",
 							"");
-					String rgxFindTitle = "<title[^>]*>(.*?)</title>";
+					// Case insensitive search for the <title> tags.
+					String rgxFindTitle = "<[tT][iI][tT][lL][eE][^>]*>(.*?)</[tT][iI][tT][lL][eE]>";
 					p = Pattern.compile(rgxFindTitle);
 					m = p.matcher(sContent);
 					if (m.find()) {

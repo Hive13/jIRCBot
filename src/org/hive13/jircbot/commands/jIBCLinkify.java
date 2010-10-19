@@ -50,7 +50,7 @@ public class jIBCLinkify extends jIBCommand {
                 urlTitle = jIRCTools.getURLTitle(url);
             }
             
-            if(urlTitle.isEmpty() && USE_BITLY_TITLE) { // Are we forcing ourselves to only use Bit.ly?
+            if(urlTitle.isEmpty() && USE_BITLY_TITLE) { // Are we allowing ourselves to fall back to Bit.ly?
                 bot.log("jIBCLinkify - jIRCTools.getURLTitle failed, waiting for bit.ly to cache title.", eLogLevel.info);
                 // The title is not retrieved by bit.ly immediately, we can optionally
                 // move on, likely without the title, or we can repeatedly try
