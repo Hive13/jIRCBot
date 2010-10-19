@@ -162,7 +162,7 @@ public class jIRCBot extends PircBot {
 		addCommand(new jIBCPluginList(commands, lineParseCommands));
 		addCommand(new jIBCOp());
 		// addCommand(new jIBCLogParser());
-		
+
 		try {
 			// Add all command threads.
 
@@ -367,6 +367,116 @@ public class jIRCBot extends PircBot {
 		return false;
 	}
 
+	/*
+	 * Below message saved for posterity explaining the thought process that
+	 * went into performing the authorization. The userList variable has been
+	 * encapsulated so that any access to it should be done through the 'safe'
+	 * userListX_Safe(~) functions. ----------------- v Old Message v
+	 * ------------------------------------- Ok, time to look into how to
+	 * authorize users again. Here is the basic sequence of steps that need to
+	 * occur: 1. Send "info <Username>" message to 'nickserv' user. 2. Parse
+	 * returned response from 'nickserv' user to determine if the user is indeed
+	 * authorized.
+	 * 
+	 * Perhaps best to try to do the 'Auth' requests as users are created, then
+	 * just act as if the requests have gone through?
+	 * 
+	 * This presents the potential that multiple threads will be accessing and
+	 * mutating the 'userList' variable. This may require that I encapsulate
+	 * accessor & mutator methods for it. ---------------- ^ Old Message ^
+	 * ---------------------------------------
+	 */
+
+	/**
+	 * Starts the process for checking if the passed in user has any
+	 * authority with the bot or in the channel.  This is done
+	 * by asking the servers 'NickServ' user if the user is logged in
+	 * and then checking the result against a white list of users
+	 * maintained by the bot in the 'properties' file.
+	 */
+	public void startAuthForUser(jIRCUser user) {
+		// Essentially sends the following to the nickserv bot:
+		// /msg nickserv info TargetUsername
+		this.sendMessage(jIRCProperties.getInstance().getNickServUsername(),
+				"info " + user.getUsername());
+
+	}
+
+	// I am reasonably sure that this function will not be called asynchronously
+	// However I am not certain.  As such, these variables have no thread safety
+	// mechanisms protecting them, and are ONLY used by the 'onNotice' function.
+	private jIRCUser targetUser = null;
+	private boolean targetUserLoggedIn = false;
+	private eAuthLevels targetPendingAuthLevel = eAuthLevels.unauthorized;
+
+	public void onNotice(String sourceNick, String sourceLogin,
+			String sourceHostname, String target, String notice) {
+		/*
+		 * Messages will be returned from the nickserv in groups.
+		 * 
+		 * Each group will be for a user.
+		 */
+		if (sourceNick.equalsIgnoreCase(jIRCProperties.getInstance()
+				.getNickServUsername())) {
+			// Check if the response is w/ regards to a user I asked about.
+			if (notice.startsWith("Information")) {
+				// Find the user referred to in this response.
+				int indexOfUsername = notice.lastIndexOf(" ") + 2;
+				String username = notice.substring(indexOfUsername,
+						notice.length() - 3);
+
+				boolean inOpList = false;
+				boolean inAdminList = false;
+
+				if ((inOpList = jIRCProperties.getInstance().getOpUserList()
+						.contains(username.toLowerCase()))
+						|| (inAdminList = jIRCProperties.getInstance()
+								.getAdminUserList()
+								.contains(username.toLowerCase()))) {
+					int endIndexOfNick = notice.indexOf(" (") - 1;
+					String nick = notice.substring(16, endIndexOfNick);
+					targetUser = userListGetSafe(nick);
+					if (inOpList)
+						targetPendingAuthLevel = eAuthLevels.operator;
+					else if (inAdminList)
+						targetPendingAuthLevel = eAuthLevels.admin;
+				}
+				// Set a flag indicating what user we are currently parsing.
+			} else if (notice.startsWith("Last seen") && targetUser != null) {
+				// Make sure it is set to "Now"
+				String isLoggedInNow = notice.substring(13);
+				targetUserLoggedIn = isLoggedInNow.equals("now");
+				if (targetUserLoggedIn) {
+					setUserAuthLevel(targetUser, targetPendingAuthLevel);
+					userListPutSafe(targetUser);
+
+					log("Just Auth'ed " + targetUser.getUsername()
+							+ " with level " + targetPendingAuthLevel,
+							eLogLevel.info);
+
+					targetUser = null;
+				}
+			} else if (notice.startsWith("***")) {
+				// End parsing, Validate User credentials.
+				targetUser = null;
+			}
+		}
+	}
+
+	public void setUserAuthLevel(jIRCUser user, eAuthLevels authLevel) {
+		user.setAuthorized(authLevel);
+		if (authLevel.ordinal() >= eAuthLevels.operator.ordinal()) {
+			Iterator<String> channels = user.getChannelIterator();
+			while (channels.hasNext()) {
+				String channel = channels.next();
+				User pIRCUser = this.getUser(channel, user.getUsername());
+				if (pIRCUser != null && !pIRCUser.isOp())
+					op(channel, user.getUsername()); // If the user is already
+														// an Op, ignore them.
+			}
+		}
+	}
+
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// The following is only used for message logging purposes right now.
 	public void onAction(String sender, String login, String hostname,
@@ -377,8 +487,7 @@ public class jIRCBot extends PircBot {
 
 	public void onUserList(String channel, User[] users) {
 		// This function is called whenever we join a channel, or whenever we
-		// initiate
-		// a "ListUsers" action for a channel.
+		// initiate a "ListUsers" action for a channel.
 
 		// Here we loop through the list of 'users' in the 'channel'.
 		for (int i = 0; i < users.length; i++) {
@@ -479,7 +588,7 @@ public class jIRCBot extends PircBot {
 				if (user.getChannelCount() == 0)
 					userListRemoveSafe(sender);
 				else
-					userListPutSafe(user);
+					userListPutSafe(user); // Restore updated user to list.
 			}
 
 			// Log this user leaving the channel.
@@ -524,101 +633,6 @@ public class jIRCBot extends PircBot {
 			while (i.hasNext()) {
 				jIRCTools.insertMessage(i.next(), this.getServer(), oldNick,
 						newNick, eMsgTypes.nickChange);
-			}
-		}
-	}
-
-	/*
-	 * Ok, time to look into how to authorize users again. Here is the basic
-	 * sequence of steps that need to occur: 1. Send "info <Username>" message
-	 * to 'nickserv' user. 2. Parse returned response from 'nickserv' user to
-	 * determine if the user is indeed authorized.
-	 * 
-	 * Perhaps best to try to do the 'Auth' requests as users are created, then
-	 * just act as if the requests have gone through?
-	 * 
-	 * This presents the potential that multiple threads will be accessing and
-	 * mutating the 'userList' variable. This may require that I encapsulate
-	 * accessor & mutator methods for it.
-	 */
-	public void startAuthForUser(jIRCUser user) {
-		// Essentially sends the following to the nickserv bot:
-		// /msg nickserv info TargetUsername
-		this.sendMessage(jIRCProperties.getInstance().getNickServUsername(),
-				"info " + user.getUsername());
-
-	}
-
-	// I am reasonably sure that this function will not be called asynchronously
-	// However I am not certain.
-	private jIRCUser targetUser = null;
-	private boolean targetUserLoggedIn = false;
-	private eAuthLevels targetPendingAuthLevel = eAuthLevels.unauthorized;
-
-	public void onNotice(String sourceNick, String sourceLogin,
-			String sourceHostname, String target, String notice) {
-		/*
-		 * Messages will be returned from the nickserv in groups.
-		 * 
-		 * Each group will be for a user.
-		 */
-		if (sourceNick.equalsIgnoreCase(jIRCProperties.getInstance()
-				.getNickServUsername())) {
-			// Check if the response is w/ regards to a user I asked about.
-			if (notice.startsWith("Information")) {
-				// Find the user referred to in this response.
-				int indexOfUsername = notice.lastIndexOf(" ") + 2;
-				String username = notice.substring(indexOfUsername,
-						notice.length() - 3);
-
-				boolean inOpList = false;
-				boolean inAdminList = false;
-
-				if ((inOpList = jIRCProperties.getInstance().getOpUserList()
-						.contains(username.toLowerCase()))
-						|| (inAdminList = jIRCProperties.getInstance()
-								.getAdminUserList()
-								.contains(username.toLowerCase()))) {
-					int endIndexOfNick = notice.indexOf(" (") - 1;
-					String nick = notice.substring(16, endIndexOfNick);
-					targetUser = userListGetSafe(nick);
-					if (inOpList)
-						targetPendingAuthLevel = eAuthLevels.operator;
-					else if (inAdminList)
-						targetPendingAuthLevel = eAuthLevels.admin;
-				}
-				// Set a flag indicating what user we are currently parsing.
-			} else if (notice.startsWith("Last seen") && targetUser != null) {
-				// Make sure it is set to "Now"
-				String isLoggedInNow = notice.substring(13);
-				targetUserLoggedIn = isLoggedInNow.equals("now");
-				if (targetUserLoggedIn) {
-					setUserAuthLevel(targetUser, targetPendingAuthLevel);
-					userListPutSafe(targetUser);
-
-					log("Just Auth'ed " + targetUser.getUsername()
-							+ " with level " + targetPendingAuthLevel,
-							eLogLevel.info);
-
-					targetUser = null;
-				}
-			} else if (notice.startsWith("***")) {
-				// End parsing, Validate User credentials.
-				targetUser = null;
-			}
-		}
-	}
-
-	public void setUserAuthLevel(jIRCUser user, eAuthLevels authLevel) {
-		user.setAuthorized(authLevel);
-		if (authLevel.ordinal() >= eAuthLevels.operator.ordinal()) {
-			Iterator<String> channels = user.getChannelIterator();
-			while (channels.hasNext()) {
-				String channel = channels.next();
-				User pIRCUser = this.getUser(channel, user.getUsername());
-				if (pIRCUser != null && !pIRCUser.isOp())
-					op(channel, user.getUsername()); // If the user is already
-													 // an Op, ignore them.
 			}
 		}
 	}
