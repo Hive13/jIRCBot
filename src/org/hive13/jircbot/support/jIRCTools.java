@@ -35,7 +35,24 @@ public class jIRCTools {
 	 * The different types of messages saved in the database.
 	 */
 	public enum eMsgTypes {
-		publicMsg, privateMsg, actionMsg, joinMsg, partMsg, nickChange, quitMsg
+		// NOTE: If adding any additional message types, append them to the end
+		// 		 of the list.
+		/** User messages in a chat channel. */
+		publicMsg, 
+		/** User message directly to the bot. */
+		privateMsg, 
+		/** Ex. /me */
+		actionMsg, 
+		/** User joins a channel the bot is in. */
+		joinMsg, 
+		/** User leaves a channel the bot is in. */
+		partMsg, 
+		/** Users changes their nickname. */
+		nickChange, 
+		/** User quits the server the bot is on. */
+		quitMsg, 
+		/** Bot messages w/ HTML formatting. */
+		htmlMsg
 	}
 
 	/**
