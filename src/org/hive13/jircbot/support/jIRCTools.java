@@ -203,7 +203,7 @@ public class jIRCTools {
 	 */
 	public static void insertMessage(String channel, String server,
 			String username, String msg, eMsgTypes msgType) {
-		if (!jIRCTools.jdbcEnabled)
+		if (!jIRCTools.jdbcEnabled || eMsgTypes.LogFreeMsg == msgType)
 			return;
 
 		int chanID = getChannelID(channel, server);
@@ -256,7 +256,7 @@ public class jIRCTools {
 	 */
 	public static void insertMessage(String channel, String server,
 			String username, String msg, eMsgTypes msgType, String tsMsgDate) {
-		if (!jIRCTools.jdbcEnabled)
+		if (!jIRCTools.jdbcEnabled || eMsgTypes.LogFreeMsg == msgType)
 			return;
 
 		int chanID = getChannelID(channel, server);
