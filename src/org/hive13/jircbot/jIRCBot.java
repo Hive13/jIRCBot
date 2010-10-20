@@ -108,7 +108,6 @@ public class jIRCBot extends PircBot {
 	}
 
 	private jIRCBot() {
-
 		// Initialize lists
 		commands = new HashMap<String, jIBCommand>();
 
@@ -231,6 +230,20 @@ public class jIRCBot extends PircBot {
 		}
 	}
 
+	// Overriding the 'sendMessage' so that I can easily log
+	// all messages sent by the bot.
+	public void sendMessage(String target, String message) {
+		this.sendMessage(target, message, eMsgTypes.LogFreeMsg);
+	}
+	
+	
+	public void sendMessage(String target, String message, eMsgTypes msgType) {
+		super.sendMessage(target, message);
+
+		// Is this not a log free message and it is a message to a channel.
+		if(msgType != eMsgTypes.LogFreeMsg && channelList.contains(target))
+			jIRCTools.insertMessage(target, jIRCProperties.getInstance().getServer(), this.getNick(), message, msgType);
+	}
 	public void onMessage(String channel, String sender, String login,
 			String hostname, String message) {
 		jIRCTools.insertMessage(channel, this.getServer(), sender, message,

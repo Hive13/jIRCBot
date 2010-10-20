@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
+import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 /**
@@ -90,8 +91,20 @@ public abstract class jIBCommandThread extends jIBCommand {
 	 *            A text message to send to the channel the command is based in.
 	 */
 	public void sendMessage(String message) {
+		this.sendMessage(message, eMsgTypes.LogFreeMsg);
+	}
+	
+	/**
+	 * This is a wrapper for the bot.sendMessage command. It automatically sends
+	 * any messages to the correct channel. It also acts as a way to prevent the
+	 * command from sending messages before it is connected to the server.
+	 * 
+	 * @param message
+	 *            A text message to send to the channel the command is based in.
+	 */
+	public void sendMessage(String message, eMsgTypes msgType) {
 		if (bot.isConnected()) {
-			bot.sendMessage(channel, message);
+			bot.sendMessage(channel, message, msgType);
 		} else {
 			bot.log("Bot not connected, tried to send: " + message,
 					eLogLevel.warning);

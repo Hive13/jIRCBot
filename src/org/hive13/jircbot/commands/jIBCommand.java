@@ -2,6 +2,7 @@ package org.hive13.jircbot.commands;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
+import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 /**
@@ -70,12 +71,12 @@ public abstract class jIBCommand {
 		if (userAuthLevel.ordinal() >= getReqAuthLevel().ordinal())
 			if (message.trim().equalsIgnoreCase("help")
 					|| message.trim().equalsIgnoreCase("h"))
-				bot.sendMessage(sender, getHelp());
+				bot.sendMessage(sender, getHelp(), eMsgTypes.LogFreeMsg);
 			else
 				new Thread(new jIBCommandRunnable(bot, channel, sender, message)).start();
 		else {
 			bot.sendMessage(sender,
-					"You do not have permission to activate this command.");
+					"You do not have permission to activate this command.", eMsgTypes.LogFreeMsg);
 			bot.log(sender + " just tried to use " + getCommandName()
 					+ " but their AuthLevel is only " + userAuthLevel,
 					eLogLevel.warning);

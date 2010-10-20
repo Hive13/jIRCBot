@@ -3,6 +3,7 @@ package org.hive13.jircbot.commands;
 import java.util.Date;
 
 import org.hive13.jircbot.jIRCBot;
+import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 
 /**
  * A simple time command. Tells the bot to give
@@ -23,7 +24,7 @@ public class jIBCTimeCmd extends jIBCommand {
     @Override
     public void handleMessage(jIRCBot bot, String channel, String sender,
             String message) {
-        bot.sendMessage(channel, sender + ": The time is now " + (new Date()));
+        bot.sendMessage(channel, sender + ": The time is now " + (new Date()), eMsgTypes.publicMsg);
 
     }
 

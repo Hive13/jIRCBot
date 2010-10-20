@@ -52,7 +52,9 @@ public class jIRCTools {
 		/** User quits the server the bot is on. */
 		quitMsg, 
 		/** Bot messages w/ HTML formatting. */
-		htmlMsg
+		htmlMsg,
+		/** Do Not Log Message. */
+		LogFreeMsg
 	}
 
 	/**
