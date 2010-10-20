@@ -244,6 +244,7 @@ public class jIRCBot extends PircBot {
 		if(msgType != eMsgTypes.LogFreeMsg && channelList.contains(target))
 			jIRCTools.insertMessage(target, jIRCProperties.getInstance().getServer(), this.getNick(), message, msgType);
 	}
+	
 	public void onMessage(String channel, String sender, String login,
 			String hostname, String message) {
 		jIRCTools.insertMessage(channel, this.getServer(), sender, message,
@@ -275,6 +276,9 @@ public class jIRCBot extends PircBot {
 		}
 	}
 
+	public void onPrivateMessage(String sender, String login, String hostname, String message) {
+		onMessage(sender, sender, login, hostname, message);
+	}
 	/*
 	 * If the bot is disconnected from the server, quit the bot.
 	 */
