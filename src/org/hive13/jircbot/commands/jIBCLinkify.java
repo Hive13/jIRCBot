@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
 import org.hive13.jircbot.support.jIRCTools;
+import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 
 public class jIBCLinkify extends jIBCommand {
     public final int        MAX_URL_LENGTH  = 25;
@@ -76,7 +77,7 @@ public class jIBCLinkify extends jIBCommand {
         if(!returnMsg.isEmpty()) {
             // Remove the last ';' character
             returnMsg = returnMsg.substring(0, returnMsg.length()-2);
-            bot.sendMessage(channel, returnMsg);
+            bot.sendMessage(channel, returnMsg, eMsgTypes.publicMsg);
         }
 
     }

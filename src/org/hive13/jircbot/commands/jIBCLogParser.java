@@ -13,6 +13,7 @@ import java.util.Locale;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.support.jIRCTools;
+import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 
 public class jIBCLogParser extends jIBCommand {
 
@@ -27,12 +28,12 @@ public class jIBCLogParser extends jIBCommand {
 	
 	protected void handleMessage(jIRCBot bot, String channel, String sender,
 			String message) {
-		bot.sendMessage(channel, "Starting to parse log...");
+		bot.sendMessage(channel, "Starting to parse log...", eMsgTypes.publicMsg);
 		boolean result = translateLogToSQL(message);
 		if (result)
-			bot.sendMessage(channel, "Finished parsing log.");
+			bot.sendMessage(channel, "Finished parsing log.", eMsgTypes.publicMsg);
 		else
-			bot.sendMessage(channel, "Failed to parse log.");
+			bot.sendMessage(channel, "Failed to parse log.", eMsgTypes.publicMsg);
 	}
 
 	Date logDate;

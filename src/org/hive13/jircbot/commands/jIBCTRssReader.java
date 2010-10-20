@@ -23,6 +23,7 @@ import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
 import org.hive13.jircbot.support.jIRCProperties;
 import org.hive13.jircbot.support.jIRCTools;
+import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -130,7 +131,7 @@ public class jIBCTRssReader extends jIBCommandThread {
 
 			if (tempEntryList.size() > 0) {
 				// If any entries remain, send a message to the channel.
-				sendMessage(formatMessage(entryList.get(0)));
+				sendMessage(formatMessage(entryList.get(0)), eMsgTypes.publicMsg);
 
 				lastEntryListSet(entryList);
 

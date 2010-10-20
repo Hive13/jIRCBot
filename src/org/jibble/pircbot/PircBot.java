@@ -424,7 +424,7 @@ public abstract class PircBot implements ReplyConstants {
      * 
      * @see Colors
      */
-    public final void sendMessage(String target, String message) {
+    public void sendMessage(String target, String message) {
         _outQueue.add("PRIVMSG " + target + " :" + message);
     }
     
