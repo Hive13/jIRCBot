@@ -54,12 +54,15 @@ public class jIBCPluginList extends jIBCommand {
 					foundOne = true;
 
 				// Add command to the result list.
-				if (curCmd instanceof jIBCommandThread
-				    && ((jIBCommandThread) curCmd).getChannel().equals(channel)) {
-					// cmdThreads have their channel in the name by default.
-					// And we do not want to show cmdThrds for other channels.
-					resultMsg += ((jIBCommandThread) curCmd).getSimpleCommandName();
-				} else
+				if (curCmd instanceof jIBCommandThread) {
+					if(((jIBCommandThread) curCmd).getChannel().equals(channel)) {
+						// 2nd if statement eliminates commands for other channels.
+						
+						// cmdThreads have their channel in the name by default.
+						// getSimpleCmdName ensures we get the root name of the cmd.
+						resultMsg += ((jIBCommandThread) curCmd).getSimpleCommandName();
+					}
+				} else 
 					resultMsg += curCmd.getCommandName();
 			}
 
