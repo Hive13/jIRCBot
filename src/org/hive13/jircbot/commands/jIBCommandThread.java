@@ -70,9 +70,9 @@ public abstract class jIBCommandThread extends jIBCommand {
 	public void handleMessage(jIRCBot bot, String channel, String sender,
 			String message) {
 		if (channel.equals(this.channel)) {
-			if (commandThreadChild != null && commandThreadChild.getIsRunning()) {
+			if (message.equals("stop")) {
 				stopCommandThread();
-			} else {
+			} else if (message.equals("start")){
 				startCommandThread();
 			}
 		} else {
@@ -121,7 +121,10 @@ public abstract class jIBCommandThread extends jIBCommand {
 			commandThreadChild = new commandThreadRunnable(loopDelay);
 		}
 		if (!commandThreadChild.getIsRunning()) {
+			sendMessage("Starting the " + getSimpleCommandName() + " command thread.", eMsgTypes.publicMsg);
 			new Thread(commandThreadChild).start();
+		} else {
+			sendMessage("The " + getSimpleCommandName() + " command thread is already running.", eMsgTypes.publicMsg);
 		}
 	}
 
@@ -131,7 +134,10 @@ public abstract class jIBCommandThread extends jIBCommand {
 	 */
 	public void stopCommandThread() {
 		if (commandThreadChild != null && commandThreadChild.getIsRunning()) {
+			sendMessage("Stopping the " + getSimpleCommandName() + " command thread.", eMsgTypes.publicMsg);
 			commandThreadChild.stop();
+		} else {
+			sendMessage("The " + getSimpleCommandName() + " command thread is not running.", eMsgTypes.publicMsg);
 		}
 	}
 
