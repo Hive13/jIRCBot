@@ -170,13 +170,15 @@ public class jIBCTRssReader extends jIBCommandThread {
 	}
 
 	public String getHelp() {
-		return "Not Done Yet"; //TODO: Implement this.
+		String cmdName = getSimpleCommandName();
+		return "The following are valid uses of this command: !" + cmdName + " help ;" +
+				" !" + cmdName + " start ; !" + cmdName + " stop";
 	}
 	@Override
 	public void handleMessage(jIRCBot bot, String channel, String sender,
 			String message) {
 		if(message.equals("")) {
-			
+			bot.sendMessage(sender, getHelp());
 		} else {
 			// If we did not handle the message, pass it on up.
 			super.handleMessage(bot, channel, sender, message);
