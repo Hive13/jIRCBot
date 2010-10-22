@@ -1,11 +1,15 @@
 package org.hive13.jircbot.commands;
 
+import java.awt.Image;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
+import org.hive13.jircbot.support.WebFile;
 import org.hive13.jircbot.support.jIRCTools;
 import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 
@@ -48,8 +52,24 @@ public class jIBCLinkify extends jIBCommand {
             
             if(urlTitle.isEmpty()) {
                 bot.log("jIBCLinkify - initial bit.ly failed, trying jIRCTools.getURLTitle", eLogLevel.info);
-                urlTitle = jIRCTools.getURLTitle(url);
-                
+                try {
+                    WebFile website = new WebFile(url);
+                    urlTitle = jIRCTools.getURLTitle(website);
+                    Object content = website.getContent();
+                    if(content instanceof Image) {
+                        // We want to resize this image.
+                        Image img = (Image)content;
+                        
+                        // Then write this image to a directory.
+                        // Then write a 'formatedMsg' to the log.
+                    }
+                } catch (MalformedURLException e) {
+                    bot.log("jIBCLinkify - WTF! Bit.ly gave us an invalid URL...", eLogLevel.error);
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    bot.log("jIBCLinkify - failed (badly) to getURLTitle()", eLogLevel.error);
+                    e.printStackTrace();
+                }
             }
             
             if(urlTitle.isEmpty() && USE_BITLY_TITLE) { // Are we allowing ourselves to fall back to Bit.ly?
