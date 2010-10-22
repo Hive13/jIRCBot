@@ -49,6 +49,7 @@ public class jIBCLinkify extends jIBCommand {
             if(urlTitle.isEmpty()) {
                 bot.log("jIBCLinkify - initial bit.ly failed, trying jIRCTools.getURLTitle", eLogLevel.info);
                 urlTitle = jIRCTools.getURLTitle(url);
+                
             }
             
             if(urlTitle.isEmpty() && USE_BITLY_TITLE) { // Are we allowing ourselves to fall back to Bit.ly?

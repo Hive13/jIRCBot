@@ -5,6 +5,7 @@ import static com.rosaloves.bitlyj.Bitly.as;
 import static com.rosaloves.bitlyj.Bitly.info;
 import static com.rosaloves.bitlyj.Bitly.shorten;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hive13.jircbot.jIRCBot;
+
+import com.mortennobel.imagescaling.ResampleOp;
 
 public class jIRCTools {
 	/** Directory for commands to use as a cache for data. */
@@ -141,6 +144,11 @@ public class jIRCTools {
 		return result;
 	}
 
+	// TODO: Work on this idea.
+	public static void getImage() {
+	    ResampleOp resampleOp = new ResampleOp(100, 200);
+	    BufferedImage rescaledTomato = resampleOp.filter(null, null);
+	}
 	/**
 	 * When passed the URL for a webpage this function attempts to determine the
 	 * title of the webpage if it is an HTML page, if it is not an HTML page it
