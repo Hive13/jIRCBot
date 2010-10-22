@@ -192,12 +192,20 @@ public class jIRCBot extends PircBot {
 					"http://api.flickr.com/services/feeds/photos_public.gne?tags=hive13&lang=en-us&format=rss_200",
 					15 * 60 * 1000)); // 15 minutes (15 * 60 seconds)
 
-			addCommandThread(new jIBCTRssReader(
-					this,
-					"Tweet",
-					channelList.get(0),
-					"[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
-					"http://search.twitter.com/search.atom?q=hive13"));
+            addCommandThread(new jIBCTRssReader(
+                    this,
+                    "Tweet",
+                    channelList.get(0),
+                    "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
+                    "http://search.twitter.com/search.atom?q=hive13"));
+            
+            addCommandThread(new jIBCTRssReader(
+                    this,
+                    "Youtube",
+                    channelList.get(0),
+                    "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
+                    "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
+			
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
 					ex);
