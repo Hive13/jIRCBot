@@ -110,7 +110,6 @@ public class jIBCTRssReader extends jIBCommandThread {
 	public void loop() {
 		
 		try {
-			// TODO Auto-generated method stub
 			// Here we pretend to be the google bot to fake out User-Agent
 			// sniffing programs.
 			URLConnection conn = feedURL.openConnection();
