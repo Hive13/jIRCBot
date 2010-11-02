@@ -11,27 +11,30 @@ public class jIRCProperties {
 	private static jIRCProperties instance = null;
 
 	private Properties config;
-	private String defaultBotName 	= "Hive13Bot";
-	private String defaultBotPass   = "";
-	private String defaultServer 	= "irc.freenode.net";
-	private String defaultChannels 	= "#Hive13_test";
+	private final String defaultBotName 	= "Hive13Bot";
+	private final String defaultBotPass   = "";
+	private final String defaultServer 	= "irc.freenode.net";
+	private final String defaultChannels 	= "#Hive13_test";
+	
+	private final String defaultBitlyName = "";
+	private final String defaultBitlyKey 	= "";
+
+	private final String defaultJDBCUrl 	= "";
+	private final String defaultJDBCUser 	= "";
+	private final String defaultJDBCPass 	= "";
+
+	private final String defaultUserAgent = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
+	
+	private final String defaultNickServ	= "nickserv";
+	private final String defaultOpUserList	   = "";
+	private final String defaultAdminUserList    = "";
+	
+	private final String defaultPlugins   = "";
+
 	private String parsedChannels[] = null;
-	
-	private String defaultBitlyName = "";
-	private String defaultBitlyKey 	= "";
-
-	private String defaultJDBCUrl 	= "";
-	private String defaultJDBCUser 	= "";
-	private String defaultJDBCPass 	= "";
-
-	private String defaultUserAgent = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
-	
-	private String defaultNickServ	= "nickserv";
-	private String defaultOpUserList	   = "";
-	private String defaultAdminUserList    = "";
-	
 	private List<String> parsedOpList = null;
 	private List<String> parsedAdminList = null;
+	private List<String> parsedPlugins = null;
 	
 	protected jIRCProperties() {
 		config = new Properties();
@@ -40,6 +43,9 @@ public class jIRCProperties {
 		} catch (IOException ex) {
 			System.err.println(ex);
 		}
+		parsedOpList = null;
+		parsedAdminList = null;
+		parsedPlugins = null;
 	}
 
 	public synchronized static jIRCProperties getInstance() {
@@ -49,6 +55,11 @@ public class jIRCProperties {
 		return instance;
 	}
 
+	public synchronized static jIRCProperties refresh() {
+		instance = null; // Kill the current instance.
+		return getInstance();
+	}
+	
 	public String getProp(String key, String defaultString) {
 		return config.getProperty(key, defaultString);
 	}
@@ -145,12 +156,26 @@ public class jIRCProperties {
      */
     public List<String> getAdminUserList() {
         // Since we only read the properties once, it does not make sense
-        // to repeatedly re-parse the channel string.
+        // to repeatedly re-parse the string.
         if(parsedAdminList == null) {
             String users = getProp("AdminUserList", defaultAdminUserList).toLowerCase();
             String splitUsers[] = users.split(", ?");
             parsedAdminList = new ArrayList<String>(Arrays.asList(splitUsers));
         }
         return parsedAdminList;
+    }
+
+    /**
+     * Find the list of plugins that need to be loaded.
+     */
+    public List<String> getPluginsList() {
+        // Since we only read the properties once, it does not make sense
+        // to repeatedly re-parse the string.
+        if(parsedPlugins == null) {
+            String plugins = getProp("plugins", defaultPlugins).toLowerCase();
+            String splitPlugins[] = plugins.split(", ?");
+            parsedPlugins = new ArrayList<String>(Arrays.asList(splitPlugins));
+        }
+        return parsedPlugins;
     }
 }
