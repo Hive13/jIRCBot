@@ -58,7 +58,7 @@ public class jIBCLinkify extends jIBCommand {
                     Object content = website.getContent();
                     if(content instanceof Image) {
                         // We want to resize this image.
-                        Image img = (Image)content;
+                        // Image img = (Image)content;
                         
                         // Then write this image to a directory.
                         // Then write a 'formatedMsg' to the log.
