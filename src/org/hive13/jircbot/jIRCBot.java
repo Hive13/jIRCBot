@@ -207,7 +207,7 @@ public class jIRCBot extends PircBot {
                     "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
                     "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
 			
-            if(channelList.contains("#hive13_test2")) {
+            if(channelList.contains("#lvl1")) {
                 int lvl1 = channelList.indexOf("#lvl1");
 
                 addCommandThread(new jIBCTRssReader(this, "L1Blog",
