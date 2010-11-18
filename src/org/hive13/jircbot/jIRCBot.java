@@ -165,6 +165,7 @@ public class jIRCBot extends PircBot {
 		try {
 			// Add all command threads.
 
+		    // #Hive13 Feeds
 			addCommandThread(new jIBCTRssReader(
 					this,
 					"WikiFeed",
@@ -206,6 +207,36 @@ public class jIRCBot extends PircBot {
                     "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
                     "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
 			
+            if(channelList.contains("#lvl1")) {
+                int lvl1 = channelList.indexOf("#lvl1");
+
+                addCommandThread(new jIBCTRssReader(this, "L1Blog",
+                        channelList.get(0), "[commandName]: [Title|c50] ([Link])",
+                        "http://www.lvl1.org/feed/"));
+
+                addCommandThread(new jIBCTRssReader(
+                        this,
+                        "L1List",
+                        channelList.get(lvl1),
+                        "[commandName]: [Title|c50] ~[Author|c20|r\\(.+\\)] ([Link])",
+                        "http://groups.google.com/group/lvl1/feed/rss_v2_0_msgs.xml"));
+
+                // PTV: Flickr feed has been known to have issues...
+                addCommandThread(new jIBCTRssReader(
+                        this,
+                        "L1Flickr",
+                        channelList.get(lvl1),
+                        "[commandName]: [Title|c50] ([Link])",
+                        "http://api.flickr.com/services/feeds/groups_pool.gne?id=1298317@N20&lang=en-us&format=atom",
+                        15 * 60 * 1000)); // 15 minutes (15 * 60 seconds)
+
+                addCommandThread(new jIBCTRssReader(
+                        this,
+                        "L1Tweet",
+                        channelList.get(lvl1),
+                        "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
+                        "http://search.twitter.com/search.atom?q=lvl1hackerspace"));
+            }
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
 					ex);
