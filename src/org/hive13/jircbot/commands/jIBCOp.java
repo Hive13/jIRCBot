@@ -7,6 +7,8 @@ import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 public class jIBCOp extends jIBCommand {
 
+    private final int BULK_OP_COUNT = 4;
+    
 	public String getHelp() {
 		return "This command has two uses.  If you are not an operator" +
 				" but think you are on the approved list then the following" +
@@ -23,6 +25,7 @@ public class jIBCOp extends jIBCommand {
 	@Override
 	protected void handleMessage(jIRCBot bot, String channel, String sender,
 			String message) {
+	    
 		// We do not want anything that has spaces, so grab the first word.
 	    /* The proper structure for this command should be as follows:
 	     * Two methods:
@@ -33,14 +36,18 @@ public class jIBCOp extends jIBCommand {
 	     */
 		String[] splitMsg = message.trim().split(" ");
 
-		
 		jIRCUser temp = bot.userListGetSafe(sender);
 		if(temp.getAuthLevel().ordinal() < eAuthLevels.operator.ordinal()) {
 			bot.startAuthForUser(temp);
 		} else {
-		    //String curTargetUsr = "";
+		    
+            int modeCount = 0;
+            String modeMsg = "";
+            
 		    for(String curTargetUsr: splitMsg) {
+		        
 		        temp = bot.userListGetSafe(curTargetUsr);
+		        
 	            if (temp != null) {
 	                boolean opped = false;
 	                // Check to make sure we are not downgrading someone from admin.
@@ -51,7 +58,19 @@ public class jIBCOp extends jIBCommand {
 	                }
 	                // Check to make sure the target user is not already opped.
 	                if (!bot.getUser(channel, curTargetUsr).isOp()) {
-	                    bot.op(channel, curTargetUsr);
+	                    // We are going to perform bulk 'op' transactions
+	                    // to cut down on channel noise.
+	                    modeMsg = "o" + modeMsg + " " + curTargetUsr;
+	                    modeCount++;
+	                    
+                        // Have we hit the bulk op limit?
+	                    if((modeCount % BULK_OP_COUNT) == 0) {
+	                        // op the people in the current list...
+	                        bot.setMode(channel, "+" + modeMsg);
+	                        // Clear the bulk mode buffer.
+	                        modeMsg = "";
+	                    }
+	                    
 	                    opped = true;
 	                }
 	    
@@ -68,7 +87,11 @@ public class jIBCOp extends jIBCommand {
 	                        + getHelp());
 	            }
 		    }
+		    
+		    // Were we left with a non-even number of users to op?
+		    if((modeCount % BULK_OP_COUNT) != 0) {
+		        bot.setMode(channel, "+" + modeMsg);
+		    }
 		}
 	}
-
 }
