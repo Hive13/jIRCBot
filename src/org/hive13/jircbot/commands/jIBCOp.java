@@ -50,21 +50,21 @@ public class jIBCOp extends jIBCommand {
 	                    opped = true;
 	                }
 	                // Check to make sure the target user is not already opped.
-	                if (!bot.getUser(channel, message).isOp()) {
-	                    bot.op(channel, message);
+	                if (!bot.getUser(channel, curTargetUsr).isOp()) {
+	                    bot.op(channel, curTargetUsr);
 	                    opped = true;
 	                }
 	    
 	                // If any action was actually performed, alert the user and log the
 	                // event.
 	                if (opped) {
-	                    bot.sendMessage(message, sender
+	                    bot.sendMessage(curTargetUsr, sender
 	                            + " granted you operator priviledges.");
-	                    bot.log(sender + " granted " + message
+	                    bot.log(sender + " granted " + curTargetUsr
 	                            + " operator priviledges.", eLogLevel.info);
 	                }
 	            } else {
-	                bot.sendMessage(sender, "Could not find user (" + message + "). "
+	                bot.sendMessage(sender, "Could not find user (" + curTargetUsr + "). "
 	                        + getHelp());
 	            }
 		    }
