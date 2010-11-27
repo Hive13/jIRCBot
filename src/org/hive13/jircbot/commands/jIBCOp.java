@@ -24,41 +24,50 @@ public class jIBCOp extends jIBCommand {
 	protected void handleMessage(jIRCBot bot, String channel, String sender,
 			String message) {
 		// We do not want anything that has spaces, so grab the first word.
-		String[] splitMsg = message.trim().split(" ", 2);
-		message = splitMsg[0];
+	    /* The proper structure for this command should be as follows:
+	     * Two methods:
+	     * - !op
+	     *     - The bot will re-check your op status if you are not currently op.
+	     * - !op <Username> <Username> <Username>
+	     *     - The bot will give operator status to all of the specified usernames.
+	     */
+		String[] splitMsg = message.trim().split(" ");
 
 		
 		jIRCUser temp = bot.userListGetSafe(sender);
 		if(temp.getAuthLevel().ordinal() < eAuthLevels.operator.ordinal()) {
 			bot.startAuthForUser(temp);
 		} else {
-			temp = bot.userListGetSafe(message);
-			if (temp != null) {
-				boolean opped = false;
-				// Check to make sure we are not downgrading someone from admin.
-				if (temp.getAuthLevel().ordinal() < eAuthLevels.operator.ordinal()) {
-					temp.setAuthorized(eAuthLevels.operator);
-					bot.userListPutSafe(temp);
-					opped = true;
-				}
-				// Check to make sure the target user is not already opped.
-				if (!bot.getUser(channel, message).isOp()) {
-					bot.op(channel, message);
-					opped = true;
-				}
-	
-				// If any action was actually performed, alert the user and log the
-				// event.
-				if (opped) {
-					bot.sendMessage(message, sender
-							+ " granted you operator priviledges.");
-					bot.log(sender + " granted " + message
-							+ " operator priviledges.", eLogLevel.info);
-				}
-			} else {
-				bot.sendMessage(sender, "Could not find user (" + message + "). "
-						+ getHelp());
-			}
+		    //String curTargetUsr = "";
+		    for(String curTargetUsr: splitMsg) {
+		        temp = bot.userListGetSafe(curTargetUsr);
+	            if (temp != null) {
+	                boolean opped = false;
+	                // Check to make sure we are not downgrading someone from admin.
+	                if (temp.getAuthLevel().ordinal() < eAuthLevels.operator.ordinal()) {
+	                    temp.setAuthorized(eAuthLevels.operator);
+	                    bot.userListPutSafe(temp);
+	                    opped = true;
+	                }
+	                // Check to make sure the target user is not already opped.
+	                if (!bot.getUser(channel, message).isOp()) {
+	                    bot.op(channel, message);
+	                    opped = true;
+	                }
+	    
+	                // If any action was actually performed, alert the user and log the
+	                // event.
+	                if (opped) {
+	                    bot.sendMessage(message, sender
+	                            + " granted you operator priviledges.");
+	                    bot.log(sender + " granted " + message
+	                            + " operator priviledges.", eLogLevel.info);
+	                }
+	            } else {
+	                bot.sendMessage(sender, "Could not find user (" + message + "). "
+	                        + getHelp());
+	            }
+		    }
 		}
 	}
 
