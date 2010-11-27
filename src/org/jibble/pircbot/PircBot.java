@@ -2869,7 +2869,9 @@ public abstract class PircBot implements ReplyConstants {
             Hashtable<?, ?> users = (Hashtable<?, ?>) _channels.get(channel);
             if (users != null) {
             	User tempUser = (User) users.get(user);
-                return new User(tempUser.getPrefix(), tempUser.getNick());
+            	if(tempUser != null) {
+            	    return new User(tempUser.getPrefix(), tempUser.getNick());
+            	}
             }
         }
         return null;
