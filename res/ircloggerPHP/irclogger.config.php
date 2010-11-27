@@ -3,13 +3,13 @@
 #
 
 # DB access used by frontend and logger
-db_host = mysql.host.com
-db_user = chanlogger
-db_pass = qF7yWI4Tcnsb4qD
+db_host = localhost
+db_user = paulbot
+db_pass = paulb0t
 db_name = channellog
 
 irc_channel = #hive13
 irc_server = irc.freenode.net
 
 # where is the frontend installed to?
-baseurl = http://caffeinesystems.ath.cx/irclogger/
+baseurl = http://portal.hive13.org/irclogger/index.php

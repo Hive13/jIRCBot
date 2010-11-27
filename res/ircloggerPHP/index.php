@@ -9,9 +9,23 @@ header('Content-Type: text/html; charset=utf-8');
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 <head>
+    <meta name="google-site-verification" content="oyan_ng5kthC1vqTLiT_tDqaVYz_O9ebh4HCvR5PSB8" />
     <title>IRC channel log</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" media="all" type="text/css" href="style.css" />
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-19655625-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
 </head>
 <body>
 <?php
@@ -102,7 +116,7 @@ if($sql) while($row = mysql_fetch_array($res, MYSQL_ASSOC)){
         $listItem .= '</span></li>';
     } else if($row['vcMsgType'] == 'nickChange') {
         $listItem = '<b>*</b><span class="server">';
-        $listItem .= htmlspecialchars($row['vcUsername']).' changed their nick to '.htmlspecialchars($row['vcMessage']).'.';
+        $listItem .= htmlspecialchars($row['vcUsername']).' changed their nick to'.htmlspecialchars($row['vcMessage']).'.';
         $listItem .= '</span></li>';
     } else{
         $listItem = '<b>*</b><span class="server">';

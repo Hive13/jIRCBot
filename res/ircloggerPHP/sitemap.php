@@ -6,7 +6,7 @@ $dbh = getdbhandle($conf);
 
 $sql = "SELECT DISTINCT DATE(tsMsgTime) as d
           FROM messages, channel
-         WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '#hive13_test'
+         WHERE fk_ChannelID = pk_ChannelID AND vcChannel = '#hive13'
       ORDER BY tsMsgTime DESC";
 $res = mysql_query($sql,$dbh);
 
