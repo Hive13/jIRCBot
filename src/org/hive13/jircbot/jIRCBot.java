@@ -209,9 +209,9 @@ public class jIRCBot extends PircBot {
 			
             addCommandThread(new jIBCTRssReader(
                     this,
-                    "Hive13",
+                    "H13Door",
                     channelList.get(0),
-                    "[commandName]: [Title|c30]",
+                    "[Title|c30]",
                     "http://localhost/isOpen/RSS.php"));
             
             if(channelList.contains("#lvl1")) {
