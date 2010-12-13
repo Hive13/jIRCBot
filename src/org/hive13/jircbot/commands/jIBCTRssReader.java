@@ -221,8 +221,11 @@ public class jIBCTRssReader extends jIBCommandThread {
 		message = formatMessageItem(message, formatItems[0],
 				getSimpleCommandName());
 		message = formatMessageItem(message, formatItems[1], entry.getTitle());
-		message = formatMessageItem(message, formatItems[2],
-				jIRCTools.generateShortURL(entry.getLink()));
+		
+		if(!entry.getLink().isEmpty())
+		    message = formatMessageItem(message, formatItems[2],
+		            jIRCTools.generateShortURL(entry.getLink()));
+		
 		message = formatMessageItem(message, formatItems[3], entry.getAuthor());
 
 		// Return the formatted message stripped of all non-ASCII characters,

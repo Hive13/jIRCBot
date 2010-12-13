@@ -96,6 +96,9 @@ public class jIRCTools {
      */
     public static String generateShortURL(String longURL, String username,
             String apikey) {
+        if(longURL.isEmpty())
+            return "";
+        
         String result = "Username or API key are not initialized";
         if (jIRCProperties.getInstance().getBitlyName().length() > 0
                 && jIRCProperties.getInstance().getBitlyAPIKey().length() > 0)
