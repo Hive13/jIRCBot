@@ -207,6 +207,13 @@ public class jIRCBot extends PircBot {
                     "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
                     "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
 			
+            addCommandThread(new jIBCTRssReader(
+                    this,
+                    "Hive13",
+                    channelList.get(0),
+                    "[commandName]: [Title|c30]",
+                    "http://localhost/isOpen/RSS.php"));
+            
             if(channelList.contains("#lvl1")) {
                 int lvl1 = channelList.indexOf("#lvl1");
 
