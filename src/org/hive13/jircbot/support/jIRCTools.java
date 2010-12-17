@@ -16,6 +16,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.naming.directory.InvalidAttributesException;
+
 import org.hive13.jircbot.jIRCBot;
 
 public class jIRCTools {
@@ -177,6 +179,18 @@ public class jIRCTools {
         return result;
     }
 
+    
+    public static PreparedStatement getStmtForConn(String statement) throws SQLException, ClassNotFoundException, InvalidAttributesException {
+    	if (!jIRCTools.jdbcEnabled)
+            throw new InvalidAttributesException("jdbcEnabled is false, refusing to create connection that can not exist.");
+
+    	Class.forName("com.mysql.jdbc.Driver");
+        Connection conn = DriverManager.getConnection(jIRCProperties
+                .getInstance().getJDBCUrl(), jIRCProperties.getInstance()
+                .getJDBCUser(), jIRCProperties.getInstance().getJDBCPass());
+        return conn.prepareStatement(statement);
+    }
+    
     /**
      * Inserts a new message into the "messages" table of the attached MySQL
      * database.
@@ -213,11 +227,7 @@ public class jIRCTools {
                 + "( fk_ChannelID, vcMsgType, vcUsername, vcMessage )"
                 + "VALUES" + "( ?, ?, ?, ? )";
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(jIRCProperties
-                    .getInstance().getJDBCUrl(), jIRCProperties.getInstance()
-                    .getJDBCUser(), jIRCProperties.getInstance().getJDBCPass());
-            PreparedStatement stmt = conn.prepareStatement(insertStatement);
+            PreparedStatement stmt = getStmtForConn(insertStatement);
             stmt.setInt(1, chanID);
             stmt.setString(2, msgType.toString());
             stmt.setString(3, username);
@@ -227,7 +237,9 @@ public class jIRCTools {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        } catch (InvalidAttributesException e) {
+			// Do Nothing, the mysql conn is just not set up.
+		}
     }
 
     /**
@@ -266,11 +278,7 @@ public class jIRCTools {
                 + "( fk_ChannelID, vcMsgType, vcUsername, vcMessage, tsMsgTime )"
                 + "VALUES" + "( ?, ?, ?, ?, ? )";
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(jIRCProperties
-                    .getInstance().getJDBCUrl(), jIRCProperties.getInstance()
-                    .getJDBCUser(), jIRCProperties.getInstance().getJDBCPass());
-            PreparedStatement stmt = conn.prepareStatement(insertStatement);
+            PreparedStatement stmt = getStmtForConn(insertStatement);
             stmt.setInt(1, chanID);
             stmt.setString(2, msgType.toString());
             stmt.setString(3, username);
@@ -281,7 +289,9 @@ public class jIRCTools {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        } catch (InvalidAttributesException e) {
+			// Do Nothing, the mysql conn is just not set up.
+		}
     }
 
     /**
@@ -301,11 +311,7 @@ public class jIRCTools {
         String stmtGetChannelID = "SELECT pk_ChannelID FROM channel WHERE vcServer=? AND vcChannel=?";
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(jIRCProperties
-                    .getInstance().getJDBCUrl(), jIRCProperties.getInstance()
-                    .getJDBCUser(), jIRCProperties.getInstance().getJDBCPass());
-            PreparedStatement stmt = conn.prepareStatement(stmtGetChannelID);
+            PreparedStatement stmt = getStmtForConn(stmtGetChannelID);
             stmt.setString(1, server);
             stmt.setString(2, channel);
             ResultSet rs = stmt.executeQuery();
@@ -316,7 +322,9 @@ public class jIRCTools {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        } catch (InvalidAttributesException e) {
+			// Do Nothing, the mysql conn is just not set up.
+		}
         return -1; // Failed to find a channelID
     }
 
@@ -332,18 +340,11 @@ public class jIRCTools {
      *         channel.
      */
     public static int insertChannel(String channel, String server) {
-        if (!jIRCTools.jdbcEnabled)
-            return -1;
-
         String stmtInsertChannel = "INSERT INTO channel "
                 + "( vcChannel, vcServer )" + "VALUES" + "( ?, ?)";
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(jIRCProperties
-                    .getInstance().getJDBCUrl(), jIRCProperties.getInstance()
-                    .getJDBCUser(), jIRCProperties.getInstance().getJDBCPass());
-            PreparedStatement stmt = conn.prepareStatement(stmtInsertChannel);
+            PreparedStatement stmt = getStmtForConn(stmtInsertChannel);
             stmt.setString(1, channel);
             stmt.setString(2, server);
             stmt.executeUpdate();
@@ -351,7 +352,9 @@ public class jIRCTools {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        } catch (InvalidAttributesException e) {
+			// Do Nothing, the mysql conn is just not set up.
+		}
 
         return getChannelID(channel, server);
     }
