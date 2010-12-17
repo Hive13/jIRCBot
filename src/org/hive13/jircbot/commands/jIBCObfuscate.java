@@ -41,6 +41,10 @@ public class jIBCObfuscate extends jIBCommand {
 		 *      in a message.
 		 */
 		
+		// Add word to 'Do Not Log' list.
+		
+		// Initiate cleaning of back logs.
+		
 
 	}
 

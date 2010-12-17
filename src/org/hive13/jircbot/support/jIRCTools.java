@@ -11,6 +11,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -359,4 +361,33 @@ public class jIRCTools {
         return getChannelID(channel, server);
     }
 
+    public static ArrayList<MessageRow> getMessagesByUser(String username) {
+    	ArrayList<MessageRow> result = new ArrayList<MessageRow>();
+    	
+    	String stmtGetMessages = 
+    		"SELECT pk_MessageID, fk_ChannelID, vcUsername, vcMessage, vcMsgType, tsMsgTime" +
+			"FROM messages" +
+			"WHERE vcUsername = ?";
+    	
+    	try {
+			PreparedStatement stmt = getStmtForConn(stmtGetMessages);
+			stmt.setString(1, username);
+			
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+            	MessageRow msgRow = new MessageRow();
+            	msgRow.fk_ChannelID = rs.getInt("fk_MessageID");
+                rs.getInt("pk_ChannelID");
+            }
+			
+		} catch (InvalidAttributesException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// Do Nothing, the mysql conn is just not set up.
+		}
+		
+    	return result;
+    }
 }
