@@ -1,5 +1,7 @@
 'Obfuscation Notes:'
 
+
+
 ~~ Query to find a random username that is not a specific username ~~
 SELECT vcUsername
 FROM messages M 
