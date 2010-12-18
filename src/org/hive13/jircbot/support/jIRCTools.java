@@ -6,6 +6,9 @@ import static com.rosaloves.bitlyj.Bitly.info;
 import static com.rosaloves.bitlyj.Bitly.shorten;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -182,6 +185,25 @@ public class jIRCTools {
         return result;
     }
 
+
+    public void logToFile(String message, String logFilename) throws IOException {
+        logToFile(message, logFilename, false);
+        
+    }
+    
+    public void logToFile(String message, String logFilename, boolean append) throws IOException {
+        File logFile = new File(getCacheDirectory().getPath()
+                + "/" + logFilename);
+        if(!logFile.exists()) {
+            logFile.createNewFile();
+        }
+        if(logFile.exists()) {
+            Writer writer = new FileWriter(logFile, append);
+            writer.write(message);
+            writer.close();
+        }
+        
+    }
     
     public static PreparedStatement getStmtForConn(String statement) throws SQLException, ClassNotFoundException, InvalidAttributesException {
     	if (!jIRCTools.jdbcEnabled)
@@ -446,7 +468,7 @@ public class jIRCTools {
                             "      FROM messages ) AS X " +
                             "    ON M.pk_messageID >= X.ID " +
                             " WHERE (vcMsgType='publicMsg' OR vcMsgType='actionMsg') " +
-                            "      AND NOT vcUsername='?' " +
+                            "      AND NOT vcUsername=? " +
                             " LIMIT 1";
         }
         try {
@@ -599,8 +621,9 @@ public class jIRCTools {
         String stmtCombined = stmtUpdateUsernamesStart + " " +
                               stmtUpdateUsernamesMeat + " " + 
                               stmtUpdateUsernamesEnd;
-        
+       
         try {
+            
             // Initialize the PreparedStatement parameters.
             PreparedStatement stmt = getStmtForConn(stmtCombined);
             for(int i = 1; i <= msgIds.size(); i++) {
@@ -617,5 +640,13 @@ public class jIRCTools {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } 
+    }
+    
+    public static String replaceAll(String string, String regex, String replaceWith){
+        Pattern myPattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        /*for space,new line, tab checks*/
+        //Pattern myPattern = Pattern.compile(regex+"[ /n/t/r]", Pattern.CASE_INSENSITIVE);
+        string = myPattern.matcher(string).replaceAll(replaceWith);
+        return string;
     }
 }
