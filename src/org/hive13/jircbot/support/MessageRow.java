@@ -1,6 +1,7 @@
 package org.hive13.jircbot.support;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 
 import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
@@ -22,8 +23,13 @@ public class MessageRow {
 	}
 	public MessageRow() {}
 	
-	public MessageRow(ResultSet rs) {
-		
+	public MessageRow(ResultSet rs) throws SQLException {
+		this.fk_ChannelID = rs.getInt("fk_ChannelID");
+		this.pk_MessageID = rs.getInt("pk_MessageID");
+		this.vcUsername = rs.getString("vcUsername");
+		this.vcMessage = rs.getString("vcMessage");
+		this.msgType = eMsgTypes.valueOf(rs.getString("vcMsgType"));
+		this.tsMsgTime = rs.getDate("tsMsgTime");
 	}
 	
 }
