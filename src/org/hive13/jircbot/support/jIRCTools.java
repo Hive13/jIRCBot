@@ -12,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -365,8 +364,8 @@ public class jIRCTools {
     	ArrayList<MessageRow> result = new ArrayList<MessageRow>();
     	
     	String stmtGetMessages = 
-    		"SELECT pk_MessageID, fk_ChannelID, vcUsername, vcMessage, vcMsgType, tsMsgTime" +
-			"FROM messages" +
+    		"SELECT pk_MessageID, fk_ChannelID, vcUsername, vcMessage, vcMsgType, tsMsgTime " +
+			"FROM messages " +
 			"WHERE vcUsername = ?";
     	
     	try {
@@ -375,9 +374,7 @@ public class jIRCTools {
 			
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-            	MessageRow msgRow = new MessageRow();
-            	msgRow.fk_ChannelID = rs.getInt("fk_MessageID");
-                rs.getInt("pk_ChannelID");
+            	result.add(new MessageRow(rs));
             }
 			
 		} catch (InvalidAttributesException e) {
