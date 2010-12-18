@@ -1,6 +1,7 @@
 package org.hive13.jircbot.commands;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.support.MessageRow;
@@ -49,7 +50,7 @@ public class jIBCObfuscate extends jIBCommand {
 		
 		// Initiate cleaning of back logs.
 	    // First we need the ID's of all the messages a user has sent  
-	    String targetUser = "Hodapp";
+	    String targetUser = "hodapp";
 		ArrayList<MessageRow> allMsgs = jIRCTools.getMessagesByUser(targetUser);
 		bot.sendMessage(channel, "Found " + allMsgs.size() + " messages for target.");
 		
@@ -60,9 +61,11 @@ public class jIBCObfuscate extends jIBCommand {
         bot.sendMessage(channel, "Retrieved " + randomNames.size() + " random usernames.");
         bot.sendMessage(channel, "Starting username nuke, this may take a while.");
 
+        // Time to build a huge update statement to eradicate all references to the target.
         jIRCTools.updateAllTargetsUsernames(targetUser, allMsgs, randomNames);
 		bot.sendMessage(channel, "Nuke query finished, checking username count...");
 		
+		// Lets check to see if the previous query worked...
         allMsgs = jIRCTools.getMessagesByUser(targetUser);
         bot.sendMessage(channel, "Found " + allMsgs.size() + " messages for target.");
         if(allMsgs.size() > 0) {
@@ -70,15 +73,41 @@ public class jIBCObfuscate extends jIBCommand {
         } else {
             bot.sendMessage(channel, "Username nuke appears to have worked.  Moving onto message reference nuke.");
         }
-		// Time to build a huge update statement to eradicate all references to the target.
-		/*
-		 * UPDATE messages
-              SET vcUsername = CASE pk_MessageID
-                WHEN 1 THEN (Find a random)
-                WHEN 2 THEN (Find a random)
-                ...
-              END
-            WHERE pk_MessageID in (1, 2, .....);
+        
+        // Ok, so hopefully we have managed to nuke all of the users direct messages.
+        // Now let's try to 'fix' all messages sent TO the user.
+        allMsgs = jIRCTools.searchMessagesForKeyword(targetUser);
+        if(allMsgs.size() > 0) {
+            bot.sendMessage(channel, "Found " + allMsgs.size() + " references to target in messages." +
+            		" Getting random usernames now.");
+            randomNames = jIRCTools.getRandomUsernames(targetUser, allMsgs.size());
+            bot.sendMessage(channel, "Retreived " + randomNames.size() + " random usernames.  Starting" +
+            		" obfuscation of messages, this may take some time.");
+            
+            // Ok, message obfuscation time...
+            for(int i = 0; i < allMsgs.size(); i++) {
+
+                String targetMessage = allMsgs.get(i).vcMessage;
+                targetMessage = Pattern.compile(targetUser, Pattern.CASE_INSENSITIVE).matcher(targetMessage).replaceAll(randomNames.get(i).vcUsername);
+                allMsgs.get(i).vcMessage = targetMessage;
+            }
+            
+            // Now time to update the database with the obfuscated messages.
+            jIRCTools.updateAllTargetsMessages(targetUser, allMsgs);
+            bot.sendMessage(channel, "Message 'fix' finished, checking results...");
+            
+            allMsgs = jIRCTools.searchMessagesForKeyword(targetUser);
+            bot.sendMessage(channel, "Found " + allMsgs.size() + " messages with target.");
+            
+        } else {
+            bot.sendMessage(channel, "You must not be popular, no references found to target in messages.");
+        }
+        bot.sendMessage(channel, "Finished.  Future messages from target will now be obfuscated." +
+        		" If you wish me to stop obfuscating the target, contact Paul.");
+		/*SELECT pk_messageID, vcMessage
+            FROM messages 
+            WHERE MATCH(vcMessage) 
+                  AGAINST ('.+pvince*' IN BOOLEAN MODE);
 		 */
 		
 	}

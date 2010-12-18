@@ -532,4 +532,90 @@ public class jIRCTools {
             e.printStackTrace();
         } 
     }
+
+    public static ArrayList<MessageRow> searchMessagesForKeyword(String keyword) {
+        ArrayList<MessageRow> result = new ArrayList<MessageRow>();
+        
+        String stmtSearchQuery = "SELECT * " +
+        		                  "FROM messages " +
+        		                  "WHERE MATCH(vcMessage)" +
+        		                  "      AGAINST (? IN BOOLEAN MODE)";
+        try {
+            PreparedStatement stmt = getStmtForConn(stmtSearchQuery);
+            stmt.setString(1, keyword);
+            
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next())
+                result.add(new MessageRow(rs));
+            
+        } catch (InvalidAttributesException e) {
+            // MySQL conn information not filled in.
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        return result;
+    }
+    
+    /**
+     * This database query is fairly specific to jIBCObfuscate.  It might make
+     * more sense if you read look at the code in there.
+     */
+    public static void updateAllTargetsMessages(String vcUsername, 
+            ArrayList<MessageRow> msgIds) {
+        
+        // Initialize the statement strings.
+        String stmtUpdateUsernamesStart =
+            "UPDATE messages " +
+            "   SET vcMessage = CASE pk_MessageID ";
+        String stmtUpdateUsernamesMeat = ""; // This will be 'WHEN # THEN ? \n'
+        String stmtUpdateUsernamesEnd =
+            "       ELSE vcMessage " +
+            "   END " +
+            "WHERE pk_MessageID in (";
+        
+        // Build the array of statements for the PreparedStatement.
+        Iterator<MessageRow> it = msgIds.iterator();
+        while(it.hasNext()) {
+            int msgID = it.next().pk_MessageID;
+            // Note: I deliberately decided not to make the
+            //       msgID a ? parameter for a couple reasons.
+            //       1. It is data straight from the database that users have never touched.
+            //       2. It would be a pain in the royal arse to not do it this way.
+            stmtUpdateUsernamesMeat += 
+                "       WHEN " + msgID +" THEN ? \n";
+            
+            if(it.hasNext())
+                stmtUpdateUsernamesEnd += msgID + ", ";
+            else
+                stmtUpdateUsernamesEnd += msgID + ") ";
+        }
+        
+        // Combine the generated statement strings.
+        String stmtCombined = stmtUpdateUsernamesStart + " " +
+                              stmtUpdateUsernamesMeat + " " + 
+                              stmtUpdateUsernamesEnd;
+        
+        try {
+            // Initialize the PreparedStatement parameters.
+            PreparedStatement stmt = getStmtForConn(stmtCombined);
+            for(int i = 1; i <= msgIds.size(); i++) {
+                stmt.setString(i, msgIds.get(i-1).vcMessage);
+            }
+            
+            // Execute the query.
+            stmt.executeUpdate();
+          
+        } catch (InvalidAttributesException e) {
+            // There was no MySQL connection setup.
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } 
+    }
 }
