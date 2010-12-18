@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.hive13.jircbot.commands.jIBCLinkify;
+import org.hive13.jircbot.commands.jIBCObfuscate;
 import org.hive13.jircbot.commands.jIBCOp;
 import org.hive13.jircbot.commands.jIBCPluginList;
 import org.hive13.jircbot.commands.jIBCQuitCmd;
@@ -160,6 +161,8 @@ public class jIRCBot extends PircBot {
 		addCommand(new jIBCQuitCmd());
 		addCommand(new jIBCPluginList(commands, lineParseCommands));
 		addCommand(new jIBCOp());
+		addCommand(new jIBCObfuscate());
+		
 		// addCommand(new jIBCLogParser());
 
 		try {
