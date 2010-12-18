@@ -6,12 +6,14 @@ import static com.rosaloves.bitlyj.Bitly.info;
 import static com.rosaloves.bitlyj.Bitly.shorten;
 
 import java.io.File;
+import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -193,6 +195,25 @@ public class jIRCTools {
     }
     
     /**
+     * Simple function to determine if a ResultSet has
+     * the specified column.
+     * 	
+     * @param rs            The ResultSet that we are checking.
+     * @param columnName    The name of the column to check for.
+     * @return              True if the ResultSet contains the column.
+     */
+    public static boolean isValidColumn(ResultSet rs, String columnName) {
+    	boolean result = false;
+    	try {
+			rs.findColumn(columnName);
+			result = true;
+		} catch (SQLException e) {
+			result = false;
+		}
+    	return result;
+    }
+    
+    /**
      * Inserts a new message into the "messages" table of the attached MySQL
      * database.
      * 
@@ -360,6 +381,14 @@ public class jIRCTools {
         return getChannelID(channel, server);
     }
 
+    /**
+     * Returns an ArrayList of MessageRows that contains all the logged
+     * message information for the passed in username.
+     * 
+     * @param username  Username to search for messages for.
+     * @return          Any arraylist of MessageRows populated with
+     *                  data from the database.
+     */
     public static ArrayList<MessageRow> getMessagesByUser(String username) {
     	ArrayList<MessageRow> result = new ArrayList<MessageRow>();
     	
@@ -378,13 +407,129 @@ public class jIRCTools {
             }
 			
 		} catch (InvalidAttributesException e) {
-			e.printStackTrace();
+            // Do Nothing, the mysql conn is just not set up.
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// Do Nothing, the mysql conn is just not set up.
+            e.printStackTrace();
 		}
 		
     	return result;
+    }
+    
+    /**
+     * Polls the database for 'n' number of random usernames
+     * 
+     * @param omitName  A username to ommit from the list of random usernames.
+     * @param number    The number of random usernames to return.
+     * @return          Returns an ArrayList of MessageRow's, however only the
+     *                  vcUsername is set in each row.
+     */
+    public static ArrayList<MessageRow> getRandomUsernames(String omitName, int number) {
+        ArrayList<MessageRow> result = new ArrayList<MessageRow>();
+        
+        String stmtNameQuery;
+        
+        if(number > 1) {
+            stmtNameQuery = "SELECT vcUsername " +
+                            "  FROM messages " +
+                            " WHERE vcUsername != ? " +
+                            "    AND vcUsername != 'Hive13Bot' " +  // No bot names
+                            "    AND vcUsername != 'Phergie' " +    // No bot names
+                            "    AND (vcMsgType='publicMsg' OR vcMsgType='actionMsg') " +
+                            "ORDER BY RAND() LIMIT ?";
+        } else {
+            stmtNameQuery = "SELECT vcUsername " +
+                            "  FROM messages M  " +
+                            "    JOIN ( " +
+                            "      SELECT FLOOR(MAX((pk_messageid)-1)*RAND()) AS ID " +
+                            "      FROM messages ) AS X " +
+                            "    ON M.pk_messageID >= X.ID " +
+                            " WHERE (vcMsgType='publicMsg' OR vcMsgType='actionMsg') " +
+                            "      AND NOT vcUsername='?' " +
+                            " LIMIT 1";
+        }
+        try {
+            PreparedStatement stmt = getStmtForConn(stmtNameQuery);
+            stmt.setString(1, omitName);
+            if(number > 1)
+                stmt.setInt(2, number);
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            while(rs.next()) {
+                result.add(new MessageRow(rs, false));
+            }
+        } catch (InvalidAttributesException e) {
+            // We do not have a MySQL connection set up.
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        
+        
+        return result;
+    }
+
+    /**
+     * This database query is fairly specific to jIBCObfuscate.  It might make
+     * more sense if you read look at the code in there.
+     */
+    public static void updateAllTargetsUsernames(String vcUsername, 
+            ArrayList<MessageRow> msgIds, ArrayList<MessageRow> replacementNames) {
+        if(msgIds.size() != replacementNames.size())
+            throw new InvalidParameterException("The msgIDs size is not " +
+            		"the same as the replacement names size.");
+        
+        // Initialize the statement strings.
+        String stmtUpdateUsernamesStart =
+            "UPDATE messages " +
+            "   SET vcUsername = CASE pk_MessageID ";
+        String stmtUpdateUsernamesMeat = ""; // This will be 'WHEN # THEN ? \n'
+        String stmtUpdateUsernamesEnd =
+            "       ELSE vcUsername " +
+            "   END " +
+            "WHERE pk_MessageID in (";
+        
+        // Build the array of statements for the PreparedStatement.
+        Iterator<MessageRow> it = msgIds.iterator();
+        while(it.hasNext()) {
+            int msgID = it.next().pk_MessageID;
+            // Note: I deliberately decided not to make the
+            //       msgID a ? parameter for a couple reasons.
+            //       1. It is data straight from the database that users have never touched.
+            //       2. It would be a pain in the royal arse to not do it this way.
+            stmtUpdateUsernamesMeat += 
+                "       WHEN " + msgID +" THEN ? \n";
+            
+            if(it.hasNext())
+                stmtUpdateUsernamesEnd += msgID + ", ";
+            else
+                stmtUpdateUsernamesEnd += msgID + ") ";
+        }
+        
+        // Combine the generated statement strings.
+        String stmtCombined = stmtUpdateUsernamesStart + " " +
+                              stmtUpdateUsernamesMeat + " " + 
+                              stmtUpdateUsernamesEnd;
+        
+        try {
+            // Initialize the PreparedStatement parameters.
+            PreparedStatement stmt = getStmtForConn(stmtCombined);
+            for(int i = 1; i <= replacementNames.size(); i++) {
+                stmt.setString(i, replacementNames.get(i-1).vcUsername);
+            }
+            
+            // Execute the query.
+            stmt.executeUpdate();
+          
+        } catch (InvalidAttributesException e) {
+            // There was no MySQL connection setup.
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } 
     }
 }
