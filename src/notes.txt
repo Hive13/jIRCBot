@@ -13,7 +13,21 @@ WHERE (vcMsgType='publicMsg' OR vcMsgType='actionMsg')
   AND NOT vcUsername='Paul_Hive13'
 LIMIT 1;
 
-Analysis: Excellent performance, under 0.04s a query.
+Analysis: Pro: Excellent performance, under 0.04s a query
+		  Con: Only returns one result.
+
+SELECT vcUsername 
+FROM messages 
+WHERE vcUsername != 'Paul_hive13' 
+	AND vcUsername != 'Hive13Bot' 
+	AND vcUsername != 'Phergie' 
+ORDER BY RAND() LIMIT 544;
+
+Analysis: Pro: Can return a list of any number of random results.
+		  Con: Execution time of any query is ~0.74s
+		  - If we need more than 18 results, this query is more efficient.
+
+
 
 ~~ Query to find all message id's where the user posted ~~
 SELECT pk_MessageID
