@@ -1,6 +1,10 @@
 package org.hive13.jircbot.commands;
 
+import java.util.ArrayList;
+
 import org.hive13.jircbot.jIRCBot;
+import org.hive13.jircbot.support.MessageRow;
+import org.hive13.jircbot.support.jIRCTools;
 
 public class jIBCObfuscate extends jIBCommand {
 
@@ -44,8 +48,39 @@ public class jIBCObfuscate extends jIBCommand {
 		// Add word to 'Do Not Log' list.
 		
 		// Initiate cleaning of back logs.
+	    // First we need the ID's of all the messages a user has sent  
+	    String targetUser = "Hodapp";
+		ArrayList<MessageRow> allMsgs = jIRCTools.getMessagesByUser(targetUser);
+		bot.sendMessage(channel, "Found " + allMsgs.size() + " messages for target.");
 		
+		// TODO: Add check to stop if we do not find any messages.
+		
+		// Then we need a list of random usernames that we have seen.
+		ArrayList<MessageRow> randomNames = jIRCTools.getRandomUsernames(targetUser, allMsgs.size());
+        bot.sendMessage(channel, "Retrieved " + randomNames.size() + " random usernames.");
+        bot.sendMessage(channel, "Starting username nuke, this may take a while.");
 
+        jIRCTools.updateAllTargetsUsernames(targetUser, allMsgs, randomNames);
+		bot.sendMessage(channel, "Nuke query finished, checking username count...");
+		
+        allMsgs = jIRCTools.getMessagesByUser(targetUser);
+        bot.sendMessage(channel, "Found " + allMsgs.size() + " messages for target.");
+        if(allMsgs.size() > 0) {
+            bot.sendMessage(channel, "Well crap, contact Paul with the username you are trying to nuke.");
+        } else {
+            bot.sendMessage(channel, "Username nuke appears to have worked.  Moving onto message reference nuke.");
+        }
+		// Time to build a huge update statement to eradicate all references to the target.
+		/*
+		 * UPDATE messages
+              SET vcUsername = CASE pk_MessageID
+                WHEN 1 THEN (Find a random)
+                WHEN 2 THEN (Find a random)
+                ...
+              END
+            WHERE pk_MessageID in (1, 2, .....);
+		 */
+		
 	}
 
 }
