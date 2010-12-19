@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.support.MessageRow;
 import org.hive13.jircbot.support.jIRCTools;
+import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 
 public class jIBCObfuscate extends jIBCommand {
 
@@ -57,27 +58,27 @@ public class jIBCObfuscate extends jIBCommand {
 		ArrayList<MessageRow> allMsgs = jIRCTools.getMessagesByUser(targetUser);
 		if(allMsgs.size() > 0) {
 		    // We found some messages sent by the target.
-    		bot.sendMessage(channel, "Found " + allMsgs.size() + " messages for target.");
+    		bot.sendMessage(channel, "Found " + allMsgs.size() + " messages for target.", eMsgTypes.LogFreeMsg);
     		
     		// Then we need a list of random usernames that we have seen.
     		ArrayList<MessageRow> randomNames = jIRCTools.getRandomUsernames(targetUser, allMsgs.size());
             bot.sendMessage(channel, "Retrieved " + randomNames.size() + " random usernames." +
-            		"Starting username nuke.");
+            		"Starting username nuke.",  eMsgTypes.LogFreeMsg);
     
             // Time to build a huge update statement to eradicate all references to the target.
             jIRCTools.updateAllTargetsUsernames(targetUser, allMsgs, randomNames);
-    		bot.sendMessage(channel, "Nuke query finished, checking username count...");
+    		bot.sendMessage(channel, "Nuke query finished, checking username count...",  eMsgTypes.LogFreeMsg);
     		
     		// Lets check to see if the previous query worked...
             allMsgs = jIRCTools.getMessagesByUser(targetUser);
-            bot.sendMessage(channel, "Found " + allMsgs.size() + " messages for target.");
+            bot.sendMessage(channel, "Found " + allMsgs.size() + " messages for target.",  eMsgTypes.LogFreeMsg);
             if(allMsgs.size() > 0) {
-                bot.sendMessage(channel, "Well crap, contact Paul with the username you are trying to nuke.");
+                bot.sendMessage(channel, "Well crap, contact Paul with the username you are trying to nuke.",  eMsgTypes.LogFreeMsg);
             } else {
-                bot.sendMessage(channel, "Username nuke appears to have worked.  Moving onto message reference nuke.");
+                bot.sendMessage(channel, "Username nuke appears to have worked.  Moving onto message reference nuke.",  eMsgTypes.LogFreeMsg);
             }
 		} else {
-		    bot.sendMessage(channel, "Did not find any messages from this username.  Moving onto the message check.");
+		    bot.sendMessage(channel, "Did not find any messages from this username.  Moving onto the message check.",  eMsgTypes.LogFreeMsg);
 		}
 		
         // Ok, so hopefully we have managed to nuke all of the users direct messages.
@@ -87,12 +88,12 @@ public class jIBCObfuscate extends jIBCommand {
         if(allMsgs.size() > 0) {
             // We found some messages.
             bot.sendMessage(channel, "Found " + allMsgs.size() + " references to target in messages." +
-            		" Getting random usernames now.");
+            		" Getting random usernames now.",  eMsgTypes.LogFreeMsg);
             
             // Now lets find some stuff to replace the names with.
             ArrayList<MessageRow> randomNames = jIRCTools.getRandomUsernames(targetUser, allMsgs.size());
             bot.sendMessage(channel, "Retreived " + randomNames.size() + " random usernames.  Starting" +
-            		" obfuscation of messages, this may take some time.");
+            		" obfuscation of messages, this may take some time.",  eMsgTypes.LogFreeMsg);
             
             // Ok, message obfuscation time...
             for(int i = 0; i < allMsgs.size(); i++) {
@@ -103,20 +104,24 @@ public class jIBCObfuscate extends jIBCommand {
             
             // Now time to update the database with the obfuscated messages.
             jIRCTools.updateAllTargetsMessages(targetUser, allMsgs);
-            bot.sendMessage(channel, "Message 'fix' finished, checking results...");
+            bot.sendMessage(channel, "Message 'fix' finished, checking results...",  eMsgTypes.LogFreeMsg);
             
             // Check the result.
             allMsgs = jIRCTools.searchMessagesForKeyword(targetUser);
             if(allMsgs.size() > 0)
-                bot.sendMessage(channel, "Replace failed for some reason. " + allMsgs.size() + " with target still exist.  Contact Paul to fix this.");
+                bot.sendMessage(channel, "Replace failed for some reason. " + allMsgs.size() + 
+                        " with target still exist.  Contact Paul to fix this.",  eMsgTypes.LogFreeMsg);
             else
-                bot.sendMessage(channel, "Message replacement worked. " + allMsgs.size() + " messages found with target.");
+                bot.sendMessage(channel, "Message replacement worked. " + allMsgs.size() + 
+                        " messages found with target.",  eMsgTypes.LogFreeMsg);
             
         } else {
-            bot.sendMessage(channel, "You must not be popular, no references found to target in messages.");
+            bot.sendMessage(channel, "You must not be popular, no references found to target in messages.", 
+                    eMsgTypes.LogFreeMsg);
         }
         bot.sendMessage(channel, "Finished.  Future messages from target will now be obfuscated." +
-        		" If you wish me to stop obfuscating the target, contact Paul.");
+        		" If you wish me to stop obfuscating the target, contact Paul.",
+        		eMsgTypes.LogFreeMsg);
 		
 	}
 
