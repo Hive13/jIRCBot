@@ -714,7 +714,7 @@ public class jIRCBot extends PircBot {
 	    // 1. Obfuscate the username.
 	    if(jIRCTools.jdbcEnabled) {
     	    ArrayList<String> obfuscateThese = jIRCData.getInstance().getObfuscatedWords();
-    	    if(obfuscateThese.indexOf(username) != -1) {
+    	    if(obfuscateThese.indexOf(username.toLowerCase()) != -1) {
     	        username = jIRCTools.getRandomUsernames(username, 1).get(0).vcUsername;
     	    }
     	    

@@ -72,7 +72,7 @@ public class jIRCData {
         // to repeatedly re-parse the string.
         if(obfuscatedWords == null) {
             String words  = getProp("obfuscatedWords", defaultObfuscatedWords).toLowerCase();
-            String splitWords[] = words.split(", ?");
+            String splitWords[] = words.split(", ");
             obfuscatedWords = new ArrayList<String>(Arrays.asList(splitWords));
         }
         return obfuscatedWords;
@@ -86,7 +86,7 @@ public class jIRCData {
         if(obfuscatedWords == null)
             getObfuscatedWords();
         
-        if(obfuscatedWords.indexOf(word) == -1) {
+        if(obfuscatedWords.indexOf(word.toLowerCase()) == -1) {
             obfuscatedWords.add(word);
             
             Iterator<String> it = obfuscatedWords.iterator();
