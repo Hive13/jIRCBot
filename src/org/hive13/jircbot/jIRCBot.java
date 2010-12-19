@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -29,11 +29,12 @@ import org.hive13.jircbot.commands.jIBCTell;
 import org.hive13.jircbot.commands.jIBCTimeCmd;
 import org.hive13.jircbot.commands.jIBCommand;
 import org.hive13.jircbot.commands.jIBCommandThread;
+import org.hive13.jircbot.support.jIRCData;
 import org.hive13.jircbot.support.jIRCProperties;
 import org.hive13.jircbot.support.jIRCTools;
+import org.hive13.jircbot.support.jIRCUser;
 import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
-import org.hive13.jircbot.support.jIRCUser;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.jibble.pircbot.PircBot;
@@ -210,12 +211,13 @@ public class jIRCBot extends PircBot {
                     "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
                     "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
 			
+            //*
             addCommandThread(new jIBCTRssReader(
                     this,
                     "H13Door",
                     channelList.get(0),
                     "[Title|c30]",
-                    "http://localhost/isOpen/RSS.php"));
+                    "http://localhost/isOpen/RSS.php"));//*/
             
             if(channelList.contains("#lvl1")) {
                 int lvl1 = channelList.indexOf("#lvl1");
@@ -291,12 +293,12 @@ public class jIRCBot extends PircBot {
 
 		// Is this not a log free message and it is a message to a channel.
 		if(msgType != eMsgTypes.LogFreeMsg && channelList.contains(target))
-			jIRCTools.insertMessage(target, jIRCProperties.getInstance().getServer(), this.getNick(), message, msgType);
+		    logMessage(target, jIRCProperties.getInstance().getServer(), this.getNick(), message, msgType);
 	}
 	
 	public void onMessage(String channel, String sender, String login,
 			String hostname, String message) {
-		jIRCTools.insertMessage(channel, this.getServer(), sender, message,
+	    logMessage(channel, this.getServer(), sender, message,
 				eMsgTypes.publicMsg);
 		// Find out if the message was directed as a command.
 		if (message.startsWith(prefix)) {
@@ -547,7 +549,7 @@ public class jIRCBot extends PircBot {
 	// The following is only used for message logging purposes right now.
 	public void onAction(String sender, String login, String hostname,
 			String target, String action) {
-		jIRCTools.insertMessage(target, this.getServer(), sender, action,
+	    logMessage(target, this.getServer(), sender, action,
 				eMsgTypes.actionMsg);
 	}
 
@@ -611,7 +613,7 @@ public class jIRCBot extends PircBot {
 			startAuthForUser(user);
 
 			// Write the event to the log.
-			jIRCTools.insertMessage(channel, this.getServer(), sender, "",
+			logMessage(channel, this.getServer(), sender, "",
 					eMsgTypes.joinMsg);
 		}
 	}
@@ -658,7 +660,7 @@ public class jIRCBot extends PircBot {
 			}
 
 			// Log this user leaving the channel.
-			jIRCTools.insertMessage(channel, this.getServer(), sender, "",
+			logMessage(channel, this.getServer(), sender, "",
 					eMsgTypes.partMsg);
 		}
 	}
@@ -675,7 +677,7 @@ public class jIRCBot extends PircBot {
 			// Then log the user quitting in all channels that the user was in.
 			Iterator<String> i = user.getChannelIterator();
 			while (i.hasNext()) {
-				jIRCTools.insertMessage(i.next(), this.getServer(), sourceNick,
+			    logMessage(i.next(), this.getServer(), sourceNick,
 						reason, eMsgTypes.quitMsg);
 			}
 		}
@@ -697,12 +699,40 @@ public class jIRCBot extends PircBot {
 			// Log the change in name.
 			Iterator<String> i = user.getChannelIterator();
 			while (i.hasNext()) {
-				jIRCTools.insertMessage(i.next(), this.getServer(), oldNick,
+			    logMessage(i.next(), this.getServer(), oldNick,
 						newNick, eMsgTypes.nickChange);
 			}
 		}
 	}
 
+	private void logMessage(String channel, String server, 
+	        String username, String message, eMsgTypes msgType) {
+	    // Here we have a generic function that we can use to log messages read
+	    // from the channel.
+	    
+	    // Obfuscation Time:
+	    // 1. Obfuscate the username.
+	    if(jIRCTools.jdbcEnabled) {
+    	    ArrayList<String> obfuscateThese = jIRCData.getInstance().getObfuscatedWords();
+    	    if(obfuscateThese.indexOf(username) != -1) {
+    	        username = jIRCTools.getRandomUsernames(username, 1).get(0).vcUsername;
+    	    }
+    	    
+    	    // 2. Obfuscate the message.
+    	    Iterator<String> it = obfuscateThese.iterator();
+    	    while(it.hasNext()) {
+    	        String omitThis = it.next();
+    	        message = jIRCTools.replaceAll(message, omitThis,
+    	                jIRCTools.getRandomUsernames(omitThis, 1).get(0).vcUsername);
+    	    }
+    	    
+    	    // Now log the message.
+    	    jIRCTools.insertMessage(channel, server, username, message, msgType);
+	    } else {
+	        // TODO: Put log to file here, the obfuscate will have to happen
+	        //       either when parsing the files, or after the parse.
+	    }
+	}
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Utility functions for member variables.
 	/**
@@ -828,4 +858,6 @@ public class jIRCBot extends PircBot {
 		}
 		return result;
 	}
+	
+	
 }

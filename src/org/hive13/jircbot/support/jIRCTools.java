@@ -27,10 +27,7 @@ import javax.naming.directory.InvalidAttributesException;
 import org.hive13.jircbot.jIRCBot;
 
 public class jIRCTools {
-    /** Directory for commands to use as a cache for data. */
-    private static final String cacheDirectoryPath = "./jIRCBotCache";
-    private static final File cacheDirectory = new File(cacheDirectoryPath);
-
+    
     /**
      * This must be checked by each JDBC method to ensure that the JDBC
      * integration is configured.
@@ -63,21 +60,66 @@ public class jIRCTools {
         LogFreeMsg
     }
 
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    // @@@@@@@@@@   ---- Generic Utility Functions ---- @@@@@@@@@@@@@@@@@@@@@@
+
     /**
-     * Attempt to get a pointer to the jIRCBot cache directory. This method
-     * attempts to create the directory first if it does not exist, however it
-     * does not guarantee that the directory will actually exist.
+     * Log message to logFilename.
      * 
-     * @return Returns a pointer to the cache directory that the bot can read //
-     *         write too.
+     * @param message       What to put in logFilename.
+     * @param logFilename   The path (including filename) to log to.  If
+     *                      the file does not exist, it will be created.
+     * @param append        True to append message to the file,
+     *                      False to overwrite the file.
      */
-    public static File getCacheDirectory() {
-        if (!cacheDirectory.exists()) {
-            cacheDirectory.mkdir();
+    public static void logToFile(String message, String logFilename) throws IOException {
+        logToFile(message, logFilename, false);
+        
+    }
+    
+    /**
+     * Log message to logFilename.
+     * 
+     * @param message       What to put in logFilename.
+     * @param logFilename   The path (including filename) to log to.  If
+     *                      the file does not exist, it will be created.
+     * @param append        True to append message to the file,
+     *                      False to overwrite the file.
+     * @throws IOException
+     */
+    public static void logToFile(String message, String logFilename, boolean append) throws IOException {
+        File logFile = new File(jIRCProperties.getInstance().getCacheDirectory().getPath()
+                + "/" + logFilename);
+        if(!logFile.exists()) {
+            logFile.createNewFile();
         }
-        return cacheDirectory;
+        if(logFile.exists()) {
+            Writer writer = new FileWriter(logFile, append);
+            writer.write(message);
+            writer.close();
+        }
+        
     }
 
+    /**
+     * Implementation of a case insensitive string replace all function.
+     * 
+     * @param string        Source string.
+     * @param regex         What to search the string for.
+     * @param replaceWith   What to replace items found with the regex with.
+     * @return              The source strings with all instances found
+     *                      by the regex replaced with replaceWith.
+     */
+    public static String replaceAll(String string, String regex, String replaceWith){
+        Pattern myPattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        /*for space,new line, tab checks*/
+        //Pattern myPattern = Pattern.compile(regex+"[ /n/t/r]", Pattern.CASE_INSENSITIVE);
+        string = myPattern.matcher(string).replaceAll(replaceWith);
+        return string;
+    }
+    
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    // @@@@@@@@@@   ---- URL Related Utility Functions ---- @@@@@@@@@@@@@@@@@@
     /**
      * Bit.ly API integration to generate a shortened URL. Make sure that the
      * bitlyName and bitlyAPIKey are specified before calling this method.
@@ -185,26 +227,21 @@ public class jIRCTools {
         return result;
     }
 
-
-    public void logToFile(String message, String logFilename) throws IOException {
-        logToFile(message, logFilename, false);
-        
-    }
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    // @@@@@@@@@@   ---- MySQL Utility Functions ---- @@@@@@@@@@@@@@@@@@@@@@@@
     
-    public void logToFile(String message, String logFilename, boolean append) throws IOException {
-        File logFile = new File(getCacheDirectory().getPath()
-                + "/" + logFilename);
-        if(!logFile.exists()) {
-            logFile.createNewFile();
-        }
-        if(logFile.exists()) {
-            Writer writer = new FileWriter(logFile, append);
-            writer.write(message);
-            writer.close();
-        }
-        
-    }
-    
+    /**
+     * This function creates a connection to a MySQL database using the settings
+     * defined in the *.properties file.  If these settings are not defined it
+     * throws an "InvalidAttributesException".
+     * 
+     * @param statement SQL Query to use to initialize the prepared statement.
+     * @return          A prepared statement that is ready to be initialized
+     *                  with the proper parameters and then executed.
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws InvalidAttributesException
+     */
     public static PreparedStatement getStmtForConn(String statement) throws SQLException, ClassNotFoundException, InvalidAttributesException {
     	if (!jIRCTools.jdbcEnabled)
             throw new InvalidAttributesException("jdbcEnabled is false, refusing to create connection that can not exist.");
@@ -215,7 +252,7 @@ public class jIRCTools {
                 .getJDBCUser(), jIRCProperties.getInstance().getJDBCPass());
         return conn.prepareStatement(statement);
     }
-    
+ 
     /**
      * Simple function to determine if a ResultSet has
      * the specified column.
@@ -234,7 +271,9 @@ public class jIRCTools {
 		}
     	return result;
     }
-    
+
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    // @@@@@@@@@@   ---- MySQL Query Functions ---- @@@@@@@@@@@@@@@@@@@@@@@@@@
     /**
      * Inserts a new message into the "messages" table of the attached MySQL
      * database.
@@ -640,13 +679,5 @@ public class jIRCTools {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } 
-    }
-    
-    public static String replaceAll(String string, String regex, String replaceWith){
-        Pattern myPattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        /*for space,new line, tab checks*/
-        //Pattern myPattern = Pattern.compile(regex+"[ /n/t/r]", Pattern.CASE_INSENSITIVE);
-        string = myPattern.matcher(string).replaceAll(replaceWith);
-        return string;
     }
 }

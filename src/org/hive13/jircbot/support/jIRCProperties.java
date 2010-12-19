@@ -1,5 +1,6 @@
 package org.hive13.jircbot.support;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +32,11 @@ public class jIRCProperties {
 	
 	private final String defaultPlugins   = "";
 
+    private final String defaultCacheDirPath = "./jIRCBotCache";
+	
+    /** Directory for commands to use as a cache for data. */
+    private static File cacheDirectory = null;
+ 
 	private String parsedChannels[] = null;
 	private List<String> parsedOpList = null;
 	private List<String> parsedAdminList = null;
@@ -137,6 +143,39 @@ public class jIRCProperties {
 		return getProp("NickServUsername", defaultNickServ);
 	}
 
+	/**
+	 * This function returns the path to the cache directory.
+	 * It also attempts to create the cache directory if it
+	 * does not already exist.
+	 * 
+	 * @return Path to the cache directory.
+	 */
+	public String getCacheDirectoryPath() {
+	    String path = getProp("CacheDirectoryPath", defaultCacheDirPath);
+	    if(cacheDirectory == null)
+	        cacheDirectory = new File(path);
+	    if(!cacheDirectory.exists())
+	        cacheDirectory.mkdir();
+	    return path;
+	} 
+	
+	/**
+     * Attempt to get a pointer to the jIRCBot cache directory. This method
+     * attempts to create the directory first if it does not exist, however it
+     * does not guarantee that the directory will actually exist.
+     * 
+     * @return Returns a pointer to the cache directory that the bot can read //
+     *         write too.
+     */
+    public File getCacheDirectory() {
+        if(cacheDirectory == null) {
+            cacheDirectory = new File(getCacheDirectoryPath());
+        }
+        if (!cacheDirectory.exists()) {
+            cacheDirectory.mkdir();
+        }
+        return cacheDirectory;
+    }
     /**
      * Find the list of users that are to be authorized.
      */
