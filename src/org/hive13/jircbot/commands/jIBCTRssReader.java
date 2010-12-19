@@ -82,7 +82,7 @@ public class jIBCTRssReader extends jIBCommandThread {
 		this.feedURL = feedURL;
 
 		// Attempt to read in a cached version of the feed.
-		cacheFile = new File(jIRCTools.getCacheDirectory().getPath() + "/"
+		cacheFile = new File(jIRCProperties.getInstance().getCacheDirectoryPath() + "/"
 				+ getCommandName() + ".xml");
 		if (cacheFile.exists()) {
 			SyndFeedInput input = new SyndFeedInput();

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.support.MessageRow;
+import org.hive13.jircbot.support.jIRCData;
 import org.hive13.jircbot.support.jIRCTools;
 import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 
@@ -51,7 +52,10 @@ public class jIBCObfuscate extends jIBCommand {
             targetUser = sender;
         
 		// Add word to 'Do Not Log' list.
-	    //TODO: Do this step.
+        if(jIRCData.getInstance().getObfuscatedWords().indexOf(targetUser) >= 0)
+            bot.sendMessage(channel, "User is already obfuscated, but we will look anyway.");
+        else
+            jIRCData.getInstance().addObfuscatedWord(targetUser);
 
         // Initiate cleaning of back logs.
         // First we need the ID's of all the messages a user has sent
