@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -73,7 +72,15 @@ public class jIRCData {
         if(obfuscatedWords == null) {
             String words  = getProp("obfuscatedWords", defaultObfuscatedWords).toLowerCase();
             String splitWords[] = words.split(", ");
-            obfuscatedWords = new ArrayList<String>(Arrays.asList(splitWords));
+            obfuscatedWords = new ArrayList<String>();
+            // Check to make sure we are not adding an empty string.
+            for(int i = 0; i < splitWords.length; i++) {
+                String addWord = "";
+                if(!(addWord = splitWords[i].trim()).isEmpty()) {
+                    // Added toLowerCase in case someone tried to be clever and edit the dat file directly.
+                    obfuscatedWords.add(addWord.toLowerCase());
+                }
+            }
         }
         return obfuscatedWords;
     }
