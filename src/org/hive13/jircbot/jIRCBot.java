@@ -211,7 +211,7 @@ public class jIRCBot extends PircBot {
                     "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
                     "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
 			
-            //*
+            /*
             addCommandThread(new jIBCTRssReader(
                     this,
                     "H13Door",
@@ -715,15 +715,28 @@ public class jIRCBot extends PircBot {
 	    if(jIRCTools.jdbcEnabled) {
     	    ArrayList<String> obfuscateThese = jIRCData.getInstance().getObfuscatedWords();
     	    if(obfuscateThese.indexOf(username.toLowerCase()) != -1) {
-    	        username = jIRCTools.getRandomUsernames(username, 1).get(0).vcUsername;
+    	        username = userListGetSafe(username).getUsernameFake();
     	    }
     	    
     	    // 2. Obfuscate the message.
     	    Iterator<String> it = obfuscateThese.iterator();
     	    while(it.hasNext()) {
     	        String omitThis = it.next();
-    	        message = jIRCTools.replaceAll(message, omitThis,
-    	                jIRCTools.getRandomUsernames(omitThis, 1).get(0).vcUsername);
+    	        
+    	        // It is now more efficient to figure out if
+    	        // we should replace before attempting to replace.
+    	        if(message.toLowerCase().indexOf(omitThis) != -1) {
+        	        // if the ommitted username is on the list,
+        	        // find their fake name.
+        	        jIRCUser user = userListGetSafe(omitThis);
+        	        String replacement = "";
+        	        if(user != null)
+        	            replacement = user.getUsernameFake();
+        	        else // If they are not on the list, create a searchable md5 hash.
+        	            replacement = jIRCTools.generateCRC32(omitThis);
+        	        
+        	        message = jIRCTools.replaceAll(message, omitThis, replacement);
+    	        }
     	    }
     	    
     	    // Now log the message.

@@ -1,5 +1,7 @@
 package org.hive13.jircbot.support;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -47,6 +49,7 @@ public class jIRCUser {
     private String _username;
     private HashMap<String, String> _channels;
     private eAuthLevels _authLevel;
+    private Date _loginDate;
     
     public jIRCUser(jIRCUser copyFrom) {
     	_channels = new HashMap<String, String>();
@@ -56,12 +59,14 @@ public class jIRCUser {
     	
     	this._username = new String(copyFrom.getUsername());
     	setAuthorized(copyFrom.getAuthLevel());
+    	_loginDate = new Date(copyFrom.getLoginDate().getTime());
     }
     
     public jIRCUser(String username) {
         _channels = new HashMap<String, String>();
         this._username = username;
         setAuthorized(eAuthLevels.unauthorized);
+        _loginDate = Calendar.getInstance().getTime();
     }
     
     /**
@@ -136,6 +141,18 @@ public class jIRCUser {
      */
     public void setUsername(String username) {
         this._username = username;
+    }
+    
+    /**
+     * Returns the user's fake username.
+     * @return  The user's fake username.
+     */
+    public String getUsernameFake() {
+        return jIRCTools.generateCRC32(_username + _loginDate.getTime());
+    }
+    
+    public Date getLoginDate() {
+        return new Date(_loginDate.getTime());
     }
     /**
      * Set the user's authorization level.
