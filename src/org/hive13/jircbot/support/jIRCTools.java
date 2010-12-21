@@ -9,7 +9,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.math.BigInteger;
 import java.security.InvalidParameterException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -118,6 +121,25 @@ public class jIRCTools {
         return string;
     }
     
+    public static String generateMD5(String input) {
+        String hashword = null;
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD2");
+            md5.update(input.getBytes());
+            BigInteger hash = new BigInteger(1, md5.digest());
+            hashword = hash.toString(Character.MAX_RADIX);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return hashword;
+    }
+    
+    public static String generateCRC32(String input) {
+        java.util.zip.CRC32 x = new java.util.zip.CRC32();
+        x.update(input.getBytes());
+        return Long.toHexString(x.getValue());
+        
+    }
     // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     // @@@@@@@@@@   ---- URL Related Utility Functions ---- @@@@@@@@@@@@@@@@@@
     /**
