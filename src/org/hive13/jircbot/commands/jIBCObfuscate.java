@@ -64,22 +64,34 @@ public class jIBCObfuscate extends jIBCommand {
             jIRCData.getInstance().addObfuscatedWord(targetUser);
 
         // Initiate cleaning of back logs.
-        // First we need the ID's of all the messages a user has sent
-		ArrayList<MessageRow> allMsgs = jIRCTools.getMessagesByUser(targetUser);
-		if(allMsgs.size() > 0) {
-		    // We found some messages sent by the target.
-    		bot.sendMessage(sender, "Found " + allMsgs.size() + " messages for target.", eMsgTypes.LogFreeMsg);
-    		
-    		// Then we need a list of random usernames that we have seen.
-    		ArrayList<MessageRow> randomNames = jIRCTools.getRandomUsernames(targetUser, allMsgs.size());
+       
+        
+        oldObfuscateMethod(bot, channel, sender, message);
+		
+	}
+	
+	private void oldObfuscateMethod(jIRCBot bot, String channel, String sender,
+            String message) {
+	    String targetUser = message;
+        if(message.isEmpty())
+            targetUser = sender;
+	    
+	    // First we need the ID's of all the messages a user has sent
+        ArrayList<MessageRow> allMsgs = jIRCTools.getMessagesByUser(targetUser);
+        if(allMsgs.size() > 0) {
+            // We found some messages sent by the target.
+            bot.sendMessage(sender, "Found " + allMsgs.size() + " messages for target.", eMsgTypes.LogFreeMsg);
+            
+            // Then we need a list of random usernames that we have seen.
+            ArrayList<MessageRow> randomNames = jIRCTools.getRandomUsernames(targetUser, allMsgs.size());
             bot.sendMessage(sender, "Retrieved " + randomNames.size() + " random usernames." +
-            		"Starting username nuke.",  eMsgTypes.LogFreeMsg);
+                    "Starting username nuke.",  eMsgTypes.LogFreeMsg);
     
             // Time to build a huge update statement to eradicate all references to the target.
             jIRCTools.updateAllTargetsUsernames(targetUser, allMsgs, randomNames);
-    		bot.sendMessage(sender, "Nuke query finished, checking username count...",  eMsgTypes.LogFreeMsg);
-    		
-    		// Lets check to see if the previous query worked...
+            bot.sendMessage(sender, "Nuke query finished, checking username count...",  eMsgTypes.LogFreeMsg);
+            
+            // Lets check to see if the previous query worked...
             allMsgs = jIRCTools.getMessagesByUser(targetUser);
             bot.sendMessage(sender, "Found " + allMsgs.size() + " messages for target.",  eMsgTypes.LogFreeMsg);
             if(allMsgs.size() > 0) {
@@ -87,23 +99,23 @@ public class jIBCObfuscate extends jIBCommand {
             } else {
                 bot.sendMessage(sender, "Username nuke appears to have worked.  Moving onto message reference nuke.",  eMsgTypes.LogFreeMsg);
             }
-		} else {
-		    bot.sendMessage(sender, "Did not find any messages from this username.  Moving onto the message check.",  eMsgTypes.LogFreeMsg);
-		}
-		
+        } else {
+            bot.sendMessage(sender, "Did not find any messages from this username.  Moving onto the message check.",  eMsgTypes.LogFreeMsg);
+        }
+        
         // Ok, so hopefully we have managed to nuke all of the users direct messages.
         // Now let's try to 'fix' all messages sent TO the user.
-		// So lets search for any messages that mention the targetUser.
+        // So lets search for any messages that mention the targetUser.
         allMsgs = jIRCTools.searchMessagesForKeyword(targetUser);
         if(allMsgs.size() > 0) {
             // We found some messages.
             bot.sendMessage(sender, "Found " + allMsgs.size() + " references to target in messages." +
-            		" Getting random usernames now.",  eMsgTypes.LogFreeMsg);
+                    " Getting random usernames now.",  eMsgTypes.LogFreeMsg);
             
             // Now lets find some stuff to replace the names with.
             ArrayList<MessageRow> randomNames = jIRCTools.getRandomUsernames(targetUser, allMsgs.size());
             bot.sendMessage(sender, "Retreived " + randomNames.size() + " random usernames.  Starting" +
-            		" obfuscation of messages, this may take some time.",  eMsgTypes.LogFreeMsg);
+                    " obfuscation of messages, this may take some time.",  eMsgTypes.LogFreeMsg);
             
             // Ok, message obfuscation time...
             for(int i = 0; i < allMsgs.size(); i++) {
@@ -130,9 +142,8 @@ public class jIBCObfuscate extends jIBCommand {
                     eMsgTypes.LogFreeMsg);
         }
         bot.sendMessage(sender, "Finished.  Future messages from target will now be obfuscated." +
-        		" If you wish me to stop obfuscating the target, contact Paul.",
-        		eMsgTypes.LogFreeMsg);
-		
+                " If you wish me to stop obfuscating the target, contact Paul.",
+                eMsgTypes.LogFreeMsg);
 	}
 
 }
