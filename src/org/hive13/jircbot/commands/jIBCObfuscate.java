@@ -6,6 +6,7 @@ import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.support.MessageRow;
 import org.hive13.jircbot.support.jIRCData;
 import org.hive13.jircbot.support.jIRCTools;
+import org.hive13.jircbot.support.jIRCUser;
 import org.hive13.jircbot.support.jIRCTools.eMsgTypes;
 import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
@@ -64,9 +65,95 @@ public class jIBCObfuscate extends jIBCommand {
             jIRCData.getInstance().addObfuscatedWord(targetUser);
 
         // Initiate cleaning of back logs.
-       
+        // First we need the ID's of all the messages a user has sent
+        ArrayList<MessageRow> allMsgs = jIRCTools.getMessagesByUser(targetUser);
+        if(allMsgs.size() > 0) {
+            // We found some messages sent by the target.
+            bot.sendMessage(sender, "Found " + allMsgs.size() + " messages for target. " +
+            		"Generating username hashes.", eMsgTypes.LogFreeMsg);
+            
+            // Updating the message rows w/ new usernames.
+            jIRCUser user = new jIRCUser(targetUser);
+            String cachedFakeName = user.getUsernameFake();
+            for(int i = 0; i < allMsgs.size(); i++) {
+                MessageRow row = allMsgs.get(i);
+                if(row.msgType == eMsgTypes.joinMsg) {
+                    user.setLoginDate(row.tsMsgTime);
+                    cachedFakeName = user.getUsernameFake();
+                }
+                row.vcUsername = cachedFakeName;
+            }
+            
+            bot.sendMessage(sender, "Generated hashes, starting database update.", eMsgTypes.LogFreeMsg);
+
+            // Time to build a huge update statement to eradicate all references to the target.
+            jIRCTools.updateAllTargetsUsernames(targetUser, allMsgs, allMsgs);
+            bot.sendMessage(sender, "Update query finished, checking username count...",  eMsgTypes.LogFreeMsg);
+            
+            // Lets check to see if the previous query worked...
+            allMsgs = jIRCTools.getMessagesByUser(targetUser);
+            bot.sendMessage(sender, "Found " + allMsgs.size() + " messages for target.",  eMsgTypes.LogFreeMsg);
+            if(allMsgs.size() > 0) {
+                bot.sendMessage(sender, "Well crap, contact Paul with the username you are trying to nuke.",  eMsgTypes.LogFreeMsg);
+            } else {
+                bot.sendMessage(sender, "Username update appears to have worked.  Moving onto message reference update.",  eMsgTypes.LogFreeMsg);
+            }
+        } else {
+            bot.sendMessage(sender, "Did not find any messages from this username.  Moving onto the message check.",  eMsgTypes.LogFreeMsg);
+        }
         
-        oldObfuscateMethod(bot, channel, sender, message);
+        // Ok, so hopefully we have managed to nuke all of the users direct messages.
+        // Now let's try to 'fix' all messages sent TO the user.
+        // So lets search for any messages that mention the targetUser.
+        allMsgs = jIRCTools.searchMessagesForKeyword(targetUser);
+        if(allMsgs.size() > 0) {
+            // We found some messages.
+            bot.sendMessage(sender, "Found " + allMsgs.size() + " references to target in messages." +
+                    " Starting username replacement now.",  eMsgTypes.LogFreeMsg);
+            
+            // find CRC:
+            String replacementName = jIRCTools.generateMD5(targetUser).substring(0, 10);
+            
+            // Ok, message obfuscation time...
+            for(int i = 0; i < allMsgs.size(); i++) {
+                String targetMessage = allMsgs.get(i).vcMessage;               
+                targetMessage = jIRCTools.replaceAll(targetMessage, targetUser, replacementName);
+                allMsgs.get(i).vcMessage = targetMessage;
+            }
+            
+            // Now time to update the database with the obfuscated messages.
+            jIRCTools.updateAllTargetsMessages(targetUser, allMsgs);
+            bot.sendMessage(sender, "Message 'fix' finished. Messages with " +
+            		"'" + replacementName + "' where sent to target name." +
+    				" Checking results...",  eMsgTypes.LogFreeMsg);
+            
+            // Check the result.
+            allMsgs = jIRCTools.searchMessagesForKeyword(targetUser);
+            if(allMsgs.size() > 0)
+                bot.sendMessage(sender, "Replace failed for some reason. " + allMsgs.size() + 
+                        " with target still exist.  Contact Paul to fix this.",  eMsgTypes.LogFreeMsg);
+            else
+                bot.sendMessage(sender, "Message replacement worked. " + allMsgs.size() + 
+                        " messages found with target.",  eMsgTypes.LogFreeMsg);
+            
+        } else {
+            bot.sendMessage(sender, "You must not be popular, no references found to target in messages.", 
+                    eMsgTypes.LogFreeMsg);
+        }
+        bot.sendMessage(sender, "Finished.  Future messages from target will now be obfuscated." +
+                " If you wish me to stop obfuscating the target, contact Paul.",
+                eMsgTypes.LogFreeMsg);
+        
+        /*  Then there is the matter of all of the instances of this user being mentioned
+         * in chat.  I think a fitting 'fix' for this might be a simple CRC32 hash of
+         * the omitted name? that is how the current 'live' obfuscate works.
+         * 
+         * This allows you to search for references TO your name while also keeping it
+         * slightly obscured from plaintext searches on google or otherwise.
+         * 
+         */
+        
+        //oldObfuscateMethod(bot, channel, sender, message);
 		
 	}
 	
