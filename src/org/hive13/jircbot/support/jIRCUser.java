@@ -154,6 +154,10 @@ public class jIRCUser {
     public Date getLoginDate() {
         return new Date(_loginDate.getTime());
     }
+    
+    public void setLoginDate(Date loginDate) {
+        this._loginDate = new Date(loginDate.getTime());
+    }
     /**
      * Set the user's authorization level.
      * @param authLevel The user's knew authorization
