@@ -47,23 +47,30 @@ public class jIBCPluginList extends jIBCommand {
 			if (curCmd.getReqAuthLevel().ordinal() <= userAuthLevel.ordinal()
 					&& !curCmd.isHidden()) {
 
-				// Should we prepend this with a comma?
-				if (foundOne)
-					resultMsg += ", ";
-				else
-					foundOne = true;
-
 				// Add command to the result list.
 				if (curCmd instanceof jIBCommandThread) {
 					if(((jIBCommandThread) curCmd).getChannel().equals(channel)) {
 						// 2nd if statement eliminates commands for other channels.
 						
+						// Should we prepend this with a comma?
+						if (foundOne)
+							resultMsg += ", ";
+						else
+							foundOne = true;
+						
 						// cmdThreads have their channel in the name by default.
 						// getSimpleCmdName ensures we get the root name of the cmd.
 						resultMsg += ((jIBCommandThread) curCmd).getSimpleCommandName();
 					}
-				} else 
+				} else {
+					// Should we prepend this with a comma?
+					if (foundOne)
+						resultMsg += ", ";
+					else
+						foundOne = true;
+					
 					resultMsg += curCmd.getCommandName();
+				}
 			}
 
 			// We have finished w/ the list of commands,
