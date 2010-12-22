@@ -64,6 +64,11 @@ public class jIBCObfuscate extends jIBCommand {
         else
             jIRCData.getInstance().addObfuscatedWord(targetUser);
 
+        if(jIRCTools.jdbcEnabled == false) {
+        	bot.sendMessage(sender, "Bot is currently not connected to a database, try again later" +
+        			" to clean up existing logs.");
+        	return;
+        }
         // Initiate cleaning of back logs.
         // First we need the ID's of all the messages a user has sent
         ArrayList<MessageRow> allMsgs = jIRCTools.getMessagesByUser(targetUser);
@@ -143,20 +148,9 @@ public class jIBCObfuscate extends jIBCommand {
         bot.sendMessage(sender, "Finished.  Future messages from target will now be obfuscated." +
                 " If you wish me to stop obfuscating the target, contact Paul.",
                 eMsgTypes.LogFreeMsg);
-        
-        /*  Then there is the matter of all of the instances of this user being mentioned
-         * in chat.  I think a fitting 'fix' for this might be a simple CRC32 hash of
-         * the omitted name? that is how the current 'live' obfuscate works.
-         * 
-         * This allows you to search for references TO your name while also keeping it
-         * slightly obscured from plaintext searches on google or otherwise.
-         * 
-         */
-        
-        //oldObfuscateMethod(bot, channel, sender, message);
-		
 	}
 	
+	@SuppressWarnings("unused") // Keeping this guy around for possible future usage.
 	private void oldObfuscateMethod(jIRCBot bot, String channel, String sender,
             String message) {
 	    String targetUser = message;
