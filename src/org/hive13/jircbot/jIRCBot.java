@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.hive13.jircbot.commands.jIBCHelp;
 import org.hive13.jircbot.commands.jIBCLinkify;
 import org.hive13.jircbot.commands.jIBCObfuscate;
 import org.hive13.jircbot.commands.jIBCOp;
@@ -158,13 +159,17 @@ public class jIRCBot extends PircBot {
 		addLineParseCommand(new jIBCLinkify());
 
 		// Add passive commands
+		// -- Help & PluginList should not be removed. --
+		addCommand(new jIBCHelp());
+		addCommand(new jIBCPluginList(commands, lineParseCommands));
+
 		addCommand(new jIBCTimeCmd());
 		addCommand(new jIBCQuitCmd());
-		addCommand(new jIBCPluginList(commands, lineParseCommands));
 		addCommand(new jIBCOp());
 		addCommand(new jIBCObfuscate());
 		
-		// addCommand(new jIBCLogParser());
+		// addCommand(new jIBCLogParser()); // <-- Removed because it was pretty alpha quality
+											// 	   and it depended heavily on my log format.
 
 		try {
 			// Add all command threads.
@@ -211,7 +216,7 @@ public class jIRCBot extends PircBot {
                     "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
                     "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
 			
-            /*
+            //*
             addCommandThread(new jIBCTRssReader(
                     this,
                     "H13Door",
@@ -307,11 +312,14 @@ public class jIRCBot extends PircBot {
 			// Check to see if it is a known standard command.
 			String[] sCmd = message.split(" ", 2);
 			if ((cmd = commands.get(sCmd[0].toLowerCase())) != null
-					|| (cmd = commands.get(sCmd[0].toLowerCase() + channel)) != null)
+					|| (cmd = commands.get(sCmd[0].toLowerCase() + channel)) != null) {
 				if (sCmd.length == 2)
 					cmd.runCommand(this, channel, sender, sCmd[1].trim());
 				else
 					cmd.runCommand(this, channel, sender, "");
+			} else {
+				this.sendMessage(sender, "Unknown command: " + message + ", try !help.");
+			}
 		}
 
 		/*
