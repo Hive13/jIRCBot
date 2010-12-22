@@ -65,7 +65,7 @@ public class jIRCTools {
 
     // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     // @@@@@@@@@@   ---- Generic Utility Functions ---- @@@@@@@@@@@@@@@@@@@@@@
-
+    
     /**
      * Log message to logFilename.
      * 
