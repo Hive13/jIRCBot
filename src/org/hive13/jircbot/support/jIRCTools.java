@@ -1,6 +1,5 @@
 package org.hive13.jircbot.support;
 
-// TODO: Document this class.
 import static com.rosaloves.bitlyj.Bitly.as;
 import static com.rosaloves.bitlyj.Bitly.info;
 import static com.rosaloves.bitlyj.Bitly.shorten;
@@ -513,6 +512,7 @@ public class jIRCTools {
         
         String stmtNameQuery;
         
+        //TODO: Make the 'excludes' more generic.
         if(number > 1) {
             stmtNameQuery = "SELECT vcUsername " +
                             "  FROM messages " +
@@ -557,7 +557,7 @@ public class jIRCTools {
 
     /**
      * This database query is fairly specific to jIBCObfuscate.  It might make
-     * more sense if you read look at the code in there.
+     * more sense if you look at the code in there.
      */
     public static void updateAllTargetsUsernames(String vcUsername, 
             ArrayList<MessageRow> msgIds, ArrayList<MessageRow> replacementNames) {
@@ -616,6 +616,14 @@ public class jIRCTools {
         } 
     }
 
+    /**
+     * Searches the database for all messages that contain the passed in keyword.
+     * The keyword can be a part of another word, but it does not work 100% of the
+     * time if this is the case.
+     * @param keyword	Keyword to search the database for.
+     * @return			Returns an ArrayList of MessageRows that contains all of
+     * 					the information about the rows that contain the keyword.
+     */
     public static ArrayList<MessageRow> searchMessagesForKeyword(String keyword) {
         ArrayList<MessageRow> result = new ArrayList<MessageRow>();
         
@@ -646,7 +654,7 @@ public class jIRCTools {
     
     /**
      * This database query is fairly specific to jIBCObfuscate.  It might make
-     * more sense if you read look at the code in there.
+     * more sense if you look at the code in there.
      */
     public static void updateAllTargetsMessages(String vcUsername, 
             ArrayList<MessageRow> msgIds) {
