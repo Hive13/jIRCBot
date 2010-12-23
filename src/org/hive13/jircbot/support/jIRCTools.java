@@ -66,13 +66,12 @@ public class jIRCTools {
     // @@@@@@@@@@   ---- Generic Utility Functions ---- @@@@@@@@@@@@@@@@@@@@@@
     
     /**
-     * Log message to logFilename.
+     * Log message to logFilename.  This creates a new log file
+     * and overwrites any previous log file with the same name.
      * 
      * @param message       What to put in logFilename.
      * @param logFilename   The path (including filename) to log to.  If
      *                      the file does not exist, it will be created.
-     * @param append        True to append message to the file,
-     *                      False to overwrite the file.
      */
     public static void logToFile(String message, String logFilename) throws IOException {
         logToFile(message, logFilename, false);
@@ -216,8 +215,6 @@ public class jIRCTools {
      * title of the webpage if it is an HTML page, if it is not an HTML page it
      * determines the MIME datatype and returns that.
      * 
-     * @param myURL
-     *            URL of the page to find the title for.
      * @return Returns the title of the webpage.
      */
     public static String getURLTitle(WebFile website) {

@@ -41,7 +41,7 @@ public class jIRCData {
 
     /**
      * Refresh information from the data file.
-     * @return
+     * @return	Returns a fresh instance of jIRCData
      */
     public synchronized static jIRCData refresh() {
         instance = null; // Kill the current instance.
@@ -87,7 +87,7 @@ public class jIRCData {
     
     /**
      * Adds a word to the obfuscated words list.
-     * @param Word to add to the obfuscation list.
+     * @param word 	Word to add to the obfuscation list.
      */
     public void addObfuscatedWord(String word) {
         if(obfuscatedWords == null)

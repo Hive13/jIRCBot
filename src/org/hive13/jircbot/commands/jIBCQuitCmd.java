@@ -5,9 +5,6 @@ import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 public class jIBCQuitCmd extends jIBCommand {
 	
-    /**
-     * @param reqAuthLevel
-     */
     public jIBCQuitCmd() {
         super(eAuthLevels.admin);
     }
