@@ -148,8 +148,6 @@ public abstract class jIBCommandThread extends jIBCommand {
 
 	/**
 	 * Gets the channel the commandThread is running in.
-	 * 
-	 * @return
 	 */
 	public String getChannel() {
 		return channel;
@@ -157,8 +155,6 @@ public abstract class jIBCommandThread extends jIBCommand {
 
 	/**
 	 * Returns a simple command name, minus the channel.
-	 * 
-	 * @return
 	 */
 	public String getSimpleCommandName() {
 		return commandName;
