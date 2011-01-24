@@ -75,7 +75,7 @@ public class jIRCBot extends PircBot {
 	/*
 	 * Ok, the userList is a bit hackish at the moment and there is the
 	 * potential that it will leak some memory. Basically I try to
-	 * programatically keep track of what users are in the channels the bot
+	 * programmatically keep track of what users are in the channels the bot
 	 * lives in and what their current usernames are.
 	 * 
 	 * The basic problem is this: I only remove users from the list when they
@@ -223,6 +223,13 @@ public class jIRCBot extends PircBot {
                     channelList.get(0),
                     "[Title|c30]",
                     "http://localhost/isOpen/RSS.php"));//*/
+            
+            addCommandThread(new jIBCTRssReader(
+                    this,
+                    "GitHub",
+                    channelList.get(0),
+                    "[commandName]: [Title|c50] ([Link])",
+                    "https://github.com/organizations/Hive13/ryodoan.private.atom?token=cec09aa6dda8d58d58fca0198bda1c10"));
             
             if(channelList.contains("#lvl1")) {
                 int lvl1 = channelList.indexOf("#lvl1");
