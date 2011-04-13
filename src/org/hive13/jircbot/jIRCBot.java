@@ -231,6 +231,13 @@ public class jIRCBot extends PircBot {
                     "[commandName]: [Title|c50] ([Link])",
                     "https://github.com/organizations/Hive13/ryodoan.private.atom?token=cec09aa6dda8d58d58fca0198bda1c10"));
             
+            addCommandThread(new jIBCTRssReader(
+                    this,
+                    "LAZOR",
+                    channelList.get(0),
+                    "[commandName]: [Title] ([Link])",
+                    "http://pledgie.com/campaigns/15103/donations_feed"));
+            
             if(channelList.contains("#lvl1")) {
                 int lvl1 = channelList.indexOf("#lvl1");
 
