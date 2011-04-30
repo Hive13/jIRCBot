@@ -56,7 +56,8 @@ public class jIBCTell extends jIBCommand {
 					// Tell the sender that the 'tell' was added for 'target
 					// user'
 					bot.sendMessage(sender, "I will tell " + splitMsg[1]
-							+ " the next time they talks in channel.");
+							+ "'" + splitMsg[2] + "'"
+							+ " the next time they talk in channel.");
 				} else {
 					bot.sendMessage(sender, splitMsg[1]
 							+ " already has the max (" + MAX_MSG_QUEUE
