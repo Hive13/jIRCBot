@@ -111,6 +111,9 @@ public class jIRCBot extends PircBot {
 	}
 
 	private jIRCBot() {
+		// Make it so that the bot outputs lots of information when run.
+		setVerbose(true);
+		
 		// Initialize lists
 		commands = new HashMap<String, jIBCommand>();
 
@@ -136,6 +139,7 @@ public class jIRCBot extends PircBot {
 			}
 		}
 
+		// Check to see if the database information is set correctly in the properties.
 		if (jIRCProperties.getInstance().getJDBCUrl().isEmpty()
 				|| jIRCProperties.getInstance().getJDBCUser().isEmpty()
 				|| jIRCProperties.getInstance().getJDBCPass().isEmpty()) {
@@ -144,14 +148,13 @@ public class jIRCBot extends PircBot {
 			jIRCTools.jdbcEnabled = true;
 		}
 
-		// Make it so that the bot outputs lots of information when run.
-		setVerbose(true);
-
+		// Currently the database is only used for chat log features.
+		// Lets check to see if the database is enabled, and print out a log message.
 		if (jIRCTools.jdbcEnabled == false)
 			this.log("MySQL Chat logging is disabled.", eLogLevel.warning);
 		else
 			this.log("MySQL Chat logging is enabled.", eLogLevel.info);
-
+		
 		// Add commands that parse every single line
 		// WARNING!! Be sparing with these commands
 		// their code should be run asynchronously
@@ -310,17 +313,28 @@ public class jIRCBot extends PircBot {
 	public void sendMessage(String target, String message, eMsgTypes msgType) {
 		super.sendMessage(target, message);
 
-		// Is this not a log free message and it is a message to a channel.
+		// If this not a log free message and it is a message to a channel.
 		if(msgType != eMsgTypes.LogFreeMsg && channelList.contains(target))
 		    logMessage(target, jIRCProperties.getInstance().getServer(), this.getNick(), message, msgType);
 	}
 	
+	/*
+	 * This function is the engine of the bot.  This gets run every time a message
+	 * appears in the chat room.  As such the code in here needs to be efficient.  This
+	 * part of the bot is single threaded.  The code that this function starts is mostly
+	 * asynchronous.
+	 * 
+	 * For certain commands it is more important that the command be asynchronous. See
+	 * the comment below relating to the "lineParseCommands"
+	 */
 	public void onMessage(String channel, String sender, String login,
 			String hostname, String message) {
+		
 	    logMessage(channel, this.getServer(), sender, message,
 				eMsgTypes.publicMsg);
+	    
 		// Find out if the message was directed as a command.
-		if (message.startsWith(prefix)) {
+		if (message.startsWith(prefix)) { // TODO - This should also check for "Bot Name"
 			message = message.replace(prefix, "");
 			jIBCommand cmd;
 			// Check to see if it is a known standard command.
@@ -332,7 +346,7 @@ public class jIRCBot extends PircBot {
 				else
 					cmd.runCommand(this, channel, sender, "");
 			} else {
-				this.sendMessage(sender, "Unknown command: " + message + ", try !help.");
+				this.sendMessage(sender, "Unknown command: " + message + ", try !help.");	// TODO - part of Issue #6 is caused here.
 			}
 		}
 
@@ -349,9 +363,18 @@ public class jIRCBot extends PircBot {
 		}
 	}
 
+	/*
+	 * This is a total hack, I am treating private messages as if they are their own
+	 * "channel"  This introduces all sorts of strange problems.  For instance, if you were to issue
+	 * an "op" command via this option, which channel would it try to op you in? All of them?
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jibble.pircbot.PircBot#onPrivateMessage(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 */
 	public void onPrivateMessage(String sender, String login, String hostname, String message) {
 		onMessage(sender, sender, login, hostname, message);
 	}
+	
 	/*
 	 * If the bot is disconnected from the server, quit the bot.
 	 */
@@ -494,7 +517,7 @@ public class jIRCBot extends PircBot {
 
 	// I am reasonably sure that this function will not be called asynchronously
 	// However I am not certain.  As such, these variables have no thread safety
-	// mechanisms protecting them, and are ONLY used by the 'onNotice' function.
+	// mechanisms protecting them, but are ONLY used by the 'onNotice' function.
 	private jIRCUser targetUser = null;
 	private boolean targetUserLoggedIn = false;
 	private eAuthLevels targetPendingAuthLevel = eAuthLevels.unauthorized;
