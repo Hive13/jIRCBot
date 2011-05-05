@@ -894,7 +894,7 @@ public class jIRCBot extends PircBot {
 	}
 
 	/**
-	 * Safely wraps the userList.EntrySet() method.
+	 * Un-Safely wraps the userList.EntrySet() method.
 	 * 
 	 * @return The set of Keys & entries for userList.
 	 */

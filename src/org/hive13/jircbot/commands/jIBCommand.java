@@ -68,7 +68,7 @@ public abstract class jIBCommand {
 	public void runCommand(jIRCBot bot, String channel, String sender,
 			String message) {
 		eAuthLevels userAuthLevel = bot.userListGetSafe(sender).getAuthLevel();
-		if (userAuthLevel.ordinal() >= getReqAuthLevel().ordinal())
+		if (userAuthLevel.ordinal() >= getReqAuthLevel().ordinal())	// TODO - This is another reason for Issue #6
 			if (message.trim().equalsIgnoreCase("help")
 					|| message.trim().equalsIgnoreCase("h"))
 				bot.sendMessage(sender, getHelp(), eMsgTypes.LogFreeMsg);
@@ -82,7 +82,7 @@ public abstract class jIBCommand {
 					eLogLevel.warning);
 		}
 	}
-
+	
 	/**
 	 * This method is internal to the commands. It is handled in a separate
 	 * thread so any calls from this method MUST be thread safe.

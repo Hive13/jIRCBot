@@ -7,6 +7,13 @@ import java.util.Iterator;
 
 import org.hive13.jircbot.jIRCBot;
 
+/*
+ * This class requires some design rework.  
+ * I am thinking about maybe either splitting it into two commands
+ * or maybe making it contain a sub-command.
+ * Main command is run by the "lineParse" functionality
+ * Sub-Command is added to the "Action" commands.
+ */
 public class jIBCTell extends jIBCommand {
 
 	private class storedMsg {
