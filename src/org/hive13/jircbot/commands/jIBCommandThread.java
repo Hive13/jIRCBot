@@ -160,6 +160,31 @@ public abstract class jIBCommandThread extends jIBCommand {
 		return commandName;
 	}
 
+	/**
+	 * This is the fancy part.  I broke my brain figuring this out and had
+	 * to re-write this class several times.
+	 * 
+	 * Here is the order of operations.
+	 * 
+	 * 1. Someone calls "runCommand" on a jIBCmdThrd object
+	 * 2. This triggers the jIBCommand.runCommand()
+	 * 3. jIBCommand.runCommand() launches a jIBCommandRunnable thread, we are now asynchronous from the main thread.
+	 * 4. This jIBCommandRunnable calls the jIBCmdThrd.handleMessage().
+	 * 5. This checks to see if this is a "start | stop" command.  If it is a start...
+	 * 5.1. jIBCmdThrd calls jIBCmdThrd.startCommandThread() which starts a commandThreadRunnable object.
+	 * 5.2. The initial jIBCommandRunnable now exits leaving the commandThreadRunnable running in the background in the jIBCmdThrd object.
+	 * 5.3. The commandThreadRunnable is set up in a semi-infinite loop that calls "jIBCmdThrd.loop()" every DELAY seconds.
+	 * 6. If it was instead a "stop" command...
+	 * 6.1. jIBCmdThrd calls jIBCmdThrd.stopCommandThread() which takes its instance of the commandThreadRunnable
+	 *      and sends it the "stop" command.
+	 * 6.2. The initial jIBCommandRunnable now exits with the commandThreadRunnable set up to exit.
+	 * 6.3. The commandThreadRunnable will eventually finish its "sleep" cycle and check to see if it should exit,
+	 *      the "stop" boolean is set, so it exits cleanly.
+	 *      
+	 * 
+	 * @author vincentp
+	 *
+	 */
 	protected class commandThreadRunnable implements Runnable {
 		private AtomicBoolean isRunning;
 		private long delay;
