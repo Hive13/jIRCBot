@@ -55,7 +55,7 @@ public class jIRCBot extends PircBot {
 	 * following: - tC implementation
 	 */
 	private final HashMap<String, jIBCommand> commands;
-	private final ArrayList<jIBCommand> lineParseCommands;
+	private final HashMap<String, jIBCommand> lineParseCommands;
 
 	// The character which tells the bot we're talking to it and not
 	// anyone/anything else.
@@ -117,8 +117,9 @@ public class jIRCBot extends PircBot {
 		// Initialize lists
 		commands = new HashMap<String, jIBCommand>();
 
-		lineParseCommands = new ArrayList<jIBCommand>();
-
+		lineParseCommands = new HashMap<String, jIBCommand>();
+		
+		
 		channelList = new ArrayList<String>();
 
 		userList = new HashMap<String, jIRCUser>();
@@ -345,8 +346,8 @@ public class jIRCBot extends PircBot {
 					cmd.runCommand(this, channel, sender, sCmd[1].trim());
 				else
 					cmd.runCommand(this, channel, sender, "");
-			} else {
-				this.sendMessage(sender, "Unknown command: " + message + ", try !help.");	// TODO - part of Issue #6 is caused here.
+			} else if (lineParseCommands.get(sCmd[0].toLowerCase()) == null) { // Check to see if this is a line parse command.
+				this.sendMessage(sender, "Unknown command: " + message + ", try !help."); // No known command.
 			}
 		}
 
@@ -357,7 +358,7 @@ public class jIRCBot extends PircBot {
 		 * greater potential to still be running if several messages come in
 		 * fast.
 		 */
-		Iterator<jIBCommand> i = lineParseCommands.iterator();
+		Iterator<jIBCommand> i = lineParseCommands.values().iterator();
 		while (i.hasNext()) {
 			i.next().runCommand(this, channel, sender, message);
 		}
@@ -820,7 +821,7 @@ public class jIRCBot extends PircBot {
 	 *            Command to add to the line parsing command.
 	 */
 	public void addLineParseCommand(jIBCommand cmd) {
-		lineParseCommands.add(cmd);
+		lineParseCommands.put(cmd.getCommandName().toLowerCase(), cmd);
 	}
 
 	/**

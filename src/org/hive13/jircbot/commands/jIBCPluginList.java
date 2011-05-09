@@ -1,6 +1,5 @@
 package org.hive13.jircbot.commands;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -10,10 +9,10 @@ import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 public class jIBCPluginList extends jIBCommand {
 
 	private HashMap<String, jIBCommand> commands;
-	private ArrayList<jIBCommand> lineParseCmds;
+	private HashMap<String, jIBCommand> lineParseCmds;
 
 	public jIBCPluginList(HashMap<String, jIBCommand> commands,
-			ArrayList<jIBCommand> lineParseCmds) {
+			HashMap<String, jIBCommand> lineParseCmds) {
 		this.commands = commands;
 		this.lineParseCmds = lineParseCmds;
 	}
@@ -77,7 +76,7 @@ public class jIBCPluginList extends jIBCommand {
 			// Have we processed the LineParser commands?
 			if (!i.hasNext() && !processedLineParse) {
 				// Start processing the lineParse commands.
-				i = lineParseCmds.iterator();
+				i = lineParseCmds.values().iterator();
 				processedLineParse = true;
 			}
 		}

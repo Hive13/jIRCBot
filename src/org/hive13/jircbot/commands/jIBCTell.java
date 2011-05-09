@@ -38,11 +38,13 @@ public class jIBCTell extends jIBCommand {
 	}
 
 	public String getHelp() {
-		return "This command stores a message for a user.  The next time" +
-				" that user sends a message in the chat room I will send" +
-				" them the messages stored for them. Ex. !" + getCommandName() +
-				" jimboJones Remember to bring that thing with you.";
+		return ""; // Blank return to tell jIBCommand to not bother, we will handle this ourselves.
 	}
+	
+	private String helpMessage = "This command stores a message for a user.  The next time" +
+									" that user sends a message in the chat room I will send" +
+									" them the messages stored for them. Ex. !" + getCommandName() +
+									" jimboJones Remember to bring that thing with you.";
 	
 	@Override
 	public void handleMessage(jIRCBot bot, String channel, String sender,
@@ -70,6 +72,9 @@ public class jIBCTell extends jIBCommand {
 							+ " already has the max (" + MAX_MSG_QUEUE
 							+ ") number of messages saved for them.");
 				}
+			} else if(splitMsg.length == 2 && (splitMsg[1].equalsIgnoreCase("help") || splitMsg[1].equalsIgnoreCase("h"))){
+				// We handle help ourselves, see GitHub Issue #6
+				bot.sendMessage(sender, helpMessage);
 			} else {
 				bot.sendMessage(sender,
 						"The correct syntax is: !tell username Remember the milk");
