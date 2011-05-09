@@ -68,13 +68,14 @@ public abstract class jIBCommand {
 	public void runCommand(jIRCBot bot, String channel, String sender,
 			String message) {
 		eAuthLevels userAuthLevel = bot.userListGetSafe(sender).getAuthLevel();
-		if (userAuthLevel.ordinal() >= getReqAuthLevel().ordinal())	// TODO - This is another reason for Issue #6
-			if (message.trim().equalsIgnoreCase("help")
-					|| message.trim().equalsIgnoreCase("h"))
+		if (userAuthLevel.ordinal() >= getReqAuthLevel().ordinal()) {	// TODO - This is another reason for Issue #6
+			String helpMsg = getHelp();	// Pre-emptive grab of the help text to see if we should actually respond to "help"
+			if (!helpMsg.isEmpty() && (message.trim().equalsIgnoreCase("help")
+					|| message.trim().equalsIgnoreCase("h")))
 				bot.sendMessage(sender, getHelp(), eMsgTypes.LogFreeMsg);
 			else
 				new Thread(new jIBCommandRunnable(bot, channel, sender, message)).start();
-		else {
+		} else {
 			bot.sendMessage(sender,
 					"You do not have permission to activate this command.", eMsgTypes.LogFreeMsg);
 			bot.log(sender + " just tried to use " + getCommandName()
