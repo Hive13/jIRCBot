@@ -18,7 +18,7 @@ public class jIBCHelp extends jIBCommand {
 	protected void handleMessage(jIRCBot bot, String channel, String sender,
 			String message) {
 		bot.sendMessage(sender, "To get a list of available commands use '!plugins'. " +
-				"To learn more about a command type '!plugins help'.");
+				"To learn more about a command type '!<Command Name> help'.");
 	}
 
 }
