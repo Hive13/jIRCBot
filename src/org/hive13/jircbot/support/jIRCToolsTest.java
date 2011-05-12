@@ -5,6 +5,8 @@ package org.hive13.jircbot.support;
 
 import static org.junit.Assert.*;
 
+import java.util.Calendar;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +17,10 @@ import org.junit.Test;
  */
 public class jIRCToolsTest {
 
-	public final String TEST_STRING = "REMOVETHIS This is a test\n\tOf a string   removethis   \n With multiple issues\t\t\n\t that will" +
+	public final String TEST_STRING = "REMOVETHIS This is a test\n\n\n\tOf a string   removethis   \n With multiple issues\t\t\n\t that will" +
 									  " need to be cleaned up: Behold, the LOD. RemoveThis";
+	public final String TEST_URL 	= "http://www.google.com/index.html";
+	public final String TEST_URL2	= "http://www.theorionbelt.com/index.html";
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -56,147 +60,36 @@ public class jIRCToolsTest {
 	}
 
 	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#generateMD5(java.lang.String)}.
-	 */
-	@Test
-	public void testGenerateMD5() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#generateCRC32(java.lang.String)}.
-	 */
-	@Test
-	public void testGenerateCRC32() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
 	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#generateShortURL(java.lang.String)}.
 	 */
 	@Test
 	public void testGenerateShortURLString() {
-		fail("Not yet implemented"); // TODO
+		String expectedShort = "http://bit.ly/mhet5U"; // This value could change, but as long as this test is run regularly it should work.
+		String shortURL = jIRCTools.generateShortURL(TEST_URL);
+		assertEquals(expectedShort, shortURL);		
 	}
 
 	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#generateShortURL(java.lang.String, java.lang.String, java.lang.String)}.
+	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#findURLTitle(java.lang.String)}.
 	 */
 	@Test
-	public void testGenerateShortURLStringStringString() {
-		fail("Not yet implemented"); // TODO
-	}
+	public void testfindURLTitleString() {
+		String urlTitle_Expected = "Google";
 
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#getShortURLTitle(java.lang.String)}.
-	 */
-	@Test
-	public void testGetShortURLTitleString() {
-		fail("Not yet implemented"); // TODO
+		String urlTitle = jIRCTools.findURLTitle(TEST_URL); // I would imagine that this would be cached by bit.ly already.
+		assertEquals(urlTitle_Expected, urlTitle);
+		
+		urlTitle = jIRCTools.findURLTitle(TEST_URL + "#" + 
+				Calendar.getInstance().getTimeInMillis()); // This however, should force a cache miss on bit.ly
+		assertEquals(urlTitle_Expected, urlTitle);
+		
+		long startTime = Calendar.getInstance().getTimeInMillis();
+		urlTitle = jIRCTools.findURLTitle(TEST_URL2 + "#" +
+				Calendar.getInstance().getTimeInMillis()); // Page w/ no title and a forced bit.ly cache miss.
+		long stopTime = Calendar.getInstance().getTimeInMillis();
+		assertEquals("", urlTitle);
+		assertTrue("findURLTitle returned in less than 5s.  It should have timed out.", stopTime-startTime > 5000);
+		
+		// TODO: Need to test URL's with spaces, unicode, UTF, new lines, etc..
 	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#getShortURLTitle(java.lang.String, java.lang.String, java.lang.String)}.
-	 */
-	@Test
-	public void testGetShortURLTitleStringStringString() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#getURLTitle(org.hive13.jircbot.support.WebFile)}.
-	 */
-	@Test
-	public void testGetURLTitle() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#getStmtForConn(java.lang.String)}.
-	 */
-	@Test
-	public void testGetStmtForConn() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#isValidColumn(java.sql.ResultSet, java.lang.String)}.
-	 */
-	@Test
-	public void testIsValidColumn() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#insertMessage(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.hive13.jircbot.support.jIRCTools.eMsgTypes)}.
-	 */
-	@Test
-	public void testInsertMessageStringStringStringStringEMsgTypes() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#insertMessage(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.hive13.jircbot.support.jIRCTools.eMsgTypes, java.lang.String)}.
-	 */
-	@Test
-	public void testInsertMessageStringStringStringStringEMsgTypesString() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#getChannelID(java.lang.String, java.lang.String)}.
-	 */
-	@Test
-	public void testGetChannelID() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#insertChannel(java.lang.String, java.lang.String)}.
-	 */
-	@Test
-	public void testInsertChannel() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#getMessagesByUser(java.lang.String)}.
-	 */
-	@Test
-	public void testGetMessagesByUser() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#getRandomUsernames(java.lang.String, int)}.
-	 */
-	@Test
-	public void testGetRandomUsernames() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#updateAllTargetsUsernames(java.lang.String, java.util.ArrayList, java.util.ArrayList)}.
-	 */
-	@Test
-	public void testUpdateAllTargetsUsernames() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#searchMessagesForKeyword(java.lang.String)}.
-	 */
-	@Test
-	public void testSearchMessagesForKeyword() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#updateAllTargetsMessages(java.lang.String, java.util.ArrayList)}.
-	 */
-	@Test
-	public void testUpdateAllTargetsMessages() {
-		fail("Not yet implemented"); // TODO
-	}
-
 }
