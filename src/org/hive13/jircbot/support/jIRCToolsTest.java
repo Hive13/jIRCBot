@@ -5,7 +5,9 @@ package org.hive13.jircbot.support;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 
 import org.junit.After;
 import org.junit.Before;
@@ -91,5 +93,34 @@ public class jIRCToolsTest {
 		assertTrue("findURLTitle returned in less than 5s.  It should have timed out.", stopTime-startTime > 5000);
 		
 		// TODO: Need to test URL's with spaces, unicode, UTF, new lines, etc..
+	}
+	
+	/**
+	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#findURLTitle(java.lang.String)}.
+	 * 
+	 * This test case is specially related to fixing GitHub Issue #1
+	 */
+	@Test
+	public void testfindURLTitle_Issue1() {
+		ArrayList<String> testUrls = new ArrayList<String>();
+		testUrls.add("http://www.fullspectrumengineering.com/forums/viewtopic.php?t=259"); // Had newline issues
+		testUrls.add("http://www.reddit.com/r/Minecraft/comments/gwzgh/im_so_obsessed_with_minecraft_so_i_got_some_wood/"); // Had issues?
+		testUrls.add("https://chrome.google.com/webstore/detail/giibodhbpkhjnbnfmbpmnkmgjflabkop"); // Returned "bit.ly"
+		
+		Iterator<String> it = testUrls.iterator();
+		while(it.hasNext()) {
+		String testURL = it.next();
+			String urlTitle = jIRCTools.findURLTitle(testURL);
+			// Make sure there are no duplicate spaces
+			//fail(urlTitle);
+			assertTrue("Found duplicate spaces in: " + urlTitle + " for URL: " + testURL, urlTitle.indexOf("  ") == -1);
+			// Make sure there are no new lines
+			assertTrue("Found multiple lines in: " + urlTitle + " for URL: " + testURL, urlTitle.indexOf("\n") == -1);
+			// Make sure there are no non-ASCII characters
+			assertTrue("Found non-ASCII in: " + urlTitle + " for URL: " + testURL, urlTitle.matches("\\A\\p{ASCII}*\\z"));
+			
+			// Make sure the title is not bit.ly
+			assertTrue("Found title to be bit.ly for URL: " + testURL, !urlTitle.equals("bit.ly"));
+		}
 	}
 }
