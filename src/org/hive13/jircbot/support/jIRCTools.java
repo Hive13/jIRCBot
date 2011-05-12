@@ -4,11 +4,13 @@ import static com.rosaloves.bitlyj.Bitly.as;
 import static com.rosaloves.bitlyj.Bitly.info;
 import static com.rosaloves.bitlyj.Bitly.shorten;
 
+import java.awt.Image;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.security.InvalidParameterException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +30,7 @@ import java.util.regex.Pattern;
 import javax.naming.directory.InvalidAttributesException;
 
 import org.hive13.jircbot.jIRCBot;
+import org.hive13.jircbot.jIRCBot.eLogLevel;
 
 public class jIRCTools {
     
@@ -176,6 +180,92 @@ public class jIRCTools {
         return result;
     }
 
+    /**
+     * This method aggressively attempts to find some string description of
+     * the passed in URL. This function has multiple stages as it tries 
+     * various methods for finding the passed in URL's title.
+     * 1. See if bit.ly has cached a title for the page.
+     * 2. Determine if the page is text or binary.
+     * 2.1. If it is binary, determine the MIME type and return that.
+     * 2.2. If it is text, download a copy of the page's text and parse it for <title> tags.
+     * 3. Did we fail to find the title via #2? Try to wait for bit.ly to cache the page title. (5 seconds, then time out)
+     *
+     * @param url	The http URL address to find a string description for.
+     * @return		A string description of the passed in URL.
+     */
+    public static String findURLTitle(String url) {
+    	return findURLTitle(url, null);
+    }
+    
+    /**
+     * This method aggressively attempts to find some string description of
+     * the passed in URL. This function has multiple stages as it tries 
+     * various methods for finding the passed in URL's title.
+     * 1. See if bit.ly has cached a title for the page.
+     * 2. Determine if the page is text or binary.
+     * 2.1. If it is binary, determine the MIME type and return that.
+     * 2.2. If it is text, download a copy of the page's text and parse it for <title> tags.
+     * 3. Did we fail to find the title via #2? Try to wait for bit.ly to cache the page title. (5 seconds, then time out)
+     *
+     * @param url	The http URL address to find a string description for.
+     * @param bot	An optional parameter for status updates for the log.
+     * @return		A string description of the passed in URL.
+     */
+    public static String findURLTitle(String url, jIRCBot bot) {
+    	final boolean USE_BITLY_TITLE = true;		// Should we give Bit.ly a 2nd chance?
+    	final boolean WAIT_FOR_TITLE = true;		// Given a 2nd chance, should we keep giving it chances until Timeout?
+    	final int WAIT_FOR_TITLE_TIMEOUT = 5000;	// Given multiple chances, how long before we give up (in ms)
+    	
+    	String urlTitle = "";
+    	boolean withBot = (bot != null);
+    	
+    	urlTitle = jIRCTools.getShortURLTitle(url);
+    	if(urlTitle.isEmpty()) {
+            if(withBot) bot.log("jIBCLinkify - initial bit.ly failed, trying jIRCTools.getURLTitle", eLogLevel.info);
+            try {
+                WebFile website = new WebFile(url);
+                urlTitle = jIRCTools.getURLTitle(website);
+                Object content = website.getContent();
+                if(content instanceof Image) {
+                    // We want to resize this image.
+                    // Image img = (Image)content;
+                    
+                    // Then write this image to a directory.
+                    // Then write a 'formatedMsg' to the log.
+                }
+            } catch (MalformedURLException e) {
+            	if(withBot) bot.log("jIBCLinkify - WTF! Bit.ly gave us an invalid URL...", eLogLevel.error);
+                e.printStackTrace();
+            } catch (IOException e) {
+            	if(withBot) bot.log("jIBCLinkify - failed (badly) to getURLTitle()", eLogLevel.error);
+                e.printStackTrace();
+            }
+        }
+        
+        if(urlTitle.isEmpty() && USE_BITLY_TITLE) { // Are we allowing ourselves to fall back to Bit.ly?
+        	if(withBot) bot.log("jIBCLinkify - jIRCTools.getURLTitle failed, waiting for bit.ly to cache title.", eLogLevel.info);
+            // The title is not retrieved by bit.ly immediately, we can optionally
+            // move on, likely without the title, or we can repeatedly try
+            // until we get a response or timeout.
+            Date start = new Date();
+            long duration = 0;
+            while((urlTitle = jIRCTools.getShortURLTitle(url)).isEmpty()
+                    && WAIT_FOR_TITLE && duration < WAIT_FOR_TITLE_TIMEOUT) {
+                try {
+                    Thread.sleep(200);
+                    duration = (new Date()).getTime() - start.getTime();
+                    if(withBot) bot.log("Waiting for URL title [ " + duration + " ms ]");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        // Remove ASCII characters, new lines, and excessive spaces.
+        urlTitle = urlTitle.replaceAll("([^\\p{ASCII}]|\\n|  )", "");
+    	return urlTitle;
+    }
+    
+    
     /**
      * Calls on the Bit.ly API to find the title of an already shortened URL.
      * Make sure that the bitlyName and bitlyAPIKey are specified before calling
