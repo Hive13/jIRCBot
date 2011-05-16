@@ -55,7 +55,8 @@ public class jIRCToolsTest {
 		assertTrue("Found occurance of RemoveThis at: " + testStr.indexOf("RemoveThis"), testStr.indexOf("RemoveThis") == -1);
 		
 		testStr = TEST_STRING; // Reset the test
-		testStr = jIRCTools.replaceAll(testStr, "(ReMoVeThIs|\\n|  )", "");
+		testStr = jIRCTools.replaceAll(testStr, "(ReMoVeThIs|\\n)", "");
+		testStr = jIRCTools.replaceAll(testStr, "  ", "");
 		assertTrue("Regex: Found newline in testStr at:" + testStr.indexOf("\n"), testStr.indexOf("\n") == -1);
 		assertTrue("Regex: Found occurance of RemoveThis at: " + testStr.indexOf("RemoveThis"), testStr.indexOf("RemoveThis") == -1);
 		assertTrue("Regex: Found multiple spaces at:" + testStr.indexOf("  "), testStr.indexOf("  ") == -1);
@@ -66,9 +67,9 @@ public class jIRCToolsTest {
 	 */
 	@Test
 	public void testGenerateShortURLString() {
-		String expectedShort = "http://bit.ly/mhet5U"; // This value could change, but as long as this test is run regularly it should work.
+		String expectedShort = "http://bit.ly/"; // This value could change, but as long as this test is run regularly it should work.
 		String shortURL = jIRCTools.generateShortURL(TEST_URL);
-		assertEquals(expectedShort, shortURL);		
+		assertEquals(expectedShort, shortURL.substring(0, expectedShort.length()));		
 	}
 
 	/**
@@ -89,7 +90,7 @@ public class jIRCToolsTest {
 		urlTitle = jIRCTools.findURLTitle(TEST_URL2 + "#" +
 				Calendar.getInstance().getTimeInMillis()); // Page w/ no title and a forced bit.ly cache miss.
 		long stopTime = Calendar.getInstance().getTimeInMillis();
-		assertEquals("", urlTitle);
+		assertEquals("www.theorionbelt.com", urlTitle);
 		assertTrue("findURLTitle returned in less than 5s.  It should have timed out.", stopTime-startTime > 5000);
 		
 		// TODO: Need to test URL's with spaces, unicode, UTF, new lines, etc..
@@ -102,6 +103,7 @@ public class jIRCToolsTest {
 	 */
 	@Test
 	public void testfindURLTitle_Issue1() {
+		String cacheMiss = "#" + Calendar.getInstance().getTimeInMillis();
 		ArrayList<String> testUrls = new ArrayList<String>();
 		testUrls.add("http://www.fullspectrumengineering.com/forums/viewtopic.php?t=259"); // Had newline issues
 		testUrls.add("http://www.reddit.com/r/Minecraft/comments/gwzgh/im_so_obsessed_with_minecraft_so_i_got_some_wood/"); // Had issues?
@@ -109,19 +111,24 @@ public class jIRCToolsTest {
 		
 		Iterator<String> it = testUrls.iterator();
 		while(it.hasNext()) {
-		String testURL = it.next();
-			String urlTitle = jIRCTools.findURLTitle(testURL);
-			// Make sure there are no duplicate spaces
-			//fail(urlTitle);
-			assertTrue("Found duplicate spaces in: " + urlTitle + " for URL: " + testURL, urlTitle.indexOf("  ") == -1);
-			// Make sure there are no new lines
-			assertTrue("Found multiple lines in: " + urlTitle + " for URL: " + testURL, urlTitle.indexOf("\n") == -1);
-			// Make sure there are no non-ASCII characters
-			assertTrue("Found non-ASCII in: " + urlTitle + " for URL: " + testURL, urlTitle.matches("\\A\\p{ASCII}*\\z"));	
-			// Make sure the title is not bit.ly
-			assertTrue("Found title to be bit.ly for URL: " + testURL, !urlTitle.equals("bit.ly"));
-			// Make sure we actually found a title...
-			assertTrue("Failed to find title for URL: " + testURL, !urlTitle.isEmpty());
+			String testURL = it.next();
+			for(int i = 1; i <= 2; i++) { // Each URL twice, once with a cache miss on bit.ly
+				if(i % 2 == 0)
+					testURL += cacheMiss;
+				
+				String urlTitle = jIRCTools.findURLTitle(testURL);
+				// Make sure there are no duplicate spaces
+				//fail(urlTitle);
+				assertTrue("Found duplicate spaces at (" + urlTitle.indexOf("  ") + ") in: " + urlTitle + " for URL: " + testURL, urlTitle.indexOf("  ") == -1);
+				// Make sure there are no new lines
+				assertTrue("Found multiple lines in: " + urlTitle + " for URL: " + testURL, urlTitle.indexOf("\n") == -1);
+				// Make sure there are no non-ASCII characters
+				assertTrue("Found non-ASCII in: " + urlTitle + " for URL: " + testURL, urlTitle.matches("\\A\\p{ASCII}*\\z"));	
+				// Make sure the title is not bit.ly
+				assertTrue("Found title to be bit.ly for URL: " + testURL, !urlTitle.equals("bit.ly"));
+				// Make sure we actually found a title...
+				assertTrue("Failed to find title for URL: " + testURL, !urlTitle.isEmpty());
+			}
 		}
 	}
 }
