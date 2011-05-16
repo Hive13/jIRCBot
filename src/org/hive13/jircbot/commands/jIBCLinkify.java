@@ -39,11 +39,12 @@ public class jIBCLinkify extends jIBCommand {
         while (m.find()) {
             String url = "";
             String urlTitle = "";
+            String shortURL = "";
             if((url = m.group()).length() > MAX_URL_LENGTH) {
-                url = jIRCTools.generateShortURL(url);
-                urlTitle = jIRCTools.findURLTitle(url);
+            	shortURL = jIRCTools.generateShortURL(url);
+                urlTitle = jIRCTools.findURLTitle(url, shortURL, bot);
             } 
-            returnMsg += urlTitle + " [ " + url + " ]; ";
+            returnMsg += urlTitle + " [ " + shortURL + " ]; ";
         }
         
         if(!returnMsg.isEmpty()) {

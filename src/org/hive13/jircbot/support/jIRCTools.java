@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.InvalidParameterException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -194,7 +195,7 @@ public class jIRCTools {
      * @return		A string description of the passed in URL.
      */
     public static String findURLTitle(String url) {
-    	return findURLTitle(url, null);
+    	return findURLTitle(url, generateShortURL(url),  null);
     }
     
     /**
@@ -207,11 +208,12 @@ public class jIRCTools {
      * 2.2. If it is text, download a copy of the page's text and parse it for <title> tags.
      * 3. Did we fail to find the title via #2? Try to wait for bit.ly to cache the page title. (5 seconds, then time out)
      *
-     * @param url	The http URL address to find a string description for.
+     * @param url		The http URL address to find a string description for.
+     * @param shortURL	The bit.ly short version of the URL passed in.
      * @param bot	An optional parameter for status updates for the log.
      * @return		A string description of the passed in URL.
      */
-    public static String findURLTitle(String url, jIRCBot bot) {
+    public static String findURLTitle(String url, String shortURL, jIRCBot bot) {
     	final boolean USE_BITLY_TITLE = true;		// Should we give Bit.ly a 2nd chance?
     	final boolean WAIT_FOR_TITLE = true;		// Given a 2nd chance, should we keep giving it chances until Timeout?
     	final int WAIT_FOR_TITLE_TIMEOUT = 5000;	// Given multiple chances, how long before we give up (in ms)
@@ -219,7 +221,7 @@ public class jIRCTools {
     	String urlTitle = "";
     	boolean withBot = (bot != null);
     	
-    	urlTitle = jIRCTools.getShortURLTitle(url);
+    	urlTitle = jIRCTools.getShortURLTitle(shortURL);
     	if(urlTitle.isEmpty()) {
             if(withBot) bot.log("jIBCLinkify - initial bit.ly failed, trying jIRCTools.getURLTitle", eLogLevel.info);
             try {
@@ -249,7 +251,7 @@ public class jIRCTools {
             // until we get a response or timeout.
             Date start = new Date();
             long duration = 0;
-            while((urlTitle = jIRCTools.getShortURLTitle(url)).isEmpty()
+            while((urlTitle = jIRCTools.getShortURLTitle(shortURL)).isEmpty()
                     && WAIT_FOR_TITLE && duration < WAIT_FOR_TITLE_TIMEOUT) {
                 try {
                     Thread.sleep(200);
@@ -260,8 +262,13 @@ public class jIRCTools {
                 }
             }
         }
+        if(urlTitle.isEmpty()) { // Is the title STILL empty?  Lets fall back to the TLD
+        	urlTitle = getURLDomain(url);
+        }
         // Remove ASCII characters, new lines, and excessive spaces.
-        urlTitle = urlTitle.replaceAll("([^\\p{ASCII}]|\\n|  )", "");
+        urlTitle = urlTitle.replaceAll("[^\\p{ASCII}]", "");
+        urlTitle = urlTitle.replaceAll("\\n", "");
+        urlTitle = urlTitle.replaceAll("  ", "");
     	return urlTitle;
     }
     
@@ -335,6 +342,19 @@ public class jIRCTools {
         return result;
     }
 
+    public static String getURLDomain(String sURL) {
+    	String result = "";
+    	try {
+			URL url = new URL(sURL);
+			result = url.getHost();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return result;
+    }
+    
     // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     // @@@@@@@@@@   ---- MySQL Utility Functions ---- @@@@@@@@@@@@@@@@@@@@@@@@
     
