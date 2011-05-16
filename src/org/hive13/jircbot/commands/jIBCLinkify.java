@@ -42,8 +42,10 @@ public class jIBCLinkify extends jIBCommand {
             String shortURL = "";
             if((url = m.group()).length() > MAX_URL_LENGTH) {
             	shortURL = jIRCTools.generateShortURL(url);
-                urlTitle = jIRCTools.findURLTitle(url, shortURL, bot);
-            } 
+            } else
+            	shortURL = url;
+            
+            urlTitle = jIRCTools.findURLTitle(url, shortURL, bot);
             returnMsg += urlTitle + " [ " + shortURL + " ]; ";
         }
         
