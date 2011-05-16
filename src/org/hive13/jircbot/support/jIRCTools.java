@@ -223,7 +223,7 @@ public class jIRCTools {
     	
     	urlTitle = jIRCTools.getShortURLTitle(shortURL);
     	if(urlTitle.isEmpty()) {
-            if(withBot) bot.log("jIBCLinkify - initial bit.ly failed, trying jIRCTools.getURLTitle", eLogLevel.info);
+            if(withBot) bot.log("findURLTitle - initial bit.ly failed, trying jIRCTools.getURLTitle", eLogLevel.info);
             try {
                 WebFile website = new WebFile(url);
                 urlTitle = jIRCTools.getURLTitle(website);
@@ -236,16 +236,16 @@ public class jIRCTools {
                     // Then write a 'formatedMsg' to the log.
                 }
             } catch (MalformedURLException e) {
-            	if(withBot) bot.log("jIBCLinkify - WTF! Bit.ly gave us an invalid URL...", eLogLevel.error);
+            	if(withBot) bot.log("findURLTitle - WTF! Bit.ly gave us an invalid URL...", eLogLevel.error);
                 e.printStackTrace();
             } catch (IOException e) {
-            	if(withBot) bot.log("jIBCLinkify - failed (badly) to getURLTitle()", eLogLevel.error);
+            	if(withBot) bot.log("findURLTitle - failed (badly) to getURLTitle()", eLogLevel.error);
                 e.printStackTrace();
             }
         }
         
         if(urlTitle.isEmpty() && USE_BITLY_TITLE) { // Are we allowing ourselves to fall back to Bit.ly?
-        	if(withBot) bot.log("jIBCLinkify - jIRCTools.getURLTitle failed, waiting for bit.ly to cache title.", eLogLevel.info);
+        	if(withBot) bot.log("findURLTitle - jIRCTools.getURLTitle failed, waiting for bit.ly to cache title.", eLogLevel.info);
             // The title is not retrieved by bit.ly immediately, we can optionally
             // move on, likely without the title, or we can repeatedly try
             // until we get a response or timeout.
@@ -263,7 +263,11 @@ public class jIRCTools {
             }
         }
         if(urlTitle.isEmpty()) { // Is the title STILL empty?  Lets fall back to the TLD
+        	if(withBot) bot.log("findURLTitle - Second bit.ly failed, let's just get the Domain...");
         	urlTitle = getURLDomain(url);
+        	if(urlTitle.isEmpty() && withBot) {
+        		bot.log("findURLTitle - getURLDomain returned a blank result.");
+        	}
         }
         // Remove ASCII characters, new lines, and excessive spaces.
         urlTitle = urlTitle.replaceAll("[^\\p{ASCII}]", "");
