@@ -57,8 +57,8 @@ public class jIRCToolsTest {
 		testStr = TEST_STRING; // Reset the test
 		testStr = jIRCTools.replaceAll(testStr, "(ReMoVeThIs|\\n|  )", "");
 		assertTrue("Regex: Found newline in testStr at:" + testStr.indexOf("\n"), testStr.indexOf("\n") == -1);
-		assertTrue("Regex: Found multiple spaces at:" + testStr.indexOf("  "), testStr.indexOf("  ") == -1);
 		assertTrue("Regex: Found occurance of RemoveThis at: " + testStr.indexOf("RemoveThis"), testStr.indexOf("RemoveThis") == -1);
+		assertTrue("Regex: Found multiple spaces at:" + testStr.indexOf("  "), testStr.indexOf("  ") == -1);
 	}
 
 	/**
@@ -117,10 +117,11 @@ public class jIRCToolsTest {
 			// Make sure there are no new lines
 			assertTrue("Found multiple lines in: " + urlTitle + " for URL: " + testURL, urlTitle.indexOf("\n") == -1);
 			// Make sure there are no non-ASCII characters
-			assertTrue("Found non-ASCII in: " + urlTitle + " for URL: " + testURL, urlTitle.matches("\\A\\p{ASCII}*\\z"));
-			
+			assertTrue("Found non-ASCII in: " + urlTitle + " for URL: " + testURL, urlTitle.matches("\\A\\p{ASCII}*\\z"));	
 			// Make sure the title is not bit.ly
 			assertTrue("Found title to be bit.ly for URL: " + testURL, !urlTitle.equals("bit.ly"));
+			// Make sure we actually found a title...
+			assertTrue("Failed to find title for URL: " + testURL, !urlTitle.isEmpty());
 		}
 	}
 }
