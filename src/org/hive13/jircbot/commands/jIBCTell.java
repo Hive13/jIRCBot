@@ -29,7 +29,7 @@ public class jIBCTell extends jIBCommand {
 		}
 	}
 
-	private final int MAX_MSG_QUEUE = 25;
+	private final int MAX_MSG_QUEUE = 10;
 	private HashMap<String, ArrayList<storedMsg>> msgMap = new HashMap<String, ArrayList<storedMsg>>();
 
 	@Override
