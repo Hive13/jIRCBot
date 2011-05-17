@@ -35,9 +35,9 @@ public class jIBCMagic8Ball extends jIBCommand {
 		// - !eightball, !m8b, !magiceightball, !magic8ball (only eightball & question currently implemented)
 		String[] splitMsg = message.split(" ", 2);
 		if(splitMsg[0].equals(getCommandName()) ||	// If the command was directly invoked...
-				(message.startsWith(bot.getName()) && message.endsWith("?"))) { // or the bot was asked a question.
+				(message.toLowerCase().startsWith(bot.getName().toLowerCase()) && message.endsWith("?"))) { // or the bot was asked a question.
 			Random r = new Random();
-			bot.sendMessage(channel, sender + ": " + strResponses[r.nextInt(21)]);
+			bot.sendMessage(channel, sender + ": " + strResponses[r.nextInt(20)]);
 		}
 	}
 
