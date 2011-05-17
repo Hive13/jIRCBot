@@ -38,7 +38,7 @@ public class jIBCTRssReader extends jIBCommandThread {
 	private final Lock read = readWriteLock.readLock();
 	private final Lock write = readWriteLock.writeLock();
 	private final String[] formatItems = { "commandName", "Title", "Link",
-			"Author" };
+			"Author", "EnclosureCache", "EnclosureLink" };
 
 	private String formatString = "[commandName] - [Title|c50] ( [Link] )";
 	private URL feedURL = null;
