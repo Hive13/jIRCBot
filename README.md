@@ -26,13 +26,17 @@ The code for jIRCBot is an extension of the PIRCBot which provides the basic IRC
 The main 'bot' code which starts the bot and directly inherits from the PircBot code is the jIRCBot.java class.  I sorta look at this class as the air traffic controller of the bot.  Requests come in from the wild world of the IRC chat room and this class directs them to sub-classes which handle these messages.
 
 #### commands
-These classes are what I consider the 'plugins' of the bot.  
+These classes are what I consider the 'plugins' of the bot. jIB = java IRC Bot, not my most inspired chose for a prefix, I know.  At this point all of the commands are run asynchronously from the bot's primary thread.  There are two primary classes that all of the commands inherit from, `jIBCommand` and `jIBCommandThread`
+
+* `jIBCommand`
+    * The basic parent class for a new command.  This is designed for commands that will be run in response to user input. They will be activated in some manner by a user's action, run their task in a seperate thread, then exit.
+* `jIBCommandThread`
+    * This class for a command is a bit fancier.  These commands are designed to be long running asynchronous processes that will send alerts to the chat room based on external events.  The primary example of thse classes is the RssReader.  CommandThreads have a kind of "Loop" function that is executed at a set period, by default this period is 30 seconds.  The RssReader for example checks an RSS feed and then pushes any new updates to the chat room.
 
 #### support
 Pretty much what the name implies these are the classes which provide some helper functions to the rest of the bot.  These classes manage the properties and common tasks.
 
-##### jIRCTools
-Common functions that many different classes use to Get Shit Done (R).  The class is divided into sections based on what functions are being provided be it database access, URL manipulation, or generating hashes.
-
-##### jIRCProperties
-I try to break common settings out into a *.properties file, this class manages these properties.
+* `jIRCTools`
+    * Common functions that many different classes use to Get Shit Done (R).  The class is divided into sections based on what functions are being provided be it database access, URL manipulation, or generating hashes.
+* `jIRCProperties`
+    * I try to break common settings out into a *.properties file, this class manages these properties.
