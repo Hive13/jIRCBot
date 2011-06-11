@@ -6,6 +6,7 @@ import org.hive13.jircbot.jIRCBot;
 
 public class jIBCMagic8Ball extends jIBCommand {
 
+	private static Random r = new Random();
 	private String strResponses[] = { "It is certain",
 			  "It is decidedly so", "Without a doubt",
 			  "Yes - definitely", "You may rely on it",
@@ -36,7 +37,6 @@ public class jIBCMagic8Ball extends jIBCommand {
 		String[] splitMsg = message.split(" ", 2);
 		if(splitMsg[0].equals(getCommandName()) ||	// If the command was directly invoked...
 				(message.toLowerCase().startsWith(bot.getName().toLowerCase()) && message.endsWith("?"))) { // or the bot was asked a question.
-			Random r = new Random();
 			bot.sendMessage(channel, sender + ": " + strResponses[r.nextInt(20)]);
 		}
 	}
