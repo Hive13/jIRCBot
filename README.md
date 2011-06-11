@@ -2,15 +2,11 @@ Hive13 IRC Bot
 ==============
 Wikipage: http://wiki.hive13.org/Hive13_IRC_Bot
 
-This is the bot that hanges out in irc.freenode.net #hive13.  The bot is written in Java with a MySQL database for 
-logging messages and a PHP website for displaying said log.
+This is the bot that hanges out in irc.freenode.net #hive13.  The bot is written in Java with a MySQL database for logging messages and a PHP website for displaying said log.
 
 Building
 --------
-The bot is developed in eclipse, and if the repository is retrieved at the root it contains all libraries (other 
-than the JDK) needed to build the bot.  I have tried to extensively comment the code to make everyone's lives easier.
-If you have already retrieved the project using Git, you can open it in Eclipse by going to 
-File->Import->General->Existing Projects Into Workspace, then selecting the projects root directory.
+The bot is developed in eclipse, and if the repository is retrieved at the root it contains all libraries (other than the JDK) needed to build the bot.  I have tried to extensively comment the code to make everyone's lives easier. If you have already retrieved the project using Git, you can open it in Eclipse by going to File->Import->General->Existing Projects Into Workspace, then selecting the projects root directory.
 
 Project Structure
 -----------------
@@ -21,3 +17,22 @@ Project Structure
 
 Code Structure
 --------------
+The project is organized into two top level package trees, _org.hive13.jircbot_ and _org.jibble.pircbot_.  We are primarily interested in _org.hive13.jircbot_.  
+
+### org.jibble.pircbot
+The code for jIRCBot is an extension of the PIRCBot which provides the basic IRC bot framework that I have extended.  I have made some very minor changes to PIRCBot which is why its code is part of the project.
+
+### org.hive13.jircbot
+The main 'bot' code which starts the bot and directly inherits from the PircBot code is the jIRCBot.java class.  I sorta look at this class as the air traffic controller of the bot.  Requests come in from the wild world of the IRC chat room and this class directs them to sub-classes which handle these messages.
+
+#### commands
+These classes are what I consider the 'plugins' of the bot.  
+
+#### support
+Pretty much what the name implies these are the classes which provide some helper functions to the rest of the bot.  These classes manage the properties and common tasks.
+
+##### jIRCTools
+Common functions that many different classes use to Get Shit Done (R).  The class is divided into sections based on what functions are being provided be it database access, URL manipulation, or generating hashes.
+
+##### jIRCProperties
+I try to break common settings out into a *.properties file, this class manages these properties.
