@@ -14,10 +14,10 @@ File->Import->General->Existing Projects Into Workspace, then selecting the proj
 
 Project Structure
 -----------------
-/lib - Libraries the bot needs to run
-/res - Resource files associated with the bot, currently the MySQL database construction scripts and the PHP website.
-/src - Source code for the bot.
-/jIRCBot.properties - A properties file for basic configuration (Bot name, IRC Server, IRC Channel, password for connection, MySQL database names, etc,etc..)  This file also contains prototyped properties that have not been implemented yet, namely the ones related to the plugins.
+- /lib - Libraries the bot needs to run
+- /res - Resource files associated with the bot, currently the MySQL database construction scripts and the PHP website.
+- /src - Source code for the bot.
+- /jIRCBot.properties - A properties file for basic configuration (Bot name, IRC Server, IRC Channel, password for connection, MySQL database names, etc,etc..)  This file also contains prototyped properties that have not been implemented yet, namely the ones related to the plugins.
 
 Code Structure
 --------------
