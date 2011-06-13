@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import org.hive13.jircbot.commands.jIBCHelp;
 import org.hive13.jircbot.commands.jIBCLinkify;
 import org.hive13.jircbot.commands.jIBCMagic8Ball;
+import org.hive13.jircbot.commands.jIBCBitcoin;
 import org.hive13.jircbot.commands.jIBCObfuscate;
 import org.hive13.jircbot.commands.jIBCOp;
 import org.hive13.jircbot.commands.jIBCPluginList;
@@ -163,6 +164,7 @@ public class jIRCBot extends PircBot {
 		addLineParseCommand(new jIBCTell());
 		addLineParseCommand(new jIBCLinkify());
 		addLineParseCommand(new jIBCMagic8Ball());
+		addLineParseCommand(new jIBCBitcoin());
 		
 		// Add passive commands
 		// -- Help & PluginList should not be removed. --
