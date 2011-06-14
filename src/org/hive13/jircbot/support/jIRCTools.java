@@ -346,19 +346,9 @@ public class jIRCTools {
         return result;
     }
     
-    public static Object getUrlContent(String url) {
-    	Object content = null;
-    	try {
-			WebFile website = new WebFile(url);
-			content = website.getContent();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return content;
+    public static Object getUrlContent(String url) throws MalformedURLException, IOException {
+    	WebFile website = new WebFile(url);
+		return website.getContent();
     }
 
     public static String getURLDomain(String sURL) {
