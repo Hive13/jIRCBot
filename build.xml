@@ -1,0 +1,102 @@
+<project name="Ndal" default="dist" basedir=".">
+    <description>
+This is the server-side component of Ndal web services. This produces 3 main
+things: A standalone JAR publishing a JAX-WS endpoint, a servlet WAR file for
+Tomcat, and a JAR containing only the Java interfaces and DTOs. These targets
+are, respectively: sib, war, sei.
+        
+"ant -p" lists all targets. "ant -v" runs verbosely.
+    </description>
+    
+    <!-- ******************************************************************
+          Set global properties for this build
+         ******************************************************************-->
+
+    <!-- Source and base package --> 
+    <property name="src" location="src"/>
+    
+    <!-- Directory for any dependency JAR files -->
+    <property name="lib" location="lib"/>
+    
+    <!-- Destination directories -->
+    <property name="build" location="build"/>
+    <property name="binDir" location="bin"/>
+    <property name="WebContent" location="WebContent/"/>
+    
+    <!-- Destination files -->
+    <property name="outputJar" location="${binDir}\hive13bot.jar"/>
+    
+    <!-- Entry point for standalone JAR -->
+    <property name="MainClass" value="org.hive13.jircbot.jIRCBot"/>
+    
+    <!-- ====== Set up the build classpaths ====== -->
+    <path id="master-classpath">
+        <fileset dir="${lib}"/>
+    </path>
+
+    <!-- ******************************************************************
+          Tasks
+         ******************************************************************-->
+    
+    <!-- ====== Target "init" ====== -->
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}"/>
+    </target>
+
+    <!-- ====== Target "compile" ====== -->
+    <target name="compile" depends="init" description="Compile the source">
+        <javac destdir="${build}" srcdir="${src}" classpathref="master-classpath"/>
+    </target>
+    
+    <!-- ====== Target "jar" ====== -->
+    <target name="jar" depends="compile"
+        description="Build a runnable JAR.">
+        <jar jarfile="${outputJar}">
+            <!-- Entry-point is needed to run it as an application: -->
+            <manifest>
+                <attribute name="Main-Class" value="${MainClass}"/>
+            </manifest>
+            <fileset dir="${build}"/>
+        	<zipgroupfileset dir="${lib}" includes="**/*.jar" />
+        </jar>
+    </target>
+
+    <!-- ====== Target "test" ====== -->
+    <target name="test" depends="jar"
+        description="Run regression tests with jUnit">
+        
+        <junit printsummary="yes" showoutput="on">
+
+            <!-- Jenkins makes use of reports from the XML formatter: -->
+            <formatter type="plain"/>
+            
+            <classpath>
+                <!-- Everything we just built is here: -->
+                <pathelement path="${build}"/>
+                <!-- All other dependencies: -->
+            	<fileset dir="${lib}">
+            		<include name="**/*.jar"/>
+            	</fileset>
+            </classpath>
+            
+            <!-- Classes to test: -->
+            <test name="org.hive13.jircbot.support.jIRCToolsTest"/>
+        </junit>
+    </target>
+    
+    <!-- ====== Target "dist" ====== -->
+    <target name="dist" depends="jar"
+        description="Build everything">
+    </target>
+
+    <!-- ====== Target "clean" ====== -->
+    <target name="clean"
+        description="Clean up">
+        <!-- Delete ${build} tree -->
+        <delete dir="${build}"/>
+    </target>
+
+</project>
