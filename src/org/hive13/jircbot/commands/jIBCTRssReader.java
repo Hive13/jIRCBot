@@ -74,6 +74,18 @@ public class jIBCTRssReader extends jIBCommandThread {
 				refreshRate);
 	}
 
+	/**
+	 * The main constructor for an RSS Reader.  It sets up the super class
+	 * and attempts to read any previously cached RSS feed entries.
+	 * 
+	 * @param bot			Parent bot.
+	 * @param commandName	This RSS Feed's command name.
+	 * @param channel		Channel the RSS feed reports into.
+	 * @param formatString	The format for the message to send to the channel... 
+	 * 						Check the code for format options. Hell if I can remember them.
+	 * @param feedURL		The RSS Feed's source URL.
+	 * @param refreshRate	How often should we check this RSS feed?
+	 */
 	@SuppressWarnings("unchecked")
 	public jIBCTRssReader(jIRCBot bot, String commandName, String channel,
 			String formatString, URL feedURL, long refreshRate) {
