@@ -173,11 +173,18 @@ public class jIBCTRssReader extends jIBCommandThread {
 		return "The following are valid uses of this command: !" + cmdName + " help ;" +
 				" !" + cmdName + " start ; !" + cmdName + " stop";
 	}
+	
+	public String getLastEntryFormatted() {
+		return formatMessage(lastEntryListGet(0));
+	}
+	
 	@Override
 	public void handleMessage(jIRCBot bot, String channel, String sender,
 			String message) {
-		if(message.equals("")) {
+		if(message.equals("help")) {
 			bot.sendMessage(sender, getHelp());
+		} else if(message.equals("")) {
+			bot.sendMessage(channel, getLastEntryFormatted());
 		} else {
 			// If we did not handle the message, pass it on up.
 			super.handleMessage(bot, channel, sender, message);
