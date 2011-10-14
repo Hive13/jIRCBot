@@ -301,7 +301,7 @@ public class jIRCBot extends PircBot {
 	 */
 	public void connectBot() {
 		abConnecting.set(true); // the bot is currently attempting to connect to a server.
-		if(this.getServer().isEmpty() || !this.getPassword().equals(botPass) || this.getPort() != 6667) {
+		if(!this.isConnected() && this.getServer() == null) {
 			this.log("Connecting bot to IRC Server.", eLogLevel.info);
 			// We have lost connection information, lets just restart the connection.
 			try {
@@ -325,7 +325,7 @@ public class jIRCBot extends PircBot {
 						ex);
 				this.log("Error: jIRCBot()" + ex.toString());
 			}
-		} else {
+		} else if(!this.isConnected()){
 			// We must have just lost our connection for some random reason
 			// Lets just reconnection.
 			this.log("Reconnecting bot to IRC Server.", eLogLevel.warning);
@@ -345,7 +345,7 @@ public class jIRCBot extends PircBot {
 				this.log("Error: jIRCBot()" + ex.toString());
 			} 
 		}
-		abConnecting.set(false); // We have either reconnected, or failed to connect.
+		abConnecting.set(false);
 	}
 	
 	// Overriding the 'sendMessage' so that I can easily log
