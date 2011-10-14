@@ -238,13 +238,20 @@ public class jIRCBot extends PircBot {
                     channelList.get(0),
                     "[Title|c30]",
                     "http://localhost/isOpen/RSS.php"));//*/
-            
+
             addCommandThread(new jIBCTRssReader(
                     this,
                     "GitHub",
                     channelList.get(0),
                     "[commandName]: [Title|c50] ([Link])",
                     "https://github.com/organizations/Hive13/ryodoan.private.atom?token=cec09aa6dda8d58d58fca0198bda1c10"));
+            
+            addCommandThread(new jIBCTRssReader(
+                    this,
+                    "Vimeo",
+                    channelList.get(0),
+                    "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
+                    "http://vimeo.com/groups/hive13/videos/rss"));
             
             if(channelList.contains("#lvl1")) {
                 int lvl1 = channelList.indexOf("#lvl1");
@@ -372,8 +379,10 @@ public class jIRCBot extends PircBot {
 				eMsgTypes.publicMsg);
 	    
 		// Find out if the message was directed as a command.
-		if (message.startsWith(prefix)) { // TODO - This should also check for "Bot Name"
+		if (message.startsWith(prefix) || message.startsWith(this.botName)) {
 			message = message.replace(prefix, "");
+			message = message.replace(this.botName, "");
+			
 			jIBCommand cmd;
 			// Check to see if it is a known standard command.
 			String[] sCmd = message.split(" ", 2);
