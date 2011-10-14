@@ -45,7 +45,7 @@ public abstract class jIBCommandThread extends jIBCommand {
 	 * @param channel
 	 *            The channel that this command is active in.
 	 * @param loopDelay
-	 *            The time between calls to 'loop()'
+	 *            The time in ms between calls to 'loop()'
 	 * @param authLevel
 	 * 			  The level of authentication required to run
 	 * 			  this command.
@@ -106,8 +106,16 @@ public abstract class jIBCommandThread extends jIBCommand {
 		if (bot.isConnected()) {
 			bot.sendMessage(channel, message, msgType);
 		} else {
-			bot.log("Bot not connected, tried to send: " + message,
-					eLogLevel.warning);
+			if(bot.abConnecting.get()) {
+				bot.log("Bot currently connecting, tried to send: " + message,
+						eLogLevel.warning);
+			} else {
+				// The bot is both not connected currently and is not
+				// trying to connect.  Tell it to try to connect.
+				bot.connectBot();
+				bot.log("Bot not connected, tried to send: " + message,
+						eLogLevel.warning);
+			}
 		}
 	}
 
