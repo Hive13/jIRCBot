@@ -27,6 +27,7 @@ import org.hive13.jircbot.commands.jIBCObfuscate;
 import org.hive13.jircbot.commands.jIBCOp;
 import org.hive13.jircbot.commands.jIBCPluginList;
 import org.hive13.jircbot.commands.jIBCQuitCmd;
+import org.hive13.jircbot.commands.jIBCTMaintThread;
 import org.hive13.jircbot.commands.jIBCTRssReader;
 import org.hive13.jircbot.commands.jIBCTell;
 import org.hive13.jircbot.commands.jIBCTimeCmd;
@@ -74,6 +75,9 @@ public class jIRCBot extends PircBot {
 	// Flag used to tell if the bot was actually told to quit vs. it timing out.
 	public AtomicBoolean abShouldQuit = new AtomicBoolean(false);
 
+	// Flag used to tell if the bot is currently reconnecting to an IRC server
+	public AtomicBoolean abConnecting = new AtomicBoolean(false);
+	
 	/*
 	 * Ok, the userList is a bit hackish at the moment and there is the
 	 * potential that it will leak some memory. Basically I try to
@@ -182,6 +186,9 @@ public class jIRCBot extends PircBot {
 		try {
 			// Add all command threads.
 
+			// Generic Command Threads
+			addCommandThread(new jIBCTMaintThread(this, "MaintThread", channelList.get(0)));
+			
 		    // #Hive13 Feeds
 			addCommandThread(new jIBCTRssReader(
 					this,
@@ -246,12 +253,13 @@ public class jIRCBot extends PircBot {
                         channelList.get(lvl1), "[commandName]: [Title|c50] ([Link])",
                         "http://www.lvl1.org/feed/"));
 
-                addCommandThread(new jIBCTRssReader(
-                        this,
-                        "L1List",
-                        channelList.get(lvl1),
-                        "[commandName]: [Title|c50] ~[Author|c20|r\\(.+\\)] ([Link])",
-                        "http://groups.google.com/group/lvl1/feed/rss_v2_0_msgs.xml"));
+                // PTV: Create a lvl1list command, but stop it immediate after it starts.
+                jIBCommandThread lvl1list = new jIBCTRssReader(this, "L1List", 
+                		channelList.get(lvl1), 
+                		"[commandName]: [Title|c50] ~[Author|c20|r\\(.+\\)] ([Link])",
+                		"http://groups.google.com/group/lvl1/feed/rss_v2_0_msgs.xml");
+                lvl1list.stopCommandThread();
+                addCommandThread(lvl1list);
 
                 // PTV: Flickr feed has been known to have issues...
                 addCommandThread(new jIBCTRssReader(
@@ -278,29 +286,61 @@ public class jIRCBot extends PircBot {
 		// Connect to IRC
 		setAutoNickChange(true);
 		setName(botName);
-		try {
-			// Connect to the config server
-			connect(serverAddress, 6667, botPass);
-
-			// Connect to all channels listed in the config.
-			for (Iterator<String> i = channelList.iterator(); i.hasNext();) {
-				joinChannel(i.next());
-			}
-		} catch (NickAlreadyInUseException ex) {
-			Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-					ex);
-			this.log("Error: jIRCBot()" + ex.toString());
-		} catch (IrcException ex) {
-			Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-					ex);
-			this.log("Error: jIRCBot()" + ex.toString());
-		} catch (IOException ex) {
-			Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-					ex);
-			this.log("Error: jIRCBot()" + ex.toString());
-		}
+		connectBot();
 	}
 
+	/**
+	 * Split into its own function to make reconnecting easier.
+	 */
+	public void connectBot() {
+		abConnecting.set(true); // the bot is currently attempting to connect to a server.
+		if(this.getServer().isEmpty() || !this.getPassword().equals(botPass) || this.getPort() != 6667) {
+			this.log("Connecting bot to IRC Server.", eLogLevel.info);
+			// We have lost connection information, lets just restart the connection.
+			try {
+				// Connect to the config server
+				connect(serverAddress, 6667, botPass);
+
+				// Connect to all channels listed in the config.
+				for (Iterator<String> i = channelList.iterator(); i.hasNext();) {
+					joinChannel(i.next());
+				}
+			} catch (NickAlreadyInUseException ex) {
+				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+						ex);
+				this.log("Error: jIRCBot()" + ex.toString());
+			} catch (IrcException ex) {
+				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+						ex);
+				this.log("Error: jIRCBot()" + ex.toString());
+			} catch (IOException ex) {
+				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+						ex);
+				this.log("Error: jIRCBot()" + ex.toString());
+			}
+		} else {
+			// We must have just lost our connection for some random reason
+			// Lets just reconnection.
+			this.log("Reconnecting bot to IRC Server.", eLogLevel.warning);
+			try {
+				this.reconnect();
+			} catch (NickAlreadyInUseException ex) {
+				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+						ex);
+				this.log("Error: jIRCBot()" + ex.toString());
+			} catch (IrcException ex) {
+				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+						ex);
+				this.log("Error: jIRCBot()" + ex.toString());
+			} catch (IOException ex) {
+				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+						ex);
+				this.log("Error: jIRCBot()" + ex.toString());
+			} 
+		}
+		abConnecting.set(false); // We have either reconnected, or failed to connect.
+	}
+	
 	// Overriding the 'sendMessage' so that I can easily log
 	// all messages sent by the bot.
 	public void sendMessage(String target, String message) {
@@ -384,21 +424,7 @@ public class jIRCBot extends PircBot {
 		} else {
 			log("Accidental disconnect detected, initiating reconnect.",
 					eLogLevel.warning);
-			try {
-				// Connect to the config server
-				connect(serverAddress);
-
-				// Connect to all channels listed in the config.
-				for (Iterator<String> i = channelList.iterator(); i.hasNext();) {
-					joinChannel(i.next());
-				}
-			} catch (NickAlreadyInUseException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (IrcException e) {
-				e.printStackTrace();
-			}
+			connectBot();
 		}
 	}
 
