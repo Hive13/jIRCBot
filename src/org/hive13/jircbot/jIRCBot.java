@@ -692,7 +692,7 @@ public class jIRCBot extends PircBot {
 
 			// Initiate check for credentials
 			startAuthForUser(user);
-
+			
 			// Write the event to the log.
 			logMessage(channel, this.getServer(), sender, "",
 					eMsgTypes.joinMsg);

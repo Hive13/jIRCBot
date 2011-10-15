@@ -1,6 +1,7 @@
 package org.hive13.jircbot.commands;
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
+import org.hive13.jircbot.support.jIRCProperties;
 import org.hive13.jircbot.support.jIRCUser.eAuthLevels;
 
 
@@ -40,6 +41,19 @@ public class jIBCTMaintThread extends jIBCommandThread {
 				bot.log(this.commandName + " - Bot failed to reconnect... see you in " + Long.toString((dfLoopDelay / 1000)) + " seconds", eLogLevel.severe);
 			}
 		}
+		
+		// Check if we are currently an operator
+		jIRCProperties.getInstance().getOpChannels();
+		boolean botIsOp = bot.getUser(channel, bot.getNick()).isOp();
+		if(!botIsOp) {
+			// For some reason we are not... lets try to op ourself.
+			bot.sendMessage("chanserv", "op " + channel);
+		} else {
+			// Ok, so lets wait for the maint thread to tick around again before doing this.
+			// Now that we are operator, lets check on the peon's in the channel with us.
+			
+		}
+		
 	}
 
 	@Override
