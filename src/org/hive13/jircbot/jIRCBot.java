@@ -117,6 +117,7 @@ public class jIRCBot extends PircBot {
 	}
 
 	private jIRCBot() {
+		abConnecting.set(true);
 		// Make it so that the bot outputs lots of information when run.
 		setVerbose(true);
 		
@@ -293,6 +294,8 @@ public class jIRCBot extends PircBot {
 		// Connect to IRC
 		setAutoNickChange(true);
 		setName(botName);
+		// It is now safe to actually launch the connect process.
+		abConnecting.set(false);
 		connectBot();
 	}
 
@@ -300,52 +303,52 @@ public class jIRCBot extends PircBot {
 	 * Split into its own function to make reconnecting easier.
 	 */
 	public void connectBot() {
-		abConnecting.set(true); // the bot is currently attempting to connect to a server.
-		if(!this.isConnected() && this.getServer() == null) {
-			this.log("Connecting bot to IRC Server.", eLogLevel.info);
-			// We have lost connection information, lets just restart the connection.
-			try {
-				// Connect to the config server
-				connect(serverAddress, 6667, botPass);
-
-				// Connect to all channels listed in the config.
-				for (Iterator<String> i = channelList.iterator(); i.hasNext();) {
-					joinChannel(i.next());
+		if(!abConnecting.get()) {
+			if(!this.isConnected() && this.getServer() == null) {
+				this.log("Connecting bot to IRC Server.", eLogLevel.info);
+				// We have lost connection information, lets just restart the connection.
+				try {
+					// Connect to the config server
+					connect(serverAddress, 6667, botPass);
+	
+					// Connect to all channels listed in the config.
+					for (Iterator<String> i = channelList.iterator(); i.hasNext();) {
+						joinChannel(i.next());
+					}
+				} catch (NickAlreadyInUseException ex) {
+					Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+							ex);
+					this.log("Error: jIRCBot()" + ex.toString());
+				} catch (IrcException ex) {
+					Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+							ex);
+					this.log("Error: jIRCBot()" + ex.toString());
+				} catch (IOException ex) {
+					Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+							ex);
+					this.log("Error: jIRCBot()" + ex.toString());
 				}
-			} catch (NickAlreadyInUseException ex) {
-				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-						ex);
-				this.log("Error: jIRCBot()" + ex.toString());
-			} catch (IrcException ex) {
-				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-						ex);
-				this.log("Error: jIRCBot()" + ex.toString());
-			} catch (IOException ex) {
-				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-						ex);
-				this.log("Error: jIRCBot()" + ex.toString());
+			} else if(!this.isConnected()){
+				// We must have just lost our connection for some random reason
+				// Lets just reconnection.
+				this.log("Reconnecting bot to IRC Server.", eLogLevel.warning);
+				try {
+					this.reconnect();
+				} catch (NickAlreadyInUseException ex) {
+					Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+							ex);
+					this.log("Error: jIRCBot()" + ex.toString());
+				} catch (IrcException ex) {
+					Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+							ex);
+					this.log("Error: jIRCBot()" + ex.toString());
+				} catch (IOException ex) {
+					Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
+							ex);
+					this.log("Error: jIRCBot()" + ex.toString());
+				} 
 			}
-		} else if(!this.isConnected()){
-			// We must have just lost our connection for some random reason
-			// Lets just reconnection.
-			this.log("Reconnecting bot to IRC Server.", eLogLevel.warning);
-			try {
-				this.reconnect();
-			} catch (NickAlreadyInUseException ex) {
-				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-						ex);
-				this.log("Error: jIRCBot()" + ex.toString());
-			} catch (IrcException ex) {
-				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-						ex);
-				this.log("Error: jIRCBot()" + ex.toString());
-			} catch (IOException ex) {
-				Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-						ex);
-				this.log("Error: jIRCBot()" + ex.toString());
-			} 
 		}
-		abConnecting.set(false);
 	}
 	
 	// Overriding the 'sendMessage' so that I can easily log
