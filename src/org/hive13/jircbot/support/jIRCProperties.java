@@ -16,6 +16,8 @@ public class jIRCProperties {
 	private final String defaultBotPass   = "";
 	private final String defaultServer 	= "irc.freenode.net";
 	private final String defaultChannels 	= "#Hive13_test";
+	private final String defaultOpChannels 	= "#Hive13_test";
+	
 	
 	private final String defaultBitlyName = "";
 	private final String defaultBitlyKey 	= "";
@@ -37,7 +39,8 @@ public class jIRCProperties {
     /** Directory for commands to use as a cache for data. */
     private static File cacheDirectory = null;
  
-	private String parsedChannels[] = null;
+    private String parsedChannels[] = null;
+    private String parsedOpChannels[] = null;
 	private List<String> parsedOpList = null;
 	private List<String> parsedAdminList = null;
 	private List<String> parsedPlugins = null;
@@ -94,6 +97,20 @@ public class jIRCProperties {
 			parsedChannels = splitChannels;
 		}
 		return parsedChannels;
+	}
+
+	public String[] getOpChannels() {
+		// Since we only read the properties once, it does not make sense
+		// to repeatedly re-parse the channel string.
+		if(parsedChannels == null) {
+			String channels = getProp("opChannels", defaultOpChannels);
+			String splitChannels[] = channels.split(",");
+			for (int i = 0; i < splitChannels.length; i++) {
+				splitChannels[i] = splitChannels[i].trim();
+			}
+			parsedOpChannels = splitChannels;
+		}
+		return parsedOpChannels;
 	}
 
 	/** Username to use for the bit.ly API */
