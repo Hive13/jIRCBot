@@ -187,7 +187,10 @@ public class jIBCTRssReader extends jIBCommandThread {
 	}
 	
 	public String getLastEntryFormatted() {
-		return formatMessage(lastEntryListGet(0));
+		if(lastEntryListSize() > 0)
+			return formatMessage(lastEntryListGet(0));
+		else
+			return getSimpleCommandName() + ": No RSS Entries received yet.";
 	}
 	
 	@Override
