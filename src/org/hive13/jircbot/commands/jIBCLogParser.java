@@ -175,11 +175,11 @@ public class jIBCLogParser extends jIBCommand {
 		} else {
 			result = true;
 		}
-
+		/*
 		if (!result) {
 			int i = 0;
 			i++;
-		}
+		}*/
 		return result;
 	}
 
