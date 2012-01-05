@@ -1,8 +1,11 @@
 package org.hive13.jircbot.commands;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.Calendar;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -49,7 +52,18 @@ public class jIBCBitcoin extends jIBCommand {
            Gson gson = new Gson();
            String errorMsg = "";
            try {
-            content = jIRCTools.getUrlContent(MT_GOX_URL);
+        	   // Wrote my own URL retriever because WebFile doesn't handle SSL correctly
+        	   URL url = new URL(MT_GOX_URL);
+        	   java.net.URLConnection httpConn = url.openConnection();
+        	   httpConn.setDoInput(true);
+        	   httpConn.connect();
+        	   InputStream in = httpConn.getInputStream();
+        	   BufferedInputStream bufIn = new BufferedInputStream(in);
+        	   byte buf[] = new byte[8192];
+        	   bufIn.read(buf, 0, 8192);
+        	   content = new String(buf,"US-ASCII");
+            // Having issues with https via getUrlContent
+            //content = jIRCTools.getUrlContent(MT_GOX_URL);
          } catch (MalformedURLException e) {
             errorMsg = "Mt. Gox is reporting an invalid URL.";
             e.printStackTrace();
@@ -69,7 +83,7 @@ public class jIBCBitcoin extends jIBCommand {
                  // Massage json to fit our class a bit
                  json = json.substring(10, json.lastIndexOf('}'));
                  MtGoxTicker ticker = gson.fromJson(json, MtGoxTicker.class);
-                 bot.sendMessage(channel, "Mt. Gox: Last=" + ticker.last + " High=" + ticker.high + " Low=" + ticker.low);
+                 bot.sendMessage(channel, "Mt. Gox: Last=" + ticker.last + " High=" + ticker.high + " Low=" + ticker.low + " Avg=" + ticker.avg);
                  lastDisplayed = Calendar.getInstance();
            } else {
                  bot.sendMessage(channel, errorMsg);
