@@ -86,6 +86,14 @@ public class jIRCTools {
    // TODO: Implement getWUndergroundTemperature
    public static double getWUndergroundTemperature(String StationID) {
       double dResult = -1;
+      /* Important information:
+       * http://www.roseindia.net/tutorials/xPath/java-xpath.shtml
+       * http://api.wunderground.com/api/***REMOVED***/conditions/q/45225.xml
+       * http://api.wunderground.com/api/***REMOVED***/conditions/q/45225.json
+       * http://www.wunderground.com/weather/api/d/***REMOVED***/stats.html
+       * 
+       */
+      
       // http://www.roseindia.net/tutorials/xPath/java-xpath.shtml
       /*// The following method did not work at all.
       // create a instance of a wunderground data reader
