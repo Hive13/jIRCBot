@@ -37,30 +37,41 @@ public class jIRCToolsTest {
 	public void tearDown() throws Exception {
 	}
 
-	/**
-	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#replaceAll(java.lang.String, java.lang.String, java.lang.String)}.
-	 */
-	@Test
-	public void testReplaceAll() {
-		String testStr = TEST_STRING;
-		testStr = jIRCTools.replaceAll(testStr, "\\n", ""); // Remove newlines from the string
-		assertTrue("Found newline in testStr at:" + testStr.indexOf("\n"), testStr.indexOf("\n") == -1);
+   /**
+    * Test method for Wunderground.
+    */
+   @Test
+   public void testWundergroundTemperature() {
+      String stationID = "KLUK";
+      double result = -255;
+      result = jIRCTools.getWUndergroundTemperature(stationID);
+      assertTrue("Result of temperature was:" + result, result != -255);
+   }
 
-		testStr = TEST_STRING; // Reset the test
-		testStr = jIRCTools.replaceAll(testStr, "  ", ""); // Remove duplicate spaces
-		assertTrue("Found multiple spaces at:" + testStr.indexOf("  "), testStr.indexOf("  ") == -1);
+   /**
+    * Test method for {@link org.hive13.jircbot.support.jIRCTools#replaceAll(java.lang.String, java.lang.String, java.lang.String)}.
+    */
+   @Test
+   public void testReplaceAll() {
+      String testStr = TEST_STRING;
+      testStr = jIRCTools.replaceAll(testStr, "\\n", ""); // Remove newlines from the string
+      assertTrue("Found newline in testStr at:" + testStr.indexOf("\n"), testStr.indexOf("\n") == -1);
 
-		testStr = TEST_STRING; // Reset the test
-		testStr = jIRCTools.replaceAll(testStr, "RemOveThIs", ""); // Case insensitive text remove
-		assertTrue("Found occurance of RemoveThis at: " + testStr.indexOf("RemoveThis"), testStr.indexOf("RemoveThis") == -1);
-		
-		testStr = TEST_STRING; // Reset the test
-		testStr = jIRCTools.replaceAll(testStr, "(ReMoVeThIs|\\n)", "");
-		testStr = jIRCTools.replaceAll(testStr, "  ", "");
-		assertTrue("Regex: Found newline in testStr at:" + testStr.indexOf("\n"), testStr.indexOf("\n") == -1);
-		assertTrue("Regex: Found occurance of RemoveThis at: " + testStr.indexOf("RemoveThis"), testStr.indexOf("RemoveThis") == -1);
-		assertTrue("Regex: Found multiple spaces at:" + testStr.indexOf("  "), testStr.indexOf("  ") == -1);
-	}
+      testStr = TEST_STRING; // Reset the test
+      testStr = jIRCTools.replaceAll(testStr, "  ", ""); // Remove duplicate spaces
+      assertTrue("Found multiple spaces at:" + testStr.indexOf("  "), testStr.indexOf("  ") == -1);
+
+      testStr = TEST_STRING; // Reset the test
+      testStr = jIRCTools.replaceAll(testStr, "RemOveThIs", ""); // Case insensitive text remove
+      assertTrue("Found occurance of RemoveThis at: " + testStr.indexOf("RemoveThis"), testStr.indexOf("RemoveThis") == -1);
+      
+      testStr = TEST_STRING; // Reset the test
+      testStr = jIRCTools.replaceAll(testStr, "(ReMoVeThIs|\\n)", "");
+      testStr = jIRCTools.replaceAll(testStr, "  ", "");
+      assertTrue("Regex: Found newline in testStr at:" + testStr.indexOf("\n"), testStr.indexOf("\n") == -1);
+      assertTrue("Regex: Found occurance of RemoveThis at: " + testStr.indexOf("RemoveThis"), testStr.indexOf("RemoveThis") == -1);
+      assertTrue("Regex: Found multiple spaces at:" + testStr.indexOf("  "), testStr.indexOf("  ") == -1);
+   }
 
 	/**
 	 * Test method for {@link org.hive13.jircbot.support.jIRCTools#generateShortURL(java.lang.String)}.
