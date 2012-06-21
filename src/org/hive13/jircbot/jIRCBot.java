@@ -30,6 +30,7 @@ import org.hive13.jircbot.commands.jIBCQuitCmd;
 import org.hive13.jircbot.commands.jIBCTMaintThread;
 import org.hive13.jircbot.commands.jIBCTRssReader;
 import org.hive13.jircbot.commands.jIBCTell;
+import org.hive13.jircbot.commands.jIBCTemperature;
 import org.hive13.jircbot.commands.jIBCTimeCmd;
 import org.hive13.jircbot.commands.jIBCommand;
 import org.hive13.jircbot.commands.jIBCommandThread;
@@ -180,6 +181,7 @@ public class jIRCBot extends PircBot {
 		addCommand(new jIBCQuitCmd());
 		addCommand(new jIBCOp());
 		addCommand(new jIBCObfuscate());
+		addCommand(new jIBCTemperature());
 		
 		// addCommand(new jIBCLogParser()); // <-- Removed because it was pretty alpha quality
 											// 	   and it depended heavily on my log format.
@@ -626,6 +628,7 @@ public class jIRCBot extends PircBot {
 		}
 	}
 
+	
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// The following is only used for message logging purposes right now.
 	public void onAction(String sender, String login, String hostname,
