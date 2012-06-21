@@ -29,25 +29,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.naming.directory.InvalidAttributesException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.jIRCBot.eLogLevel;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import de.mbenning.weather.wunderground.api.domain.DataSet;
-import de.mbenning.weather.wunderground.api.domain.WeatherStation;
-import de.mbenning.weather.wunderground.api.domain.WeatherStations;
-import de.mbenning.weather.wunderground.impl.services.HttpDataReaderService;
 
 public class jIRCTools {
     
@@ -82,84 +66,6 @@ public class jIRCTools {
         /** Do Not Log Message. */
         LogFreeMsg
     }
-
-   // TODO: Implement getWUndergroundTemperature
-   public static double getWUndergroundTemperature(String StationID) {
-      double dResult = -1;
-      /* Important information:
-       * http://www.roseindia.net/tutorials/xPath/java-xpath.shtml
-       * http://api.wunderground.com/api/***REMOVED***/conditions/q/45225.xml
-       * http://api.wunderground.com/api/***REMOVED***/conditions/q/45225.json
-       * http://www.wunderground.com/weather/api/d/***REMOVED***/stats.html
-       * 
-       */
-      
-      // http://www.roseindia.net/tutorials/xPath/java-xpath.shtml
-      /*// The following method did not work at all.
-      // create a instance of a wunderground data reader
-      HttpDataReaderService dataReader = new HttpDataReaderService();
-      
-      // select a wunderground weather station (ID "INORDRHE72" = Dortmund-Mengede)
-      WeatherStation weatherStation = WeatherStations.ALL.get("INORDRHE72");
-      
-      // set selected weather station to data reader
-      dataReader.setWeatherStation(weatherStation);
-      
-      // get current (last) weather data set from selected station
-      DataSet current = dataReader.getCurrentData();
-      
-      // print selected weather station ID
-      // System.out.println(weatherStation.getStationId());
-      
-      // print city, state and country of weather station
-      //System.out.println(weatherStation.getCity() + " " + weatherStation.getState() + " " + weatherStation.getCountry());
-      
-      // print datetime of measure and temperature ...
-      //System.out.println(current.getDateTime() + " " + current.getTemperature());
-      result = current.getTemperature();
-      
-      return result;//*/
-      WebFile website;
-      try {
-         website = new WebFile("http://api.wunderground.com/api/***REMOVED***/conditions/q/45225.xml");
-         String urlTitle = jIRCTools.getURLTitle(website);
-         Object content = website.getContent();
-         
-         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-         domFactory.setNamespaceAware(true);
-         DocumentBuilder builder = domFactory.newDocumentBuilder();
-         Document doc = builder.parse("persons.xml");
-         
-         XPath xpath = XPathFactory.newInstance().newXPath();
-         
-         XPathExpression expr = xpath.compile("/response/current_observation/temp_f");
-         
-         Object result = expr.evaluate(doc, XPathConstants.NUMBER);
-         
-         NodeList nodes = (NodeList) result;
-         for(int i = 0; i < nodes.getLength(); i++) {
-            dResult = Double.parseDouble(nodes.item(i).getNodeValue());
-         }
-      } catch (MalformedURLException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      } catch (IOException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      } catch (ParserConfigurationException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      } catch (SAXException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      } catch (XPathExpressionException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
-      
-      return dResult;
-      
-   }
     
     // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     // @@@@@@@@@@   ---- Generic Utility Functions ---- @@@@@@@@@@@@@@@@@@@@@@

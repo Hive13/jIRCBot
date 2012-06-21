@@ -12,7 +12,6 @@ import javax.net.ssl.SSLHandshakeException;
 
 import org.hive13.jircbot.jIRCBot;
 import org.hive13.jircbot.support.MtGoxTicker;
-import org.hive13.jircbot.support.jIRCTools;
 
 import com.google.gson.Gson;
 

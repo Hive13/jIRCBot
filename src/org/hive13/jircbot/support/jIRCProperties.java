@@ -18,9 +18,10 @@ public class jIRCProperties {
 	private final String defaultChannels 	= "#Hive13_test";
 	private final String defaultOpChannels 	= "#Hive13_test";
 	
-	
 	private final String defaultBitlyName = "";
 	private final String defaultBitlyKey 	= "";
+
+	private final String defaultWundergroundKey = "";
 
 	private final String defaultJDBCUrl 	= "";
 	private final String defaultJDBCUser 	= "";
@@ -121,6 +122,11 @@ public class jIRCProperties {
 	/** API key to use for the bit.ly API */
 	public String getBitlyAPIKey() {
 		return getProp("bitlyAPI", defaultBitlyKey);
+	}
+
+	/** API key to use for the Weather Underground API */
+	public String getWundergroundAPIKey() {
+		return getProp("WUAPI", defaultWundergroundKey);
 	}
 
 	/** JDBC URL to use to connect to the database */

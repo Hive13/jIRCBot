@@ -38,17 +38,6 @@ public class jIRCToolsTest {
 	}
 
    /**
-    * Test method for Wunderground.
-    */
-   @Test
-   public void testWundergroundTemperature() {
-      String stationID = "KLUK";
-      double result = -255;
-      result = jIRCTools.getWUndergroundTemperature(stationID);
-      assertTrue("Result of temperature was:" + result, result != -255);
-   }
-
-   /**
     * Test method for {@link org.hive13.jircbot.support.jIRCTools#replaceAll(java.lang.String, java.lang.String, java.lang.String)}.
     */
    @Test
