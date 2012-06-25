@@ -306,7 +306,7 @@ public class jIRCBot extends PircBot {
 	 */
 	public void connectBot() {
 		if(!abConnecting.get()) {
-			if(!this.isConnected() && this.getServer() == null) {
+			if(!this.isConnected()) {
 				this.log("Connecting bot to IRC Server.", eLogLevel.info);
 				// We have lost connection information, lets just restart the connection.
 				try {
@@ -330,25 +330,6 @@ public class jIRCBot extends PircBot {
 							ex);
 					this.log("Error: jIRCBot()" + ex.toString());
 				}
-			} else if(!this.isConnected()){
-				// We must have just lost our connection for some random reason
-				// Lets just reconnection.
-				this.log("Reconnecting bot to IRC Server.", eLogLevel.warning);
-				try {
-					this.reconnect();
-				} catch (NickAlreadyInUseException ex) {
-					Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-							ex);
-					this.log("Error: jIRCBot()" + ex.toString());
-				} catch (IrcException ex) {
-					Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-							ex);
-					this.log("Error: jIRCBot()" + ex.toString());
-				} catch (IOException ex) {
-					Logger.getLogger(jIRCBot.class.getName()).log(Level.SEVERE, null,
-							ex);
-					this.log("Error: jIRCBot()" + ex.toString());
-				} 
 			}
 		}
 	}
@@ -384,7 +365,7 @@ public class jIRCBot extends PircBot {
 				eMsgTypes.publicMsg);
 	    
 		// Find out if the message was directed as a command.
-		if (message.startsWith(prefix) || message.startsWith(this.botName)) {
+		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, "");
 			message = message.replace(this.botName, "");
 			
