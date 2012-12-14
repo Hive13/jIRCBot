@@ -78,9 +78,9 @@ public class jIBCOp extends jIBCommand {
 	                // event.
 	                if (opped) {
 	                    bot.sendMessage(curTargetUsr, sender
-	                            + " granted you operator priviledges.");
+	                            + " granted you operator privileges.");
 	                    bot.log(sender + " granted " + curTargetUsr
-	                            + " operator priviledges.", eLogLevel.info);
+	                            + " operator privileges.", eLogLevel.info);
 	                }
 	            } else {
 	                bot.sendMessage(sender, "Could not find user (" + curTargetUsr + "). "
