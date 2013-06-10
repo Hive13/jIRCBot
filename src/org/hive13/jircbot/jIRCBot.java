@@ -225,7 +225,7 @@ public class jIRCBot extends PircBot {
                     "Tweet",
                     channelList.get(0),
                     "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])",
-                    "http://search.twitter.com/search.atom?q=hive13"));
+                    "http://search.twitter.com/search.atom?q=hive13%20-B_hive13%20-danielleabroad"));
             
             addCommandThread(new jIBCTRssReader(
                     this,
