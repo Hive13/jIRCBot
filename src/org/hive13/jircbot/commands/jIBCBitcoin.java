@@ -16,7 +16,7 @@ import org.hive13.jircbot.support.MtGoxTicker;
 import com.google.gson.Gson;
 
 public class jIBCBitcoin extends jIBCommand {
-   private final String MT_GOX_URL = "https://mtgox.com/code/data/ticker.php";
+   private final String MT_GOX_URL = "https://data.mtgox.com/code/data/ticker.php";
    private Calendar lastDisplayed = null;
       
         @Override
