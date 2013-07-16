@@ -4,13 +4,12 @@ import java.io.IOException;
 
 import org.hive13.jircbotx.listener.Linkify;
 import org.hive13.jircbotx.listener.Magic8Ball;
+import org.hive13.jircbotx.listener.Tell;
 import org.hive13.jircbotx.listener.Temperature;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
-import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.ListenerAdapter;
-import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.MessageEvent;
 
 /**
@@ -18,8 +17,7 @@ import org.pircbotx.hooks.events.MessageEvent;
  * @author vincentp
  * 
  */
-public class JIRCBotX extends ListenerAdapter<PircBotX> implements
-      Listener<PircBotX> {
+public class JIRCBotX extends ListenerAdapter<PircBotX> {
 
    public void onMessage(MessageEvent<PircBotX> event) throws Exception {
       // Hello world
@@ -52,6 +50,7 @@ public class JIRCBotX extends ListenerAdapter<PircBotX> implements
       bot.getListenerManager().addListener(new Linkify());
       bot.getListenerManager().addListener(new Magic8Ball());
       bot.getListenerManager().addListener(new Temperature());
+      bot.getListenerManager().addListener(new Tell());
       
       try {
          bot.connect("irc.freenode.net");
