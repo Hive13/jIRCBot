@@ -18,6 +18,11 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/jIRCBot/lib/java-image-scaling-0.8.5-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/pircbotx-1.9.jar" sourcepath="lib/pircbotx-1.9-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/jIRCBot/lib/pircbotx-1.9-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/gson-1.7.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
