@@ -1,9 +1,12 @@
 package org.hive13.jircbotx;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.hive13.jircbotx.listener.Linkify;
+import org.hive13.jircbotx.listener.Logger;
 import org.hive13.jircbotx.listener.Magic8Ball;
+import org.hive13.jircbotx.listener.Quit;
 import org.hive13.jircbotx.listener.Tell;
 import org.hive13.jircbotx.listener.Temperature;
 import org.pircbotx.PircBotX;
@@ -17,20 +20,34 @@ import org.pircbotx.hooks.events.MessageEvent;
  * @author vincentp
  * 
  */
-public class JIRCBotX extends ListenerAdapter<PircBotX> {
+public class JIRCBotX {
 
-   public void onMessage(MessageEvent<PircBotX> event) throws Exception {
-      // Hello world
-      // This way to handle commands is useful for listeners that listen for
-      // multiple commands
-      if (event.getMessage().startsWith("!quit"))
-      {
-         event.getBot().quitServer();
-         System.exit(0);
-         
-      }
+   /**
+    * The different types of messages saved in the database.
+    */
+   public enum eMsgTypes {
+       // NOTE: If adding any additional message types, append them to the end
+       // of the list.
+       /** User messages in a chat channel. */
+       publicMsg,
+       /** User message directly to the bot. */
+       privateMsg,
+       /** Ex. /me */
+       actionMsg,
+       /** User joins a channel the bot is in. */
+       joinMsg,
+       /** User leaves a channel the bot is in. */
+       partMsg,
+       /** Users changes their nickname. */
+       nickChange,
+       /** User quits the server the bot is on. */
+       quitMsg,
+       /** Bot messages w/ HTML formatting. */
+       htmlMsg,
+       /** Do Not Log Message. */
+       LogFreeMsg
    }
-
+   
    /**
     * @param args
     */
@@ -46,11 +63,12 @@ public class JIRCBotX extends ListenerAdapter<PircBotX> {
       
       bot.setCapEnabled(true);
 
-      bot.getListenerManager().addListener(new JIRCBotX());
       bot.getListenerManager().addListener(new Linkify());
       bot.getListenerManager().addListener(new Magic8Ball());
       bot.getListenerManager().addListener(new Temperature());
       bot.getListenerManager().addListener(new Tell());
+      bot.getListenerManager().addListener(new Logger());
+      bot.getListenerManager().addListener(new Quit());
       
       try {
          bot.connect("irc.freenode.net");

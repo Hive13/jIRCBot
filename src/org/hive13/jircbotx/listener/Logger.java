@@ -1,0 +1,76 @@
+package org.hive13.jircbotx.listener;
+
+import java.util.Iterator;
+
+import org.hive13.jircbotx.JIRCBotX.eMsgTypes;
+import org.hive13.jircbotx.support.BotDatabase;
+import org.pircbotx.Channel;
+import org.pircbotx.PircBotX;
+import org.pircbotx.User;
+import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.events.ActionEvent;
+import org.pircbotx.hooks.events.JoinEvent;
+import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.NickChangeEvent;
+import org.pircbotx.hooks.events.PartEvent;
+import org.pircbotx.hooks.events.QuitEvent;
+
+public class Logger extends ListenerAdapter<PircBotX> {
+
+   
+   public void onMessage(MessageEvent<PircBotX> event) throws Exception {
+      logEvent(event.getChannel(), event.getBot().getServer(), event.getUser(), event.getMessage(), eMsgTypes.publicMsg);
+   }
+   
+   public void onAction(ActionEvent<PircBotX> event) {
+      logEvent(event.getChannel(), event.getBot().getServer(), event.getUser(), event.getMessage(), eMsgTypes.actionMsg);
+   }
+   
+   public void onNickChange(NickChangeEvent<PircBotX> event) {
+      // This is a User changing their Nick.
+      // This could be US changing our Nick, but who cares if we change our
+      // nick?
+      logEvent(null, event.getBot().getServer(), event.getUser(), event.getOldNick(), event.getNewNick(), eMsgTypes.actionMsg);
+   }
+   
+   public void onJoin(JoinEvent<PircBotX> event) {
+      logEvent(event.getChannel(), event.getBot().getServer(), event.getUser(), "", eMsgTypes.joinMsg);
+   }
+   public void onPart(PartEvent<PircBotX> event) {
+      // TODO: Make sure the following statements are still true, at its worse, we will just be doing an unnecessary check...
+      // This function is called when a user leaves a channel we are in.
+      // This function is also called when WE leave a channel.
+      if(!event.getUser().getNick().equals(event.getBot().getNick()))
+      {
+         logEvent(event.getChannel(), event.getBot().getServer(), event.getUser(), "", eMsgTypes.partMsg);
+      }
+   }
+
+   public void onQuit(QuitEvent<PircBotX> event) {
+      // Send event for all channel's 'User' is in, therefore pass a 'null' channel.
+      logEvent(null, event.getBot().getServer(), event.getUser(), "", eMsgTypes.quitMsg);
+   }
+   
+   private void logEvent(Channel EventChannel, String server, 
+         User EventUser, String message, eMsgTypes msgType) {
+      logEvent(EventChannel, server, EventUser, message, EventUser.getNick(), msgType);
+   }
+   
+   // Use when you want to fake out the saved user
+   private void logEvent(Channel EventChannel, String server, 
+         User EventUser, String username, String message, eMsgTypes msgType) {
+   
+      // TODO: Add back in message obfuscation?  Leaving it out for simplicity sake for now.
+      
+      if(EventChannel == null)
+      {
+         Iterator<Channel> it = EventUser.getChannels().iterator();
+         while(it.hasNext())
+         {
+            BotDatabase.insertMessage(it.next().getName(), server, username, message, msgType);
+         }
+      }
+      else
+         BotDatabase.insertMessage(EventChannel.getName(), server, username, message, msgType);
+   }
+}
