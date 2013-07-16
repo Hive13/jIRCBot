@@ -1,12 +1,12 @@
 package org.hive13.jircbotx.listener;
 
+import org.hive13.jircbotx.ListenerAdapterX;
 import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 
 import java.util.Random;
 
-public class Magic8Ball extends ListenerAdapter<PircBotX> {
+public class Magic8Ball extends ListenerAdapterX {
    private static Random r = new Random();
    private String strResponses[] = { "It is certain",
            "It is decidedly so", "Without a doubt",
@@ -21,15 +21,27 @@ public class Magic8Ball extends ListenerAdapter<PircBotX> {
            "Very doubtful"};
    
 
-   public void onMessage(MessageEvent<PircBotX> event) throws Exception {
+   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
       String message = event.getMessage().toLowerCase();
       if((message.startsWith(event.getBot().getNick().toLowerCase()) && message.endsWith("?")) ||
-            message.startsWith("!eightball") ||
+            message.startsWith("!" + getCommandName()) ||
             message.startsWith("!magiceightball") ||
             message.startsWith("!m8b") ||
             message.startsWith("!magic8ball"))
       {
          event.respond(strResponses[r.nextInt(20)]);
       }
+   }
+
+
+   @Override
+   public String getCommandName() {
+      return "eightball";
+   }
+
+
+   @Override
+   public String getHelp() {
+      return "Find out answers to your questions.  Either ask the bot or directly run this command via !" + getCommandName();
    }
 }

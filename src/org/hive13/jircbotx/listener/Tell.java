@@ -5,11 +5,25 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.hive13.jircbotx.ListenerAdapterX;
 import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 
-public class Tell extends ListenerAdapter<PircBotX> {
+public class Tell extends ListenerAdapterX {
+
+   @Override
+   public String getCommandName() {
+      return "tell";
+   }
+
+   @Override
+   public String getHelp() {
+      return "This command stores a message for a user.  The next time" +
+            " that user sends a message in the chat room I will send" +
+            " them the messages stored for them. Ex. !Tell" +
+            " jimboJones Remember to bring that thing with you.";
+   }
+   
    private class storedMsg {
       Date storedDate;
       String message;
@@ -25,13 +39,8 @@ public class Tell extends ListenerAdapter<PircBotX> {
    
    private final int MAX_MSG_QUEUE = 10;
    private HashMap<String, ArrayList<storedMsg>> msgMap = new HashMap<String, ArrayList<storedMsg>>();
-
-   private String helpMessage = "This command stores a message for a user.  The next time" +
-         " that user sends a message in the chat room I will send" +
-         " them the messages stored for them. Ex. !Tell" +
-         " jimboJones Remember to bring that thing with you.";
    
-   public void onMessage(MessageEvent<PircBotX> event) throws Exception {
+   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
       String message = event.getMessage();
       String sender = event.getUser().getNick();
       
@@ -58,9 +67,6 @@ public class Tell extends ListenerAdapter<PircBotX> {
                      + " already has the max (" + MAX_MSG_QUEUE
                      + ") number of messages saved for them.");
             }
-         } else if(splitMsg.length == 2 && (splitMsg[1].equalsIgnoreCase("help") || splitMsg[1].equalsIgnoreCase("h"))){
-            // We handle help ourselves, see GitHub Issue #6
-            event.getUser().sendMessage(helpMessage);
          } else {
             event.getUser().sendMessage("The correct syntax is: !tell username Remember the milk");
          }

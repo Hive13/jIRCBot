@@ -1,7 +1,6 @@
 package org.hive13.jircbotx;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.hive13.jircbotx.listener.Linkify;
 import org.hive13.jircbotx.listener.Logger;
@@ -12,8 +11,6 @@ import org.hive13.jircbotx.listener.Temperature;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
-import org.pircbotx.hooks.ListenerAdapter;
-import org.pircbotx.hooks.events.MessageEvent;
 
 /**
  * 

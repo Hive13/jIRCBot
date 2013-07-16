@@ -3,18 +3,23 @@ package org.hive13.jircbotx.listener;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.UrlTools;
 import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 
-public class Linkify extends ListenerAdapter<PircBotX> {
+public class Linkify extends ListenerAdapterX {
    public final int        MAX_URL_LENGTH  = 25;
    public final boolean    USE_BITLY_TITLE = true;
    public final boolean    WAIT_FOR_TITLE  = true;
    public final int        WAIT_FOR_TITLE_TIMEOUT  = 5000;
    
-   public void onMessage(MessageEvent<PircBotX> event) throws Exception {
+   public Linkify()
+   {
+      bHideCommand = true;
+   }
+   
+   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
       String message = event.getMessage();
       String regex = "(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\[\\]\\(\\)\\w\\-\\.,@?^=%&amp;:/~\\+#!]*[\\[\\]\\(\\)\\w\\-\\@?^=%&amp;/~\\+#!])";
       Pattern p = Pattern.compile(regex);
@@ -40,5 +45,15 @@ public class Linkify extends ListenerAdapter<PircBotX> {
           event.getBot().sendMessage(event.getChannel(), returnMsg);
       }
       
+   }
+
+   @Override
+   public String getCommandName() {
+      return "linkify";
+   }
+
+   @Override
+   public String getHelp() {
+      return "";
    }
 }

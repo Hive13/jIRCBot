@@ -3,11 +3,11 @@ package org.hive13.jircbotx.listener;
 import java.util.Iterator;
 
 import org.hive13.jircbotx.JIRCBotX.eMsgTypes;
+import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.BotDatabase;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -15,10 +15,24 @@ import org.pircbotx.hooks.events.NickChangeEvent;
 import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.QuitEvent;
 
-public class Logger extends ListenerAdapter<PircBotX> {
+public class Logger extends ListenerAdapterX {
 
+   public Logger()
+   {
+      bHideCommand = false;
+   }
    
-   public void onMessage(MessageEvent<PircBotX> event) throws Exception {
+   @Override
+   public String getCommandName() {
+      return "logger";
+   }
+
+   @Override
+   public String getHelp() {
+      return "";
+   }
+   
+   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
       logEvent(event.getChannel(), event.getBot().getServer(), event.getUser(), event.getMessage(), eMsgTypes.publicMsg);
    }
    
