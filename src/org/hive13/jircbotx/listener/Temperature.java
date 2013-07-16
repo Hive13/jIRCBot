@@ -8,10 +8,10 @@
  */
 package org.hive13.jircbotx.listener;
 
+import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.BotProperties;
 import org.hive13.jircbotx.support.WUndergroundAPI;
 import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 
 import java.io.IOException;
@@ -27,10 +27,20 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
-public class Temperature extends ListenerAdapter<PircBotX> {
+public class Temperature extends ListenerAdapterX {
    private URL tempFeedURL = null;
 
-   public void onMessage(MessageEvent<PircBotX> event) throws Exception {
+   @Override
+   public String getCommandName() {
+      return "temp";
+   }
+
+   @Override
+   public String getHelp() {
+      return "";
+   }
+   
+   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
       if(event.getMessage().toLowerCase().startsWith("!temp"))
       {
          // Retrieve the current Hive13 temperature
@@ -99,5 +109,4 @@ public class Temperature extends ListenerAdapter<PircBotX> {
          return pubDateCompare;
       }
    }
-   
 }
