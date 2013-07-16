@@ -3,6 +3,7 @@ package org.hive13.jircbotx;
 import java.io.IOException;
 
 import org.hive13.jircbotx.listener.Linkify;
+import org.hive13.jircbotx.listener.Magic8Ball;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
@@ -48,6 +49,7 @@ public class JIRCBotX extends ListenerAdapter<PircBotX> implements
 
       bot.getListenerManager().addListener(new JIRCBotX());
       bot.getListenerManager().addListener(new Linkify());
+      bot.getListenerManager().addListener(new Magic8Ball());
       
       try {
          bot.connect("irc.freenode.net");
