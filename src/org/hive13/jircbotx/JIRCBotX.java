@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.hive13.jircbotx.listener.Linkify;
 import org.hive13.jircbotx.listener.Magic8Ball;
+import org.hive13.jircbotx.listener.Temperature;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
@@ -37,8 +38,8 @@ public class JIRCBotX extends ListenerAdapter<PircBotX> implements
     */
    public static void main(String[] args) {
       PircBotX bot = new PircBotX();
-      bot.setName("Hive13Bot_InTraining");
-      bot.setLogin("Hive13Bot");
+      bot.setName("H13Bot_Dev");
+      bot.setLogin("H13Bot_Dev");
 
       bot.setAutoNickChange(true);
       bot.setAutoReconnect(true);
@@ -50,6 +51,7 @@ public class JIRCBotX extends ListenerAdapter<PircBotX> implements
       bot.getListenerManager().addListener(new JIRCBotX());
       bot.getListenerManager().addListener(new Linkify());
       bot.getListenerManager().addListener(new Magic8Ball());
+      bot.getListenerManager().addListener(new Temperature());
       
       try {
          bot.connect("irc.freenode.net");
