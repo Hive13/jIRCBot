@@ -1,7 +1,9 @@
 package org.hive13.jircbotx;
 
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.hive13.jircbotx.JIRCBotX.eMsgTypes;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 
@@ -13,17 +15,18 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
    
    protected ListenerThreadRunnable listenerThreadChild = null;
 
-   public ListenerThreadX()
+   public ListenerThreadX(PircBotX bot)
    {
-      this("", LOOP_DELAY_DEFAULT);
+      this(bot, "", LOOP_DELAY_DEFAULT);
    }
-   public ListenerThreadX(String channelList)
+   public ListenerThreadX(PircBotX bot, String channelList)
    {
-      this(channelList, LOOP_DELAY_DEFAULT);
+      this(bot, channelList, LOOP_DELAY_DEFAULT);
    }
-   public ListenerThreadX(String channelList, long loopDelay)
+   public ListenerThreadX(PircBotX bot, String channelList, long loopDelay)
    {
       super(channelList);
+      this.bot = bot;
       this.loopDelay = loopDelay;
    }
    
@@ -47,7 +50,7 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
    protected void handleMessage(MessageEvent<PircBotX> event) throws Exception {
       String splitMessage[] = event.getMessage().toLowerCase().split(" ");
       
-      if (splitMessage.length > 1 ) {
+      if (splitMessage.length > 1 && splitMessage[0].equals("!" + getCommandName())) {
          if (splitMessage[1].equals("stop")) {
             stopCommandThread();
          } else if (splitMessage[1].equals("start")){
@@ -56,6 +59,47 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
       } 
    }
 
+   /**
+    * This is a wrapper for the bot.sendMessage command. It automatically sends
+    * any messages to the correct channel. It also acts as a way to prevent the
+    * command from sending messages before it is connected to the server.
+    * 
+    * @param message
+    *            A text message to send to the channel the command is based in.
+    */
+   public void sendMessage(String message) {
+      this.sendMessage(message, eMsgTypes.LogFreeMsg);
+   }
+   
+   /**
+    * This is a wrapper for the bot.sendMessage command. It automatically sends
+    * any messages to the correct channel. It also acts as a way to prevent the
+    * command from sending messages before it is connected to the server.
+    * 
+    * @param message
+    *            A text message to send to the channel the command is based in.
+    */
+   public void sendMessage(String message, eMsgTypes msgType) {
+      if (bot.isConnected()) {
+         Iterator<String> chanIt = ListenerChannelList.iterator();
+         while(chanIt.hasNext())
+            bot.sendMessage(chanIt.next(), message);
+      } else {
+         // Do nothing...  old reconnect & warn code below
+         /*
+         if(bot.abConnecting.get()) {
+            bot.log("Bot currently connecting, tried to send: " + message,
+                  eLogLevel.warning);
+         } else {
+            // The bot is both not connected currently and is not
+            // trying to connect.  Tell it to try to connect.
+            bot.connectBot();
+            bot.log("Bot not connected, tried to send: " + message,
+                  eLogLevel.warning);
+         }//*/
+      }
+   }
+   
    /**
     * This method will safely start an instance of the command thread. If an
     * instance of the commandThread exists but is not running, it restarts that
