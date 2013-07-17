@@ -2,6 +2,8 @@ package org.hive13.jircbotx;
 
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.hive13.jircbotx.JIRCBotX.eMsgTypes;
 import org.pircbotx.PircBotX;
@@ -80,11 +82,12 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
     *            A text message to send to the channel the command is based in.
     */
    public void sendMessage(String message, eMsgTypes msgType) {
-      if (bot.isConnected()) {
+      if (botIsInChannels()) {
          Iterator<String> chanIt = ListenerChannelList.iterator();
          while(chanIt.hasNext())
             bot.sendMessage(chanIt.next(), message);
       } else {
+         Logger.getLogger(ListenerThreadX.class.getName()).log(Level.INFO, getCommandName() + " tried to send [" + message + "] to its channels but the bot reported it was not connected to those channels.");
          // Do nothing...  old reconnect & warn code below
          /*
          if(bot.abConnecting.get()) {
@@ -128,6 +131,28 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
       } else {
          sendMessage("The " + getCommandName() + " thread is not running.", eMsgTypes.publicMsg);
       }
+   }
+   
+   private boolean botIsInChannels()
+   {
+      boolean result = bot.isConnected();
+      
+      Iterator<String> itChanJoinList = ListenerChannelList.iterator();
+      
+      while(result && itChanJoinList.hasNext())
+      {
+         boolean foundChan = false;
+         String channel = itChanJoinList.next();
+         Iterator<String> itChanInList = bot.getChannelsNames().iterator();
+         while(!foundChan && itChanInList.hasNext())
+         {
+            if(itChanInList.next().equalsIgnoreCase(channel))
+               foundChan = true;
+         }
+         result &= foundChan;
+      }
+      
+      return result;
    }
    
    /**
