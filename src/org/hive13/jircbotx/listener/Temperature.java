@@ -37,7 +37,7 @@ public class Temperature extends ListenerAdapterX {
 
    @Override
    public String getHelp() {
-      return "";
+      return "Returns the current temperature inside and outside the hackerspace.";
    }
    
    public void handleMessage(MessageEvent<PircBotX> event) throws Exception {

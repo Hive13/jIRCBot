@@ -9,8 +9,20 @@ import org.pircbotx.hooks.events.MessageEvent;
 public abstract class ListenerAdapterX extends ListenerAdapter<PircBotX> {
    
    
-   protected ArrayList<String> ListenerChannelList = new ArrayList<String>();
+   protected ArrayList<String> ListenerChannelList;
 
+   public ListenerAdapterX() { this(""); }
+   public ListenerAdapterX(String channelList)
+   {
+      ListenerChannelList = new ArrayList<String>();
+      
+      String[] splitList = channelList.split(",");
+      for(int i = 0; i < splitList.length; ++i)
+      {
+         ListenerChannelList.add(splitList[i]);
+      }
+   }
+   
    public boolean shouldListenToChannel(String channel)
    {
       return (!isChannelRestricted() || (isChannelRestricted() && isListenerChannel(channel)));
