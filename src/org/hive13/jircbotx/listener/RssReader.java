@@ -83,6 +83,7 @@ public class RssReader extends ListenerThreadX {
     * @param feedURL    The RSS Feed's source URL.
     * @param refreshRate   How often should we check this RSS feed?
     */
+   @SuppressWarnings("unchecked")
    public RssReader(PircBotX bot, String commandName, String channelList,
          String formatString, URL feedURL, long refreshRate) {
       super(bot, channelList, refreshRate);
