@@ -50,7 +50,7 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
    protected void handleMessage(MessageEvent<PircBotX> event) throws Exception {
       String splitMessage[] = event.getMessage().toLowerCase().split(" ");
       
-      if (splitMessage.length > 1 && splitMessage[0].equals("!" + getCommandName())) {
+      if (splitMessage.length > 1 && splitMessage[0].equals("!" + getCommandName().toLowerCase())) {
          if (splitMessage[1].equals("stop")) {
             stopCommandThread();
          } else if (splitMessage[1].equals("start")){
@@ -110,10 +110,10 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
          listenerThreadChild = new ListenerThreadRunnable(loopDelay);
       }
       if (!listenerThreadChild.getIsRunning()) {
-         //sendMessage("Starting the " + getSimpleCommandName() + " command thread.", eMsgTypes.publicMsg);
+         sendMessage("Starting the " + getCommandName() + " thread.", eMsgTypes.publicMsg);
          new Thread(listenerThreadChild).start();
       } else {
-         //sendMessage("The " + listenerThreadChild() + " command thread is already running.", eMsgTypes.publicMsg);
+         sendMessage("The " + getCommandName() + " thread is already running.", eMsgTypes.publicMsg);
       }
    }
 
@@ -123,10 +123,10 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
     */
    public void stopCommandThread() {
       if (listenerThreadChild != null && listenerThreadChild.getIsRunning()) {
-         //sendMessage("Stopping the " + getCommandName() + " command thread.", eMsgTypes.publicMsg);
+         sendMessage("Stopping the " + getCommandName() + " thread.", eMsgTypes.publicMsg);
          listenerThreadChild.stop();
       } else {
-         //sendMessage("The " + getCommandName() + " command thread is not running.", eMsgTypes.publicMsg);
+         sendMessage("The " + getCommandName() + " thread is not running.", eMsgTypes.publicMsg);
       }
    }
    

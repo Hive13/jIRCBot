@@ -3,9 +3,12 @@ package org.hive13.jircbotx.listener;
 import org.hive13.jircbotx.ListenerAdapterX;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.QuitEvent;
 
 public class Quit extends ListenerAdapterX {
 
+   boolean ranQuit = false;
+   
    // TODO: Add an auth level restriction to 'Quit', for now we hide it.
    public Quit()
    {
@@ -26,8 +29,14 @@ public class Quit extends ListenerAdapterX {
       if (event.getMessage().toLowerCase().startsWith("!quit"))
       {
          event.getBot().quitServer();
-         System.exit(0);
-         
+         ranQuit = true;
       }
    }
+   
+   public void onQuit(QuitEvent<PircBotX> event) throws Exception {
+      if(ranQuit)
+         System.exit(0);
+   }
+   
+   
 }

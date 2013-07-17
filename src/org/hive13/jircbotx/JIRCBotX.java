@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import org.hive13.jircbotx.listener.Linkify;
 import org.hive13.jircbotx.listener.ChannelLogger;
 import org.hive13.jircbotx.listener.Magic8Ball;
+import org.hive13.jircbotx.listener.Plugins;
 import org.hive13.jircbotx.listener.Quit;
 import org.hive13.jircbotx.listener.RssReader;
 import org.hive13.jircbotx.listener.Tell;
@@ -69,6 +70,7 @@ public class JIRCBotX {
       bot.getListenerManager().addListener(new Tell());
       bot.getListenerManager().addListener(new ChannelLogger());
       bot.getListenerManager().addListener(new Quit());
+      bot.getListenerManager().addListener(new Plugins(bot));
       
       try {
          bot.getListenerManager().addListener(new RssReader(bot, "DoorAlert", botChannel, "http://www.hive13.org/isOpen/RSS.php"));
