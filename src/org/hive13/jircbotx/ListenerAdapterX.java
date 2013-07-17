@@ -19,7 +19,8 @@ public abstract class ListenerAdapterX extends ListenerAdapter<PircBotX> {
       String[] splitList = channelList.split(",");
       for(int i = 0; i < splitList.length; ++i)
       {
-         ListenerChannelList.add(splitList[i]);
+         if(!splitList[i].isEmpty())
+            ListenerChannelList.add(splitList[i]);
       }
    }
    
@@ -33,11 +34,11 @@ public abstract class ListenerAdapterX extends ListenerAdapter<PircBotX> {
    }
    public boolean isListenerChannel(String channel)
    {
-      return ListenerChannelList.contains(ListenerChannelList);
+      return ListenerChannelList.contains(channel.toLowerCase());
    }
    public void addListenerChannels(String channel)
    {
-      String[] splitChannels = channel.split(",");
+      String[] splitChannels = channel.toLowerCase().split(",");
       for(int i = 0; i < splitChannels.length; ++i)
       {
          ListenerChannelList.add(splitChannels[i]);
