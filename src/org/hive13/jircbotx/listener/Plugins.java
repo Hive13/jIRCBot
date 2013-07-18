@@ -2,22 +2,22 @@ package org.hive13.jircbotx.listener;
 
 import java.util.Iterator;
 
+import org.hive13.jircbotx.JircBotX;
 import org.hive13.jircbotx.ListenerAdapterX;
-import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.events.MessageEvent;
 
 public class Plugins extends ListenerAdapterX {
 
-   private PircBotX bot;
+   private JircBotX bot;
    
-   public Plugins(PircBotX bot)
+   public Plugins(JircBotX bot)
    {
       this.bot = bot;
    }
 
    @Override
-   public void handleMessage(MessageEvent<PircBotX> event) throws Exception
+   public void handleMessage(MessageEvent<JircBotX> event) throws Exception
    {
       String[] splitMsg = event.getMessage().split(" ");
       if(splitMsg.length > 0 && splitMsg[0].equals("!" + getCommandName()))

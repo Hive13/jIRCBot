@@ -8,10 +8,10 @@
  */
 package org.hive13.jircbotx.listener;
 
+import org.hive13.jircbotx.JircBotX;
 import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.BotProperties;
 import org.hive13.jircbotx.support.WUndergroundAPI;
-import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class Temperature extends ListenerAdapterX {
       return "Returns the current temperature inside and outside the hackerspace.";
    }
    
-   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
+   public void handleMessage(MessageEvent<JircBotX> event) throws Exception {
       if(event.getMessage().toLowerCase().startsWith("!temp"))
       {
          // Retrieve the current Hive13 temperature

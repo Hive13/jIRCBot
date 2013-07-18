@@ -5,27 +5,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.hive13.jircbotx.HiveBot.eMsgTypes;
-import org.pircbotx.PircBotX;
+import org.hive13.jircbotx.JircBotX.eMsgTypes;
 import org.pircbotx.hooks.events.MessageEvent;
 
 public abstract class ListenerThreadX extends ListenerAdapterX {
    private static final int LOOP_DELAY_DEFAULT = 30000; // 30 seconds
    
-   protected PircBotX bot = null;
+   protected JircBotX bot = null;
    protected long loopDelay = LOOP_DELAY_DEFAULT;
    
    protected ListenerThreadRunnable listenerThreadChild = null;
 
-   public ListenerThreadX(PircBotX bot)
+   public ListenerThreadX(JircBotX bot)
    {
       this(bot, "", LOOP_DELAY_DEFAULT);
    }
-   public ListenerThreadX(PircBotX bot, String channelList)
+   public ListenerThreadX(JircBotX bot, String channelList)
    {
       this(bot, channelList, LOOP_DELAY_DEFAULT);
    }
-   public ListenerThreadX(PircBotX bot, String channelList, long loopDelay)
+   public ListenerThreadX(JircBotX bot, String channelList, long loopDelay)
    {
       super(channelList);
       this.bot = bot;
@@ -49,7 +48,7 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
     * 3. ListenerAdapterX then calls this 'handleMessage' which is described above.
     */
    @Override
-   protected void handleMessage(MessageEvent<PircBotX> event) throws Exception {
+   protected void handleMessage(MessageEvent<JircBotX> event) throws Exception {
       String splitMessage[] = event.getMessage().toLowerCase().split(" ");
       
       if (splitMessage.length > 1 && splitMessage[0].equals("!" + getCommandName().toLowerCase())) {

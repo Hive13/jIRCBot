@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.hive13.jircbotx.JircBotX;
 import org.hive13.jircbotx.ListenerAdapterX;
-import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 
 public class Tell extends ListenerAdapterX {
@@ -40,7 +40,7 @@ public class Tell extends ListenerAdapterX {
    private final int MAX_MSG_QUEUE = 10;
    private HashMap<String, ArrayList<storedMsg>> msgMap = new HashMap<String, ArrayList<storedMsg>>();
    
-   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
+   public void handleMessage(MessageEvent<JircBotX> event) throws Exception {
       String message = event.getMessage();
       String sender = event.getUser().getNick();
       

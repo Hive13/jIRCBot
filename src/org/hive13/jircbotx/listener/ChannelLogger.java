@@ -2,11 +2,11 @@ package org.hive13.jircbotx.listener;
 
 import java.util.Iterator;
 
-import org.hive13.jircbotx.HiveBot.eMsgTypes;
+import org.hive13.jircbotx.JircBotX.eMsgTypes;
+import org.hive13.jircbotx.JircBotX;
 import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.BotDatabase;
 import org.pircbotx.Channel;
-import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.JoinEvent;
@@ -32,25 +32,26 @@ public class ChannelLogger extends ListenerAdapterX {
       return "";
    }
    
-   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
+   @Override
+   public void handleMessage(MessageEvent<JircBotX> event) throws Exception {
       logEvent(event.getChannel(), event.getBot().getServer(), event.getUser(), event.getMessage(), eMsgTypes.publicMsg);
    }
    
-   public void onAction(ActionEvent<PircBotX> event) {
+   public void onAction(ActionEvent<JircBotX> event) {
       logEvent(event.getChannel(), event.getBot().getServer(), event.getUser(), event.getMessage(), eMsgTypes.actionMsg);
    }
    
-   public void onNickChange(NickChangeEvent<PircBotX> event) {
+   public void onNickChange(NickChangeEvent<JircBotX> event) {
       // This is a User changing their Nick.
       // This could be US changing our Nick, but who cares if we change our
       // nick?
       logEvent(null, event.getBot().getServer(), event.getUser(), event.getOldNick(), event.getNewNick(), eMsgTypes.actionMsg);
    }
    
-   public void onJoin(JoinEvent<PircBotX> event) {
+   public void onJoin(JoinEvent<JircBotX> event) {
       logEvent(event.getChannel(), event.getBot().getServer(), event.getUser(), "", eMsgTypes.joinMsg);
    }
-   public void onPart(PartEvent<PircBotX> event) {
+   public void onPart(PartEvent<JircBotX> event) {
       // TODO: Make sure the following statements are still true, at its worse, we will just be doing an unnecessary check...
       // This function is called when a user leaves a channel we are in.
       // This function is also called when WE leave a channel.
@@ -60,7 +61,7 @@ public class ChannelLogger extends ListenerAdapterX {
       }
    }
 
-   public void onQuit(QuitEvent<PircBotX> event) {
+   public void onQuit(QuitEvent<JircBotX> event) {
       // Send event for all channel's 'User' is in, therefore pass a 'null' channel.
       logEvent(null, event.getBot().getServer(), event.getUser(), "", eMsgTypes.quitMsg);
    }

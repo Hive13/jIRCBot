@@ -1,7 +1,7 @@
 package org.hive13.jircbotx.listener;
 
+import org.hive13.jircbotx.JircBotX;
 import org.hive13.jircbotx.ListenerAdapterX;
-import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 
 import java.util.Random;
@@ -21,7 +21,7 @@ public class Magic8Ball extends ListenerAdapterX {
            "Very doubtful"};
    
 
-   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
+   public void handleMessage(MessageEvent<JircBotX> event) throws Exception {
       String message = event.getMessage().toLowerCase();
       if((message.startsWith(event.getBot().getNick().toLowerCase()) && message.endsWith("?")) ||
             message.startsWith("!" + getCommandName()) ||

@@ -19,11 +19,11 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hive13.jircbotx.HiveBot.eMsgTypes;
+import org.hive13.jircbotx.JircBotX;
+import org.hive13.jircbotx.JircBotX.eMsgTypes;
 import org.hive13.jircbotx.ListenerThreadX;
 import org.hive13.jircbotx.support.BotProperties;
 import org.hive13.jircbotx.support.UrlTools;
-import org.pircbotx.PircBotX;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -46,25 +46,25 @@ public class RssReader extends ListenerThreadX {
 
    private String commandName = "";
    
-   public RssReader(PircBotX bot, String commandName, String channelList,
+   public RssReader(JircBotX bot, String commandName, String channelList,
          String rssFeedLink) throws MalformedURLException {
       this(bot, commandName, channelList,
             "[commandName] - [Title|c50] ( [Link] )", new URL(rssFeedLink),
             30 * 1000);
    }
-   public RssReader(PircBotX bot, String commandName, String channelList,
+   public RssReader(JircBotX bot, String commandName, String channelList,
          String rssFeedLink, long refreshRate) throws MalformedURLException {
       this(bot, commandName, channelList,
             "[commandName] - [Title|c50] ( [Link] )", new URL(rssFeedLink),
             refreshRate);
    }
-   public RssReader(PircBotX bot, String commandName, String channelList,
+   public RssReader(JircBotX bot, String commandName, String channelList,
          String formatString, String rssFeedLink)
          throws MalformedURLException {
       this(bot, commandName, channelList, formatString, new URL(rssFeedLink),
             30 * 1000);
    }
-   public RssReader(PircBotX bot, String commandName, String channelList,
+   public RssReader(JircBotX bot, String commandName, String channelList,
          String formatString, String rssFeedLink, long refreshRate)
          throws MalformedURLException {
       this(bot, commandName, channelList, formatString, new URL(rssFeedLink),
@@ -84,7 +84,7 @@ public class RssReader extends ListenerThreadX {
     * @param refreshRate   How often should we check this RSS feed?
     */
    @SuppressWarnings("unchecked")
-   public RssReader(PircBotX bot, String commandName, String channelList,
+   public RssReader(JircBotX bot, String commandName, String channelList,
          String formatString, URL feedURL, long refreshRate) {
       super(bot, channelList, refreshRate);
       this.formatString = formatString;

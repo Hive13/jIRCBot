@@ -5,11 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.hive13.jircbotx.JircBotX;
 import org.hive13.jircbotx.HiveBot;
 import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.BotProperties;
 import org.pircbotx.Channel;
-import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -38,7 +38,7 @@ public class UserAuth extends ListenerAdapterX {
    }
 
    @Override
-   protected void handleMessage(MessageEvent<PircBotX> event) 
+   protected void handleMessage(MessageEvent<JircBotX> event) 
    {      
       String[] splitMessage = event.getMessage().split(" ");
       if(splitMessage.length > 0 && splitMessage[0].equalsIgnoreCase("!" + getCommandName()))
@@ -114,13 +114,13 @@ public class UserAuth extends ListenerAdapterX {
     * @see org.pircbotx.hooks.ListenerAdapter#onUserList(org.pircbotx.hooks.events.UserListEvent)
     */
    @Override
-   public void onUserList(UserListEvent<PircBotX> event) throws Exception {
+   public void onUserList(UserListEvent<JircBotX> event) throws Exception {
       super.onUserList(event);
       AuthCheckUsersInList(event.getBot(), event.getChannel(), event.getUsers());  
    }
 
    @Override
-   public void onJoin(JoinEvent<PircBotX> event) throws Exception {
+   public void onJoin(JoinEvent<JircBotX> event) throws Exception {
       super.onJoin(event);
       if(event.getUser().equals(event.getBot().getUserBot()))
       {
@@ -133,7 +133,7 @@ public class UserAuth extends ListenerAdapterX {
       }
    }
 
-   private void AuthCheckUsersInList(PircBotX bot, Channel authChannel, Set<User> userList)
+   private void AuthCheckUsersInList(JircBotX bot, Channel authChannel, Set<User> userList)
    {
       Iterator<User> itUsers = userList.iterator();
       
@@ -142,7 +142,7 @@ public class UserAuth extends ListenerAdapterX {
          AuthCheckUser(bot, authChannel, itUsers.next());
       }
    }
-   private void AuthCheckUser(PircBotX bot, Channel authChannel, User authUser)
+   private void AuthCheckUser(JircBotX bot, Channel authChannel, User authUser)
    {
       try {
          String regName = HiveBot.getRegisteredName(authUser.getNick());

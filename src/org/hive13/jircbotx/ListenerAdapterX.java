@@ -2,11 +2,10 @@ package org.hive13.jircbotx;
 
 import java.util.ArrayList;
 
-import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 
-public abstract class ListenerAdapterX extends ListenerAdapter<PircBotX> {
+public abstract class ListenerAdapterX extends ListenerAdapter<JircBotX> {
    
    
    protected ArrayList<String> ListenerChannelList;
@@ -56,7 +55,7 @@ public abstract class ListenerAdapterX extends ListenerAdapter<PircBotX> {
       return bHideCommand;
    }
    
-   public final void onMessage(MessageEvent<PircBotX> event) throws Exception
+   public final void onMessage(MessageEvent<JircBotX> event) throws Exception
    {
       if(shouldListenToChannel(event.getChannel().getName()))
       {
@@ -86,7 +85,7 @@ public abstract class ListenerAdapterX extends ListenerAdapter<PircBotX> {
     * This method is internal to the commands. If a command wants to receive the 'onMessage'
     * function, it needs to use handleMessage instead. 
     */
-   protected void handleMessage(MessageEvent<PircBotX> event) throws Exception {}
+   protected void handleMessage(MessageEvent<JircBotX> event) throws Exception {}
    
    /**
     * This method returns a unique name for the command.
