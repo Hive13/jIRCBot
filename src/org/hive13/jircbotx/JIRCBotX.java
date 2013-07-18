@@ -1,7 +1,12 @@
 package org.hive13.jircbotx;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.hive13.jircbotx.listener.Linkify;
 import org.hive13.jircbotx.listener.ChannelLogger;
@@ -12,6 +17,7 @@ import org.hive13.jircbotx.listener.RssReader;
 import org.hive13.jircbotx.listener.Tell;
 import org.hive13.jircbotx.listener.Temperature;
 import org.hive13.jircbotx.listener.UserAuth;
+import org.hive13.jircbotx.support.BotProperties;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
@@ -56,10 +62,23 @@ public class JIRCBotX {
     * @param args
     */
    public static void main(String[] args) {
-      String botChannel = "#hive13";
+      Properties config = new Properties();
+      try {
+         config.load(new FileInputStream("jIRCBot.properties"));
+      } catch (FileNotFoundException e2) {
+         Logger.getLogger(JIRCBotX.class.getName()).log(Level.SEVERE, null,
+               e2);
+      } catch (IOException e2) {
+         Logger.getLogger(JIRCBotX.class.getName()).log(Level.SEVERE, null,
+               e2);
+      }
+      
+      String[] botChannels = BotProperties.getInstance().getChannels();
+      String botChannel = botChannels[0];
+      
       bot = new PircBotX();
-      bot.setName("H13Bot_Dev");
-      bot.setLogin("H13Bot_Dev");
+      bot.setName(BotProperties.getInstance().getBotName());
+      bot.setLogin(BotProperties.getInstance().getBotName());
 
       bot.setAutoNickChange(true);
       bot.setAutoReconnect(true);
@@ -89,7 +108,10 @@ public class JIRCBotX {
       }
       
       try {
-         bot.connect("irc.freenode.net");
+         bot.connect(BotProperties.getInstance().getServer(), 
+               6667, 
+               BotProperties.getInstance().getBotPass());
+         
          bot.joinChannel(botChannel);
       } catch (NickAlreadyInUseException e) {
          e.printStackTrace();
