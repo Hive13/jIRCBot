@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.hive13.jircbotx.JIRCBotX.eMsgTypes;
+import org.hive13.jircbotx.HiveBot.eMsgTypes;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 
