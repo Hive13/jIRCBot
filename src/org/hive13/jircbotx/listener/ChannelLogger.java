@@ -67,7 +67,7 @@ public class ChannelLogger extends ListenerAdapterX {
    
    private void logEvent(Channel EventChannel, String server, 
          User EventUser, String message, eMsgTypes msgType) {
-      logEvent(EventChannel, server, EventUser, message, EventUser.getNick(), msgType);
+      logEvent(EventChannel, server, EventUser, EventUser.getNick(), message, msgType);
    }
    
    // Use when you want to fake out the saved user
