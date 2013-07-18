@@ -11,9 +11,12 @@ import org.hive13.jircbotx.listener.Quit;
 import org.hive13.jircbotx.listener.RssReader;
 import org.hive13.jircbotx.listener.Tell;
 import org.hive13.jircbotx.listener.Temperature;
+import org.hive13.jircbotx.listener.UserAuth;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
+import org.pircbotx.hooks.WaitForQueue;
+import org.pircbotx.hooks.events.WhoisEvent;
 
 /**
  * 
@@ -22,6 +25,7 @@ import org.pircbotx.exception.NickAlreadyInUseException;
  */
 public class JIRCBotX {
 
+   private static PircBotX bot;
    /**
     * The different types of messages saved in the database.
     */
@@ -52,8 +56,8 @@ public class JIRCBotX {
     * @param args
     */
    public static void main(String[] args) {
-      String botChannel = "#hive13_bot";
-      PircBotX bot = new PircBotX();
+      String botChannel = "#hive13";
+      bot = new PircBotX();
       bot.setName("H13Bot_Dev");
       bot.setLogin("H13Bot_Dev");
 
@@ -71,6 +75,7 @@ public class JIRCBotX {
       bot.getListenerManager().addListener(new ChannelLogger());
       bot.getListenerManager().addListener(new Quit());
       bot.getListenerManager().addListener(new Plugins(bot));
+      bot.getListenerManager().addListener(new UserAuth());
       
       try {
          bot.getListenerManager().addListener(new RssReader(bot, "DoorAlert", botChannel, "http://www.hive13.org/isOpen/RSS.php"));
@@ -95,4 +100,18 @@ public class JIRCBotX {
       }
    }
 
+   public static String getRegisteredName(String userNick) throws InterruptedException
+   {
+      String result;
+      bot.sendRawLine("WHOIS " + userNick + " " + userNick);
+      WaitForQueue queue = new WaitForQueue(bot);
+      while(true) {
+         @SuppressWarnings("unchecked")
+         WhoisEvent<PircBotX> mevent = queue.waitFor(WhoisEvent.class);
+         result = mevent.getRegisteredAs();
+         break;
+      }
+      queue.close();
+      return result;
+   }
 }

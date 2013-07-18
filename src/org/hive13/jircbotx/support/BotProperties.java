@@ -101,9 +101,12 @@ public class BotProperties {
    }
 
    public String[] getOpChannels() {
-      // Since we only read the properties once, it does not make sense
+      return getOpChannels(false);
+   }
+   public String[] getOpChannels(boolean refreshList) {
+      // Since we only read the properties once (unless refreshed), it does not make sense
       // to repeatedly re-parse the channel string.
-      if(parsedChannels == null) {
+      if(parsedChannels == null || refreshList) {
          String channels = getProp("opChannels", defaultOpChannels);
          String splitChannels[] = channels.split(",");
          for (int i = 0; i < splitChannels.length; i++) {
@@ -199,10 +202,19 @@ public class BotProperties {
         }
         return cacheDirectory;
     }
+
     /**
      * Find the list of users that are to be authorized.
      */
     public List<String> getOpUserList() {
+        return getOpUserList(false);
+    }
+    /**
+     * Find the list of users that are to be authorized.
+     * @param refresh   Force refresh from the properties file.
+     * @return
+     */
+    public List<String> getOpUserList(boolean refresh) {
         // Since we only read the properties once, it does not make sense
         // to repeatedly re-parse the channel string.
         if(parsedOpList == null) {
