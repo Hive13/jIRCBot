@@ -2,6 +2,8 @@ package org.hive13.jircbotx;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.hive13.jircbotx.listener.Linkify;
 import org.hive13.jircbotx.listener.ChannelLogger;
@@ -73,9 +75,9 @@ public class JIRCBotX {
       // Currently the database is only used for chat log features.
       // Lets check to see if the database is enabled, and print out a log message.
       if (BotDatabase.jdbcEnabled == false)
-         bot.log("MySQL Chat logging is disabled.");
+         Logger.getLogger(JIRCBotX.class.getName()).log(Level.INFO, "MySQL Chat logging is disabled.");
       else
-         bot.log("MySQL Chat logging is enabled.");
+         Logger.getLogger(JIRCBotX.class.getName()).log(Level.INFO, "MySQL Chat logging is enabled.");
       
       String[] botChannels = BotProperties.getInstance().getChannels();
       String botChannel = botChannels[0];
