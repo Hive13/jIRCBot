@@ -17,6 +17,7 @@ import org.hive13.jircbotx.listener.RssReader;
 import org.hive13.jircbotx.listener.Tell;
 import org.hive13.jircbotx.listener.Temperature;
 import org.hive13.jircbotx.listener.UserAuth;
+import org.hive13.jircbotx.support.BotDatabase;
 import org.hive13.jircbotx.support.BotProperties;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
@@ -62,21 +63,28 @@ public class JIRCBotX {
     * @param args
     */
    public static void main(String[] args) {
-      Properties config = new Properties();
-      try {
-         config.load(new FileInputStream("jIRCBot.properties"));
-      } catch (FileNotFoundException e2) {
-         Logger.getLogger(JIRCBotX.class.getName()).log(Level.SEVERE, null,
-               e2);
-      } catch (IOException e2) {
-         Logger.getLogger(JIRCBotX.class.getName()).log(Level.SEVERE, null,
-               e2);
+
+      bot = new PircBotX();
+      
+      // Check to see if the database information is set correctly in the properties.
+      if (BotProperties.getInstance().getJDBCUrl().isEmpty()
+            || BotProperties.getInstance().getJDBCUser().isEmpty()
+            || BotProperties.getInstance().getJDBCPass().isEmpty()) {
+         BotDatabase.jdbcEnabled = false;
+      } else {
+         BotDatabase.jdbcEnabled = true;
       }
+
+      // Currently the database is only used for chat log features.
+      // Lets check to see if the database is enabled, and print out a log message.
+      if (BotDatabase.jdbcEnabled == false)
+         bot.log("MySQL Chat logging is disabled.");
+      else
+         bot.log("MySQL Chat logging is enabled.");
       
       String[] botChannels = BotProperties.getInstance().getChannels();
       String botChannel = botChannels[0];
       
-      bot = new PircBotX();
       bot.setName(BotProperties.getInstance().getBotName());
       bot.setLogin(BotProperties.getInstance().getBotName());
 
