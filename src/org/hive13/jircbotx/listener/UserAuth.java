@@ -47,7 +47,7 @@ public class UserAuth extends ListenerAdapterX {
          {  // Support for "!op" to recheck a user's op status.
 
             // Force a refresh of the op whitelist.
-            opList = BotProperties.getInstance().getOpUserList(true); 
+            opList = BotProperties.refresh().getOpUserList(true); 
             
             // Check the calling user's op status against the op whitelist.
             AuthCheckUser(event.getBot(), event.getChannel(), event.getUser());
@@ -56,7 +56,7 @@ public class UserAuth extends ListenerAdapterX {
          {  // Support for "!op recheck" to re-check all user's in a channel's op status.
             
             // force a refresh of the op userlist.
-            opList = BotProperties.getInstance().getOpUserList(true); 
+            opList = BotProperties.refresh().getOpUserList(); 
             
             // Go through the user's in the channel and re-check their authorization status.
             AuthCheckUsersInList(event.getBot(), event.getChannel(), event.getChannel().getUsers());
@@ -125,7 +125,7 @@ public class UserAuth extends ListenerAdapterX {
       if(event.getUser().equals(event.getBot().getUserBot()))
       {
          // TODO: Find a better way for the bot to op itself.
-         event.getBot().sendMessage("chanserv", "op " + event.getChannel());
+         event.getBot().sendMessage("chanserv", "op " + event.getChannel().getName());
       }
       else
       {
@@ -146,7 +146,7 @@ public class UserAuth extends ListenerAdapterX {
    {
       try {
          String regName = JIRCBotX.getRegisteredName(authUser.getNick());
-         if(regName != null && opList.contains(regName))
+         if(regName != null && opList.contains(regName) && !authUser.getChannelsOpIn().contains(authChannel))
          {
             bot.op(authChannel, authUser);
          }

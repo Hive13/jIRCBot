@@ -28,7 +28,7 @@ public class Quit extends ListenerAdapterX {
    public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
       if (event.getMessage().toLowerCase().startsWith("!quit"))
       {
-         event.getBot().quitServer();
+         event.getBot().quitServer("Goodbye cruel world!");
          ranQuit = true;
       }
    }
