@@ -86,7 +86,7 @@ public abstract class ListenerAdapterX extends ListenerAdapter<PircBotX> {
     * This method is internal to the commands. If a command wants to receive the 'onMessage'
     * function, it needs to use handleMessage instead. 
     */
-   protected void handleMessage(MessageEvent<PircBotX> event) throws Exception {};
+   protected void handleMessage(MessageEvent<PircBotX> event) throws Exception {}
    
    /**
     * This method returns a unique name for the command.
