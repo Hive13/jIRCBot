@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.hive13.jircbotx.JIRCBotX;
+import org.hive13.jircbotx.HiveBot;
 import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.BotProperties;
 import org.pircbotx.Channel;
@@ -145,7 +145,7 @@ public class UserAuth extends ListenerAdapterX {
    private void AuthCheckUser(PircBotX bot, Channel authChannel, User authUser)
    {
       try {
-         String regName = JIRCBotX.getRegisteredName(authUser.getNick());
+         String regName = HiveBot.getRegisteredName(authUser.getNick());
          if(regName != null && opList.contains(regName) && !authUser.getChannelsOpIn().contains(authChannel))
          {
             bot.op(authChannel, authUser);

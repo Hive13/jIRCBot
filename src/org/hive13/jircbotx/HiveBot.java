@@ -27,7 +27,7 @@ import org.pircbotx.hooks.events.WhoisEvent;
  * @author vincentp
  * 
  */
-public class JIRCBotX {
+public class HiveBot {
 
    private static PircBotX bot;
    /**
@@ -75,9 +75,9 @@ public class JIRCBotX {
       // Currently the database is only used for chat log features.
       // Lets check to see if the database is enabled, and print out a log message.
       if (BotDatabase.jdbcEnabled == false)
-         Logger.getLogger(JIRCBotX.class.getName()).log(Level.INFO, "MySQL Chat logging is disabled.");
+         Logger.getLogger(HiveBot.class.getName()).log(Level.INFO, "MySQL Chat logging is disabled.");
       else
-         Logger.getLogger(JIRCBotX.class.getName()).log(Level.INFO, "MySQL Chat logging is enabled.");
+         Logger.getLogger(HiveBot.class.getName()).log(Level.INFO, "MySQL Chat logging is enabled.");
       
       String[] botChannels = BotProperties.getInstance().getChannels();
       String botChannel = botChannels[0];
@@ -108,6 +108,8 @@ public class JIRCBotX {
          bot.getListenerManager().addListener(new RssReader(bot, "Flickr", botChannel, "[commandName]: [Title|c50] ([Link])", "http://api.flickr.com/services/feeds/photos_public.gne?tags=hive13&lang=en-us&format=rss_200", 15 * 60 * 1000)); // 15 min refresh period.
          bot.getListenerManager().addListener(new RssReader(bot, "Youtube", botChannel, "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])", "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
          bot.getListenerManager().addListener(new RssReader(bot, "Vimeo", botChannel, "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])", "http://vimeo.com/groups/hive13/videos/rss"));
+         bot.getListenerManager().addListener(new RssReader(bot, "HiveList", botChannel, "[commandName]: [Title|c50] ~[Author|c20|r\\(.+\\)] ([Link])", "https://groups.google.com/forum/feed/cincihackerspace/msgs/atom.xml?num=15"));
+      
       } catch (MalformedURLException e1) {
          e1.printStackTrace();
       }

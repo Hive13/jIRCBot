@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hive13.jircbotx.JIRCBotX.eMsgTypes;
+import org.hive13.jircbotx.HiveBot.eMsgTypes;
 import org.hive13.jircbotx.ListenerThreadX;
 import org.hive13.jircbotx.support.BotProperties;
 import org.hive13.jircbotx.support.UrlTools;

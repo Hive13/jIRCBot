@@ -2,7 +2,7 @@ package org.hive13.jircbotx.listener;
 
 import java.util.Iterator;
 
-import org.hive13.jircbotx.JIRCBotX.eMsgTypes;
+import org.hive13.jircbotx.HiveBot.eMsgTypes;
 import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.BotDatabase;
 import org.pircbotx.Channel;

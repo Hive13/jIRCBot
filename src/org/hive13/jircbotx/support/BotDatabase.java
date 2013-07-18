@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 
 import javax.naming.directory.InvalidAttributesException;
 
-import org.hive13.jircbotx.JIRCBotX;
-import org.hive13.jircbotx.JIRCBotX.eMsgTypes;
+import org.hive13.jircbotx.HiveBot;
+import org.hive13.jircbotx.HiveBot.eMsgTypes;
 
 public class BotDatabase {
 
@@ -95,7 +95,7 @@ public class BotDatabase {
            if ((chanID = insertChannel(channel, server)) == -1) { // Did the
                                                                   // create
                                                                   // work?
-               Logger.getLogger(JIRCBotX.class.getName()).log(
+               Logger.getLogger(HiveBot.class.getName()).log(
                        Level.SEVERE,
                        "Failed to insert new channel: " + channel + "@"
                                + server + "\n");
@@ -146,7 +146,7 @@ public class BotDatabase {
            if ((chanID = insertChannel(channel, server)) == -1) { // Did the
                                                                   // create
                                                                   // work?
-               Logger.getLogger(JIRCBotX.class.getName()).log(
+               Logger.getLogger(HiveBot.class.getName()).log(
                        Level.SEVERE,
                        "Failed to insert new channel: " + channel + "@"
                                + server + "\n");
