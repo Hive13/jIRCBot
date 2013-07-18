@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.UrlTools;
-import org.pircbotx.PircBotX;
+import org.hive13.jircbotx.JircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 
 public class Linkify extends ListenerAdapterX {
@@ -19,7 +19,7 @@ public class Linkify extends ListenerAdapterX {
       bHideCommand = true;
    }
    
-   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
+   public void handleMessage(MessageEvent<JircBotX> event) throws Exception {
       String message = event.getMessage();
       String regex = "(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\[\\]\\(\\)\\w\\-\\.,@?^=%&amp;:/~\\+#!]*[\\[\\]\\(\\)\\w\\-\\@?^=%&amp;/~\\+#!])";
       Pattern p = Pattern.compile(regex);

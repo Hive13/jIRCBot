@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
-import org.hive13.jircbotx.HiveBot.eMsgTypes;
+import org.hive13.jircbotx.JircBotX.eMsgTypes;
 
 
 public class MessageRow {

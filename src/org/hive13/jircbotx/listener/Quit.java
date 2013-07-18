@@ -1,7 +1,7 @@
 package org.hive13.jircbotx.listener;
 
+import org.hive13.jircbotx.JircBotX;
 import org.hive13.jircbotx.ListenerAdapterX;
-import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.QuitEvent;
 
@@ -25,7 +25,7 @@ public class Quit extends ListenerAdapterX {
       return "Shuts down the bot";
    }
 
-   public void handleMessage(MessageEvent<PircBotX> event) throws Exception {
+   public void handleMessage(MessageEvent<JircBotX> event) throws Exception {
       if (event.getMessage().toLowerCase().startsWith("!quit"))
       {
          event.getBot().quitServer("Goodbye cruel world!");
@@ -33,7 +33,7 @@ public class Quit extends ListenerAdapterX {
       }
    }
    
-   public void onQuit(QuitEvent<PircBotX> event) throws Exception {
+   public void onQuit(QuitEvent<JircBotX> event) throws Exception {
       if(ranQuit)
          System.exit(0);
    }

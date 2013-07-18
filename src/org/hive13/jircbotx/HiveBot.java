@@ -29,39 +29,13 @@ import org.pircbotx.hooks.events.WhoisEvent;
  */
 public class HiveBot {
 
-   private static PircBotX bot;
-   /**
-    * The different types of messages saved in the database.
-    */
-   public enum eMsgTypes {
-       // NOTE: If adding any additional message types, append them to the end
-       // of the list.
-       /** User messages in a chat channel. */
-       publicMsg,
-       /** User message directly to the bot. */
-       privateMsg,
-       /** Ex. /me */
-       actionMsg,
-       /** User joins a channel the bot is in. */
-       joinMsg,
-       /** User leaves a channel the bot is in. */
-       partMsg,
-       /** Users changes their nickname. */
-       nickChange,
-       /** User quits the server the bot is on. */
-       quitMsg,
-       /** Bot messages w/ HTML formatting. */
-       htmlMsg,
-       /** Do Not Log Message. */
-       LogFreeMsg
-   }
-   
+   private static JircBotX bot;
    /**
     * @param args
     */
    public static void main(String[] args) {
 
-      bot = new PircBotX();
+      bot = new JircBotX();
       
       // Check to see if the database information is set correctly in the properties.
       if (BotProperties.getInstance().getJDBCUrl().isEmpty()

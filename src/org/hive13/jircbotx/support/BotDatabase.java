@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import javax.naming.directory.InvalidAttributesException;
 
 import org.hive13.jircbotx.HiveBot;
-import org.hive13.jircbotx.HiveBot.eMsgTypes;
+import org.hive13.jircbotx.JircBotX.eMsgTypes;
 
 public class BotDatabase {
 
