@@ -1,12 +1,7 @@
 package org.hive13.jircbotx;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.hive13.jircbotx.listener.Linkify;
 import org.hive13.jircbotx.listener.ChannelLogger;
