@@ -27,7 +27,7 @@ are, respectively: sib, war, sei.
     <property name="outputJar" location="${binDir}\hive13bot.jar"/>
     
     <!-- Entry point for standalone JAR -->
-    <property name="MainClass" value="org.hive13.jircbot.jIRCBot"/>
+    <property name="MainClass" value="org.hive13.jircbotx.HiveBot"/>
     
     <!-- ====== Set up the build classpaths ====== -->
     <path id="master-classpath">
