@@ -6,7 +6,9 @@ This is the bot that hanges out in irc.freenode.net #hive13.  The bot is written
 
 Building
 --------
-The bot is developed in eclipse, and if the repository is retrieved at the root it contains all libraries (other than the JDK) needed to build the bot.  I have tried to extensively comment the code to make everyone's lives easier. If you have already retrieved the project using Git, you can open it in Eclipse by going to File->Import->General->Existing Projects Into Workspace, then selecting the projects root directory.
+Easiest way to build is using ant, the root of the project has an ant buildfile.xml which will generate a runnable jar file.
+
+The bot is developed using eclipse, and if the repository is retrieved at the root it contains all libraries (other than the JDK) needed to build the bot.  I have tried to extensively comment the code to make everyone's lives easier. If you have already retrieved the project using Git, you can open it in Eclipse by going to File->Import->General->Existing Projects Into Workspace, then selecting the projects root directory.
 
 Project Structure
 -----------------
@@ -17,6 +19,10 @@ Project Structure
 
 Code Structure
 --------------
+This is all horribly out of date.  We recently migrated to using PircBotX 1.9.  This is the successor to the jibble PircBot framework.
+
+*Old comments below*
+
 The project is organized into two top level package trees, _org.hive13.jircbot_ and _org.jibble.pircbot_.  We are primarily interested in _org.hive13.jircbot_.  
 
 ### org.jibble.pircbot
