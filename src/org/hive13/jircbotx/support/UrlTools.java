@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hive13.jircbotx.support.WebFile.eUserAgent;
+
 public class UrlTools {
    /**
     * Bit.ly API integration to generate a shortened URL. Make sure that the
@@ -215,8 +217,13 @@ public class UrlTools {
        return result;
    }
    
-   public static Object getUrlContent(String url) throws MalformedURLException, IOException {
-     WebFile website = new WebFile(url);
+   public static Object getUrlContent(String url) throws MalformedURLException, IOException
+   {
+      return getUrlContent(url, "", "", eUserAgent.fake);
+   }
+   
+   public static Object getUrlContent(String url, String username, String password, eUserAgent fakeUserAgent) throws MalformedURLException, IOException {
+     WebFile website = new WebFile(url, username, password, fakeUserAgent);
      return website.getContent();
    }
 

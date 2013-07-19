@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.hive13.jircbotx.listener.GitFeed;
 import org.hive13.jircbotx.listener.Linkify;
 import org.hive13.jircbotx.listener.ChannelLogger;
 import org.hive13.jircbotx.listener.Magic8Ball;
@@ -83,7 +84,10 @@ public class HiveBot {
          bot.getListenerManager().addListener(new RssReader(bot, "Youtube", botChannel, "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])", "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
          bot.getListenerManager().addListener(new RssReader(bot, "Vimeo", botChannel, "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])", "http://vimeo.com/groups/hive13/videos/rss"));
          bot.getListenerManager().addListener(new RssReader(bot, "HiveList", botChannel, "[commandName]: [Title|c50] ~[Author|c20|r\\(.+\\)] ([Link])", "https://groups.google.com/forum/feed/cincihackerspace/msgs/atom.xml?num=15"));
-      
+         bot.getListenerManager().addListener(new GitFeed(bot, "GitHub", botChannel, 
+                                                            BotProperties.getInstance().getGitHubLogin(), 
+                                                            BotProperties.getInstance().getGitHubPass(), 
+                                                            BotProperties.getInstance().getGitHubOrg()));
       } catch (MalformedURLException e1) {
          e1.printStackTrace();
       }

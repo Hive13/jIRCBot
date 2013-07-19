@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hive13.jircbotx.JircBotX;
+import org.hive13.jircbotx.JircBotX.eLogLevel;
 import org.hive13.jircbotx.JircBotX.eMsgTypes;
 import org.hive13.jircbotx.ListenerThreadX;
 import org.hive13.jircbotx.support.BotProperties;
@@ -40,11 +41,11 @@ public class RssReader extends ListenerThreadX {
          "Author", "EnclosureCache", "EnclosureLink" };
 
    private String formatString = "[commandName] - [Title|c50] ( [Link] )";
-   private URL feedURL = null;
    private File cacheFile = null;
    private List<SyndEntry> lastEntryList_private = null;
 
    private String commandName = "";
+   protected URL feedURL = null;
    
    public RssReader(JircBotX bot, String commandName, String channelList,
          String rssFeedLink) throws MalformedURLException {
@@ -132,47 +133,57 @@ public class RssReader extends ListenerThreadX {
          // Get the feed's list of entries
          @SuppressWarnings("unchecked")
          List<SyndEntry> entryList = feed.getEntries();
-         Collections.sort(entryList, new SyndEntryComparator());
-
-         // Check for new entries.
-         List<SyndEntry> tempEntryList = getNewEntries(entryList);
-
-         if (tempEntryList.size() > 0) {
-            // If any entries remain, send a message to the channel.
-            sendMessage(formatMessage(entryList.get(0)), eMsgTypes.publicMsg);
-
-            lastEntryListSet(entryList);
-
-            // This means the list changed, update the saved file version.
-            if (!cacheFile.exists())
-               cacheFile.createNewFile();
-            if (cacheFile.exists()) {
-               Writer writer = new FileWriter(cacheFile, false);
-               SyndFeedOutput output = new SyndFeedOutput();
-               output.output(feed, writer);
-               writer.close();
+         if(entryList != null && !entryList.isEmpty())
+         {
+            Collections.sort(entryList, new SyndEntryComparator());
+   
+            // Check for new entries.
+            List<SyndEntry> tempEntryList = getNewEntries(entryList);
+   
+            if (tempEntryList.size() > 0) {
+               // If any entries remain, send a message to the channel.
+               sendMessage(formatMessage(entryList.get(0)), eMsgTypes.publicMsg);
+   
+               lastEntryListSet(entryList);
+   
+               // This means the list changed, update the saved file version.
+               if (!cacheFile.exists())
+                  cacheFile.createNewFile();
+               if (cacheFile.exists()) {
+                  Writer writer = new FileWriter(cacheFile, false);
+                  SyndFeedOutput output = new SyndFeedOutput();
+                  output.output(feed, writer);
+                  writer.close();
+               }
             }
+         }
+         else
+         {
+            if(entryList == null)
+               bot.log(getCommandName() + " feed was null?", eLogLevel.error);
+            else
+               bot.log(getCommandName() + " feed was empty?", eLogLevel.error);
          }
       } catch (MalformedURLException ex) {
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
-         //bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
+         bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
       } catch (IllegalArgumentException ex) {
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
-         //bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
+         bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
       } catch (FeedException ex) {
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
-         //bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
+         bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
       } catch (IOException ex) {
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
-         //bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
+         bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
       } catch (Exception ex) {
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
-         //bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
+         bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
       }
    }
 
@@ -216,10 +227,18 @@ public class RssReader extends ListenerThreadX {
       Iterator<SyndEntry> i = entryList.iterator();
       while (i.hasNext()) {
          SyndEntry curEntry = i.next();
-         if (curEntry.getPublishedDate().after(
+         if (curEntry.getPublishedDate() != null && lastSyndEntry.getPublishedDate() != null &&
+               curEntry.getPublishedDate().after(
                lastSyndEntry.getPublishedDate())) {
             resultList.add(curEntry);
-         } else {
+         } else if(curEntry.getUpdatedDate() != null && lastSyndEntry.getUpdatedDate() != null &&
+               curEntry.getUpdatedDate().after(
+               lastSyndEntry.getUpdatedDate()))
+         {
+            resultList.add(curEntry);
+         }
+         else
+         {
             return resultList;
          }
       }
@@ -284,7 +303,7 @@ public class RssReader extends ListenerThreadX {
                   if (m.find()) {
                      formatItemReplacement = m.group();
                   } else {
-                     /*
+                     //*
                      bot.log("RssReader.formatMessageItem( "
                            + message
                            + ", "
@@ -300,8 +319,8 @@ public class RssReader extends ListenerThreadX {
                   // Disregard the parameter if it
                   // is the formatItem.
                } else {
-                  //bot.log("RssReader.formatMessageItem - unknown parameter: "
-                  //      + par, eLogLevel.warning);
+                  bot.log("RssReader.formatMessageItem - unknown parameter: "
+                        + par, eLogLevel.warning);
                }
             }
          }
@@ -364,8 +383,12 @@ public class RssReader extends ListenerThreadX {
     */
    class SyndEntryComparator implements Comparator<SyndEntry> {
       public int compare(SyndEntry o1, SyndEntry o2) {
-         int pubDateCompare = o2.getPublishedDate().compareTo(
+         int pubDateCompare = 0; //
+         if(o1.getPublishedDate() != null && o2.getPublishedDate() != null)
+            pubDateCompare = o2.getPublishedDate().compareTo(
                o1.getPublishedDate());
+         else if(o1.getUpdatedDate() != null && o2.getPublishedDate() != null)
+            pubDateCompare = o2.getUpdatedDate().compareTo(o1.getUpdatedDate());
          return pubDateCompare;
       }
    }
