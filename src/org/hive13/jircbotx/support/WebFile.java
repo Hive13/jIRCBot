@@ -1,7 +1,13 @@
 package org.hive13.jircbotx.support;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.gdata.util.common.util.Base64;
+
+
 
 /**
  * Get a web file.
@@ -12,6 +18,13 @@ import java.util.regex.Pattern;
  * I have made very limited changes, if any to this class.
  */
 public final class WebFile {
+   public enum eUserAgent
+   {
+      real, // This uses our 'real' user agent string.
+      fake, // This uses a fake one (probably google)
+      none  // This leaves it blank.
+   }
+   
     // Saved response.
     private java.util.Map<String,java.util.List<String>> responseHeader = null;
     private java.net.URL responseURL = null;
@@ -20,8 +33,13 @@ public final class WebFile {
     private String charset   = null;
     private Object content   = null;
  
+    public WebFile( String urlString ) throws MalformedURLException, IOException
+    {
+       this(urlString, "", "", eUserAgent.fake);
+    }
+    
     /** Open a web file. */
-    public WebFile( String urlString )
+    public WebFile( String urlString, String username, String password, eUserAgent userAgent)
         throws java.net.MalformedURLException, java.io.IOException {
         // Open a URL connection.
         final java.net.URL url = new java.net.URL( urlString );
@@ -36,8 +54,16 @@ public final class WebFile {
         conn.setConnectTimeout( 10000 );    // 10 sec
         conn.setReadTimeout( 10000 );       // 10 sec
         conn.setInstanceFollowRedirects( true );
-        conn.setRequestProperty( "User-agent", BotProperties.getInstance().getUserAgentString() );
+        if(eUserAgent.fake == userAgent)
+           conn.setRequestProperty( "User-agent", BotProperties.getInstance().getUserAgentString() );
+        else if(eUserAgent.real == userAgent)
+           conn.setRequestProperty( "User-agent", "HiveBot" );
  
+        if(!username.isEmpty())
+        {
+           String encoded = Base64.encode((username + ":" + password).getBytes());
+           conn.setRequestProperty("Authorization", "Basic "+encoded);
+        }
         // Send the request.
         conn.connect( );
  

@@ -32,7 +32,66 @@ public class JircBotX extends PircBotX {
        LogFreeMsg
    }
 
+   /**
+    * Various log levels for when the bot is writing to the log. This is
+    * primarily used for formatting the log message.
+    * 
+    * @author vincentp
+    * 
+    */
+   public enum eLogLevel {
+      /** Just an alert message giving a bot status update. */
+      info,
+      /**
+       * Either a minor error or slightly unexpected event has occurred. this
+       * is not really serious and the bot will continue normal operations
+       */
+      warning,
+      /**
+       * A more serious event has occurred. The bot will probably recover from
+       * this error and continue normal operations, however it is not
+       * guaranteed.
+       */
+      error,
+      /**
+       * A major error has occurred that will effect bot actions and
+       * operations. This should never occur in the course of bot operation
+       * unless it has been incorrectly configured or compiled. The bot can
+       * not continue normal operations and will probably act very strangely
+       * until it is restarted. This error is thrown when a key process is
+       * interrupted or throws an error.
+       */
+      severe
+   }
    
+   /**
+    * This function uses the logLevel to determine how to treat each message
+    * that is passed to it.
+    * 
+    * @param line
+    *            Line to write to the log.
+    * @param logLevel
+    *            The level of importance to give the message.
+    */
+   public void log(String line, eLogLevel logLevel) {
+      switch (logLevel) {
+      case info:
+         line = "<Info> " + line;
+         break;
+      case warning:
+         line = "<Warning> " + line;
+         break;
+      case error:
+         line = "<Error> " + line;
+         break;
+      case severe:
+         line = "<Severe Error> " + line;
+         break;
+      }
+      
+      super.log(line);
+   }
+
    /* (non-Javadoc)
     * @see org.pircbotx.PircBotX#sendMessage(org.pircbotx.User, java.lang.String)
     */

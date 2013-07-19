@@ -23,6 +23,11 @@ public class BotProperties {
 
    private final String defaultWundergroundKey = "";
 
+   private final String defaultGitHubUser = "";
+   private final String defaultGitHubPass = "";
+   private final String defaultGitHubOrg = "";
+   
+   
    private final String defaultJDBCUrl    = "";
    private final String defaultJDBCUser   = "";
    private final String defaultJDBCPass   = "";
@@ -132,6 +137,21 @@ public class BotProperties {
       return getProp("WUAPI", defaultWundergroundKey);
    }
 
+   /** API key to use for the Weather Underground API */
+   public String getGitHubLogin() {
+      return getProp("githubUser", defaultGitHubUser);
+   }
+
+   /** API key to use for the Weather Underground API */
+   public String getGitHubPass() {
+      return getProp("githubPass", defaultGitHubPass);
+   }
+
+   /** API key to use for the Weather Underground API */
+   public String getGitHubOrg() {
+      return getProp("githubOrg", defaultGitHubOrg);
+   }
+   
    /** JDBC URL to use to connect to the database */
    public String getJDBCUrl() {
       return getProp("jdbcURL", defaultJDBCUrl);
