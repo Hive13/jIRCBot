@@ -9,7 +9,7 @@ import org.hive13.jircbotx.JircBotX.eMsgTypes;
 import org.pircbotx.hooks.events.MessageEvent;
 
 public abstract class ListenerThreadX extends ListenerAdapterX {
-   private static final int LOOP_DELAY_DEFAULT = 30000; // 30 seconds
+   protected static final int LOOP_DELAY_DEFAULT = 30000; // 30 seconds
    
    protected JircBotX bot = null;
    protected long loopDelay = LOOP_DELAY_DEFAULT;
