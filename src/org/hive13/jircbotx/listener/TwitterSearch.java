@@ -1,19 +1,18 @@
 package org.hive13.jircbotx.listener;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.hive13.jircbotx.JircBotX;
 import org.hive13.jircbotx.JircBotX.eMsgTypes;
 import org.hive13.jircbotx.ListenerThreadX;
 import org.hive13.jircbotx.JircBotX.eLogLevel;
+import org.hive13.jircbotx.support.BotDataCache;
+import org.hive13.jircbotx.support.BotProperties;
 import org.pircbotx.User;
 
 import twitter4j.Query;
@@ -26,11 +25,7 @@ import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
 public class TwitterSearch extends ListenerThreadX {
-   private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-   private final Lock read = readWriteLock.readLock();
-   private final Lock write = readWriteLock.writeLock();
-   private File cacheFile = null;
-   private List<Status> lastStatusList_private = null;
+   private long lastSentID = 0;
    
    private String commandName = "";
    private String searchString = "";
@@ -43,16 +38,17 @@ public class TwitterSearch extends ListenerThreadX {
       super(bot, channelList, loopDelay);
       this.commandName = commandName;
       this.searchString = searchString;
+      lastSentID = BotDataCache.getInstance().getLatestTweetID();
    }
    
    @Override
    public void loop() {
-      AccessToken accessToken = new AccessToken("accesskey","accesssecret");
+      AccessToken accessToken = new AccessToken(BotProperties.getInstance().getTwitterAccessToken(),BotProperties.getInstance().getTwitterAccessSecret());
       Twitter twitter = new TwitterFactory().getInstance();
-      twitter.setOAuthConsumer("consumerkey", "consumersecret");
+      twitter.setOAuthConsumer(BotProperties.getInstance().getTwitterKey(), BotProperties.getInstance().getTwitterSecret());
       twitter.setOAuthAccessToken(accessToken);
       
-      Query query = new Query("hive13 -b_hive13 -katerinabonvora -thehive_berlin -danielleabroad -joelix -jennifuchs");
+      Query query = new Query(searchString);
       try {
          //AccessToken accessToken = null;
          // Prepare the query to Search for the specific string.
@@ -73,7 +69,16 @@ public class TwitterSearch extends ListenerThreadX {
          {
             Collections.sort(tweetList, new StatusComparator());
             
-            sendMessage(tweetList.get(0).getText(), eMsgTypes.publicMsg);
+            Status lastTweet = tweetList.get(0);
+            if(lastTweet.getId() > lastSentID)
+            {
+               sendMessage(getCommandName() + " @" + lastTweet.getUser().getScreenName() + ": " + tweetList.get(0).getText(), eMsgTypes.publicMsg);
+               lastSentID = tweetList.get(0).getId();
+               // TODO: Shared resource that COULD have multiple accesses... should do the following:
+               //       - Require we split this up by command name.
+               //       - Control access via a mutex.
+               BotDataCache.getInstance().setLatestTweetID(lastSentID);
+            }
          }
          else
          {
@@ -100,6 +105,8 @@ public class TwitterSearch extends ListenerThreadX {
               " !" + getCommandName() + " start ; !" + getCommandName() + " stop";
    }
    
+   // TODO: Implement functionality to re-generate the access token
+   @SuppressWarnings("unused")
    private AccessToken generateNewAccessToken(User commUser)
    {
       AccessToken resultToken = null;
