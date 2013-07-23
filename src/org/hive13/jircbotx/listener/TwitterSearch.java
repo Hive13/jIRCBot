@@ -13,6 +13,7 @@ import org.hive13.jircbotx.ListenerThreadX;
 import org.hive13.jircbotx.JircBotX.eLogLevel;
 import org.hive13.jircbotx.support.BotDataCache;
 import org.hive13.jircbotx.support.BotProperties;
+import org.hive13.jircbotx.support.UrlTools;
 import org.pircbotx.User;
 
 import twitter4j.Query;
@@ -72,7 +73,9 @@ public class TwitterSearch extends ListenerThreadX {
             Status lastTweet = tweetList.get(0);
             if(lastTweet.getId() > lastSentID)
             {
-               sendMessage(getCommandName() + " @" + lastTweet.getUser().getScreenName() + ": " + tweetList.get(0).getText(), eMsgTypes.publicMsg);
+               sendMessage(getCommandName() + " @" + lastTweet.getUser().getScreenName() 
+                     + ": " + tweetList.get(0).getText() 
+                     + " [" + UrlTools.generateShortURL("https://twitter.com/" + lastTweet.getUser().getScreenName()  + "/status/" + lastTweet.getId()) + "]", eMsgTypes.publicMsg);
                lastSentID = tweetList.get(0).getId();
                // TODO: Shared resource that COULD have multiple accesses... should do the following:
                //       - Require we split this up by command name.

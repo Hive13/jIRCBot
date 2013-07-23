@@ -114,7 +114,6 @@ public class RssReader extends ListenerThreadX {
             bot.log("Info: " + getCommandName() + " " + ex.toString());
          }
       }
-      this.startCommandThread();
    }
    
    @Override

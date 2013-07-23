@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.hive13.jircbotx.JircBotX.eMsgTypes;
+import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 
 public abstract class ListenerThreadX extends ListenerAdapterX {
@@ -29,6 +30,19 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
       super(channelList);
       this.bot = bot;
       this.loopDelay = loopDelay;
+   }
+
+   
+   /* (non-Javadoc)
+    * @see org.pircbotx.hooks.ListenerAdapter#onJoin(org.pircbotx.hooks.events.JoinEvent)
+    */
+   @Override
+   public void onJoin(JoinEvent<JircBotX> event) throws Exception {
+      super.onJoin(event);
+      if(shouldListenToChannel(event.getChannel().getName()))
+      {
+         this.startCommandThread(true);
+      }
    }
    
    /**
@@ -106,21 +120,28 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
       }
    }
    
+   
+   public void startCommandThread(boolean beQuiet)
+   {
+      if (listenerThreadChild == null) {
+         listenerThreadChild = new ListenerThreadRunnable(loopDelay);
+      }
+      if (!listenerThreadChild.getIsRunning()) {
+         if(!beQuiet) sendMessage("Starting the " + getCommandName() + " thread.", eMsgTypes.publicMsg);
+         new Thread(listenerThreadChild).start();
+      } else {
+         if(!beQuiet) sendMessage("The " + getCommandName() + " thread is already running.", eMsgTypes.publicMsg);
+      }
+      
+   }
+   
    /**
     * This method will safely start an instance of the command thread. If an
     * instance of the commandThread exists but is not running, it restarts that
     * instance.
     */
    public void startCommandThread() {
-      if (listenerThreadChild == null) {
-         listenerThreadChild = new ListenerThreadRunnable(loopDelay);
-      }
-      if (!listenerThreadChild.getIsRunning()) {
-         sendMessage("Starting the " + getCommandName() + " thread.", eMsgTypes.publicMsg);
-         new Thread(listenerThreadChild).start();
-      } else {
-         sendMessage("The " + getCommandName() + " thread is already running.", eMsgTypes.publicMsg);
-      }
+      startCommandThread(false);
    }
 
    /**
