@@ -394,7 +394,7 @@ public class RssReader extends ListenerThreadX {
          if(o1.getPublishedDate() != null && o2.getPublishedDate() != null)
             pubDateCompare = o2.getPublishedDate().compareTo(
                o1.getPublishedDate());
-         else if(o1.getUpdatedDate() != null && o2.getPublishedDate() != null)
+         else if(o1.getUpdatedDate() != null && o2.getUpdatedDate() != null)
             pubDateCompare = o2.getUpdatedDate().compareTo(o1.getUpdatedDate());
          return pubDateCompare;
       }
