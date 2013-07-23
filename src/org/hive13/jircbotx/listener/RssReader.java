@@ -46,6 +46,7 @@ public class RssReader extends ListenerThreadX {
 
    private String commandName = "";
    protected URL feedURL = null;
+   protected boolean updateFailed = false;
    
    public RssReader(JircBotX bot, String commandName, String channelList,
          String rssFeedLink) throws MalformedURLException {
@@ -158,28 +159,35 @@ public class RssReader extends ListenerThreadX {
          }
          else
          {
+            updateFailed = true;
+            
             if(entryList == null)
                bot.log(getCommandName() + " feed was null?", eLogLevel.error);
             else
                bot.log(getCommandName() + " feed was empty?", eLogLevel.error);
          }
       } catch (MalformedURLException ex) {
+         updateFailed = true;
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
          bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
       } catch (IllegalArgumentException ex) {
+         updateFailed = true;
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
          bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
       } catch (FeedException ex) {
+         updateFailed = true;
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
          bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
       } catch (IOException ex) {
+         updateFailed = true;
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
          bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
       } catch (Exception ex) {
+         updateFailed = true;
          Logger.getLogger(RssReader.class.getName()).log(Level.SEVERE,
                null, ex);
          bot.log(getCommandName() + " " + ex.toString(), eLogLevel.severe);
