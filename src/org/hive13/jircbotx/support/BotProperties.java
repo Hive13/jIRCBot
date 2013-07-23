@@ -26,7 +26,11 @@ public class BotProperties {
    private final String defaultGitHubUser = "";
    private final String defaultGitHubPass = "";
    private final String defaultGitHubOrg = "";
-   
+
+   private final String defaultTwitterKey = "";
+   private final String defaultTwitterSecret = "";
+   private final String defaultTwitterAccessToken = "";
+   private final String defaultTwitterAccessSecret = "";
    
    private final String defaultJDBCUrl    = "";
    private final String defaultJDBCUser   = "";
@@ -150,6 +154,26 @@ public class BotProperties {
    /** API key to use for the Weather Underground API */
    public String getGitHubOrg() {
       return getProp("githubOrg", defaultGitHubOrg);
+   }
+
+   /** API key to use for the Weather Underground API */
+   public String getTwitterKey() {
+      return getProp("twitterKey", defaultTwitterKey);
+   }
+
+   /** API key to use for the Weather Underground API */
+   public String getTwitterSecret() {
+      return getProp("twitterSecret", defaultTwitterSecret);
+   }
+
+   /** API key to use for the Weather Underground API */
+   public String getTwitterAccessToken() {
+      return getProp("twitterAccessToken", defaultTwitterAccessToken);
+   }
+
+   /** API key to use for the Weather Underground API */
+   public String getTwitterAccessSecret() {
+      return getProp("twitterAccessSecret", defaultTwitterAccessSecret);
    }
    
    /** JDBC URL to use to connect to the database */

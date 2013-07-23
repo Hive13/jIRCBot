@@ -9,7 +9,7 @@ import org.hive13.jircbotx.JircBotX.eMsgTypes;
 import org.pircbotx.hooks.events.MessageEvent;
 
 public abstract class ListenerThreadX extends ListenerAdapterX {
-   private static final int LOOP_DELAY_DEFAULT = 30000; // 30 seconds
+   protected static final int LOOP_DELAY_DEFAULT = 30000; // 30 seconds
    
    protected JircBotX bot = null;
    protected long loopDelay = LOOP_DELAY_DEFAULT;
@@ -84,7 +84,11 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
       if (botIsInChannels()) {
          Iterator<String> chanIt = ListenerChannelList.iterator();
          while(chanIt.hasNext())
-            bot.sendMessage(chanIt.next(), message);
+         {
+            String chan = chanIt.next();
+            bot.sendMessage(chan, message);
+            bot.logMessage(chan, message, eMsgTypes.publicMsg);
+         }
       } else {
          Logger.getLogger(ListenerThreadX.class.getName()).log(Level.INFO, getCommandName() + " tried to send [" + message + "] to its channels but the bot reported it was not connected to those channels.");
          // Do nothing...  old reconnect & warn code below
