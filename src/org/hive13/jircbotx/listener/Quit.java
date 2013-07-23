@@ -26,16 +26,18 @@ public class Quit extends ListenerAdapterX {
    }
 
    public void handleMessage(MessageEvent<JircBotX> event) throws Exception {
-      if (event.getMessage().toLowerCase().startsWith("!quit"))
+      
+      if (event.getUser().getChannelsOpIn().contains(event.getChannel()) // If the calling user is an op in this channel
+            && event.getMessage().toLowerCase().startsWith("!quit"))     // and if the the user issued the !quit command.
       {
-         event.getBot().quitServer("Goodbye cruel world!");
+         event.getBot().disconnect();
          ranQuit = true;
       }
    }
    
    public void onQuit(QuitEvent<JircBotX> event) throws Exception {
-      if(ranQuit)
-         System.exit(0);
+      //if(ranQuit)
+      //   System.exit(0);
    }
    
    

@@ -74,7 +74,7 @@ public class HiveBot {
       bot.getListenerManager().addListener(new Tell());
       bot.getListenerManager().addListener(new ChannelLogger());
       bot.getListenerManager().addListener(new Quit());
-      bot.getListenerManager().addListener(new Plugins(bot));
+      bot.getListenerManager().addListener(new Plugins());
       bot.getListenerManager().addListener(new UserAuth());
       bot.getListenerManager().addListener(new TwitterSearch(bot, "Twitter", botChannel, "hive13 -2versa -b_hive13 -katerinabonvora -thehive_berlin -danielleabroad -joelix -jennifuchs"));
       
