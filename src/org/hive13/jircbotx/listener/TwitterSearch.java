@@ -74,9 +74,9 @@ public class TwitterSearch extends ListenerThreadX {
             if(lastTweet.getId() > lastSentID)
             {
                sendMessage(getCommandName() + " @" + lastTweet.getUser().getScreenName() 
-                     + ": " + tweetList.get(0).getText() 
-                     + " [" + UrlTools.generateShortURL("https://twitter.com/" + lastTweet.getUser().getScreenName()  + "/status/" + lastTweet.getId()) + "]", eMsgTypes.publicMsg);
-               lastSentID = tweetList.get(0).getId();
+                     + ": " + lastTweet.getText() 
+                     + " [" + getTweetURL(lastTweet) + "]", eMsgTypes.publicMsg);
+               lastSentID = lastTweet.getId();
                BotDataCache.getInstance().setLatestTweetID(getCommandName(), lastSentID);
             }
          }
@@ -103,6 +103,11 @@ public class TwitterSearch extends ListenerThreadX {
       // TODO Auto-generated method stub
       return "The following are valid uses of this command: !" + getCommandName() + " help ;" +
               " !" + getCommandName() + " start ; !" + getCommandName() + " stop";
+   }
+   
+   public static String getTweetURL(Status status)
+   {
+      return UrlTools.generateShortURL("https://twitter.com/" + status.getUser().getId() + "/status/" + status.getId());
    }
    
    // TODO: Implement functionality to re-generate the access token
