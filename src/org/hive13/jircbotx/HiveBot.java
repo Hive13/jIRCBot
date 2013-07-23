@@ -14,6 +14,7 @@ import org.hive13.jircbotx.listener.Quit;
 import org.hive13.jircbotx.listener.RssReader;
 import org.hive13.jircbotx.listener.Tell;
 import org.hive13.jircbotx.listener.Temperature;
+import org.hive13.jircbotx.listener.TwitterSearch;
 import org.hive13.jircbotx.listener.UserAuth;
 import org.hive13.jircbotx.support.BotDatabase;
 import org.hive13.jircbotx.support.BotProperties;
@@ -75,6 +76,7 @@ public class HiveBot {
       bot.getListenerManager().addListener(new Quit());
       bot.getListenerManager().addListener(new Plugins(bot));
       bot.getListenerManager().addListener(new UserAuth());
+      bot.getListenerManager().addListener(new TwitterSearch(bot, "Twitter", botChannel, "hive13 -2versa -b_hive13 -katerinabonvora -thehive_berlin -danielleabroad -joelix -jennifuchs"));
       
       try {
          bot.getListenerManager().addListener(new RssReader(bot, "DoorAlert", botChannel, "http://www.hive13.org/isOpen/RSS.php"));

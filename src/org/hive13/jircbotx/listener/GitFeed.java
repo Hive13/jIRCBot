@@ -98,8 +98,12 @@ public class GitFeed extends RssReader {
          }
             
       } catch (MalformedURLException e) {
+         Logger.getLogger(GitFeed.class.getName()).log(
+               Level.SEVERE, null, e);
          e.printStackTrace();
       } catch (IOException e) {
+         Logger.getLogger(GitFeed.class.getName()).log(
+               Level.SEVERE, null, e);
          e.printStackTrace();
       }
       return result;
