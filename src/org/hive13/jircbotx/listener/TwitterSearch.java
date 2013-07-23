@@ -39,7 +39,7 @@ public class TwitterSearch extends ListenerThreadX {
       super(bot, channelList, loopDelay);
       this.commandName = commandName;
       this.searchString = searchString;
-      lastSentID = BotDataCache.getInstance().getLatestTweetID();
+      lastSentID = BotDataCache.getInstance().getLatestTweetID(getCommandName());
    }
    
    @Override
@@ -77,10 +77,7 @@ public class TwitterSearch extends ListenerThreadX {
                      + ": " + tweetList.get(0).getText() 
                      + " [" + UrlTools.generateShortURL("https://twitter.com/" + lastTweet.getUser().getScreenName()  + "/status/" + lastTweet.getId()) + "]", eMsgTypes.publicMsg);
                lastSentID = tweetList.get(0).getId();
-               // TODO: Shared resource that COULD have multiple accesses... should do the following:
-               //       - Require we split this up by command name.
-               //       - Control access via a mutex.
-               BotDataCache.getInstance().setLatestTweetID(lastSentID);
+               BotDataCache.getInstance().setLatestTweetID(getCommandName(), lastSentID);
             }
          }
          else
