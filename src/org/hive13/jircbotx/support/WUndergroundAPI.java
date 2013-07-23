@@ -68,7 +68,7 @@ public class WUndergroundAPI {
       if(floodPrevention.size() == 0) return true;
       
       // Remove events older than 24 hours.
-      while(floodPrevention.peek() < dayAgo ) floodPrevention.remove();
+      while(floodPrevention.peek() != null && floodPrevention.peek() < dayAgo ) floodPrevention.remove();
       
       // Check to see if we have more than the flood limit
       if(floodPrevention.size() >= DAY_FLOOD_LIMIT) return false;
