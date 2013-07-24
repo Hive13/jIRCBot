@@ -35,7 +35,7 @@ public class Linkify extends ListenerAdapterX {
           } else
              shortURL = url;
           
-          urlTitle = UrlTools.findURLTitle(url, shortURL);
+          urlTitle = UrlTools.findURLTitle(url, shortURL, event.getBot());
           returnMsg += urlTitle + " [ " + shortURL + " ]; ";
       }
       

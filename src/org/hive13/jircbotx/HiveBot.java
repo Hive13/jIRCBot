@@ -74,7 +74,7 @@ public class HiveBot {
       bot.getListenerManager().addListener(new Tell());
       bot.getListenerManager().addListener(new ChannelLogger());
       bot.getListenerManager().addListener(new Quit());
-      bot.getListenerManager().addListener(new Plugins(bot));
+      bot.getListenerManager().addListener(new Plugins());
       bot.getListenerManager().addListener(new UserAuth());
       bot.getListenerManager().addListener(new TwitterSearch(bot, "Twitter", botChannel, "hive13 -2versa -b_hive13 -katerinabonvora -thehive_berlin -danielleabroad -joelix -jennifuchs"));
       
@@ -85,7 +85,7 @@ public class HiveBot {
          bot.getListenerManager().addListener(new RssReader(bot, "Flickr", botChannel, "[commandName]: [Title|c50] ([Link])", "http://api.flickr.com/services/feeds/photos_public.gne?tags=hive13&lang=en-us&format=rss_200", 15 * 60 * 1000)); // 15 min refresh period.
          bot.getListenerManager().addListener(new RssReader(bot, "Youtube", botChannel, "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])", "http://gdata.youtube.com/feeds/base/videos/-/hive13?client=ytapi-youtube-browse&v=2"));
          bot.getListenerManager().addListener(new RssReader(bot, "Vimeo", botChannel, "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])", "http://vimeo.com/groups/hive13/videos/rss"));
-         bot.getListenerManager().addListener(new RssReader(bot, "HiveList", botChannel, "[commandName]: [Title|c50] ~[Author|c20|r\\(.+\\)] ([Link])", "https://groups.google.com/forum/feed/cincihackerspace/msgs/atom.xml?num=15"));
+         bot.getListenerManager().addListener(new RssReader(bot, "HiveList", botChannel, "[commandName]: [Title|c50] ~[Author|c20|r\\(.+\\)] ([Link])", "https://groups.google.com/forum/feed/cincihackerspace/msgs/atom.xml?num=100"));
          bot.getListenerManager().addListener(new GitFeed(bot, "GitHub", botChannel, 
                                                             BotProperties.getInstance().getGitHubLogin(), 
                                                             BotProperties.getInstance().getGitHubPass(), 
