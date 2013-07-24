@@ -84,13 +84,10 @@ public class Temperature extends ListenerAdapterX {
             // tempreature.
          }
       } catch (IOException e) {
-         // TODO Auto-generated catch block
          e.printStackTrace();
       } catch (IllegalArgumentException e) {
-         // TODO Auto-generated catch block
          e.printStackTrace();
       } catch (FeedException e) {
-         // TODO Auto-generated catch block
          e.printStackTrace();
       }
 

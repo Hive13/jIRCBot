@@ -9,13 +9,6 @@ import org.pircbotx.hooks.events.MessageEvent;
 
 public class Plugins extends ListenerAdapterX {
 
-   private JircBotX bot;
-   
-   public Plugins(JircBotX bot)
-   {
-      this.bot = bot;
-   }
-
    @Override
    public void handleMessage(MessageEvent<JircBotX> event) throws Exception
    {
@@ -24,7 +17,7 @@ public class Plugins extends ListenerAdapterX {
       {
          String cmdList = "";
          @SuppressWarnings("rawtypes")
-         Iterator<Listener> it = bot.getListenerManager().getListeners().iterator();
+         Iterator<Listener> it = event.getBot().getListenerManager().getListeners().iterator();
          while(it.hasNext())
          {
             @SuppressWarnings("rawtypes")

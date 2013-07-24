@@ -33,17 +33,23 @@ public class GitFeed extends RssReader {
    public void loop() {
       // TODO: do some stuff here to re-get & re-validate the URL periodically.
       Date curDate = Calendar.getInstance().getTime();
-      if((curDate.getTime() - lastGitUpdate.getTime()) > (12 * 60 * 60 * 1000))
+      if((curDate.getTime() - lastGitUpdate.getTime()) > (12 * 60 * 60 * 1000) || updateFailed)
       {
+         bot.log(getCommandName() + " attempting to retrieve new github feed URL. (updateFailed:" + updateFailed + ")", eLogLevel.info);
          try {
             feedURL = new URL(getGitHubFeedURL(gitUsername, gitPassword, gitOrg));
+            
+            // Reset the 'update failed' flag.
+            updateFailed = false;
          } catch (MalformedURLException ex) {
             Logger.getLogger(GitFeed.class.getName()).log(
                   Level.WARNING, null, ex);
             bot.log(getCommandName() + " failed to retrieve new github url.", eLogLevel.warning);
          }
       }
-      super.loop();
+      
+      if(!updateFailed)
+         super.loop();
    }
 
    /**

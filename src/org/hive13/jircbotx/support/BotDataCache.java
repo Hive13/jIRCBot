@@ -58,14 +58,14 @@ public class BotDataCache {
        }
    }
    
-   public long getLatestTweetID()
+   public long getLatestTweetID(String commandName)
    {
-      String result = getProp("twitterStatusID", defaultTweetStatusID);
+      String result = getProp("twitterStatusID-" + commandName, defaultTweetStatusID);
       return Long.parseLong(result);
    }
    
-   public void setLatestTweetID(long StatusID)
+   public void setLatestTweetID(String commandName, long StatusID)
    {
-      setProp("twitterStatusID", Long.toString(StatusID));
+      setProp("twitterStatusID-" + commandName, Long.toString(StatusID));
    }
 }
