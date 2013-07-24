@@ -38,13 +38,18 @@ public class GitFeed extends RssReader {
          bot.log(getCommandName() + " attempting to retrieve new github feed URL. (updateFailed:" + updateFailed + ")", eLogLevel.info);
          try {
             feedURL = new URL(getGitHubFeedURL(gitUsername, gitPassword, gitOrg));
+            
+            // Reset the 'update failed' flag.
+            updateFailed = false;
          } catch (MalformedURLException ex) {
             Logger.getLogger(GitFeed.class.getName()).log(
                   Level.WARNING, null, ex);
             bot.log(getCommandName() + " failed to retrieve new github url.", eLogLevel.warning);
          }
       }
-      super.loop();
+      
+      if(!updateFailed)
+         super.loop();
    }
 
    /**
