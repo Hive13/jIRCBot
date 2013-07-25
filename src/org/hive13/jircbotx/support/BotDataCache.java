@@ -1,5 +1,6 @@
 package org.hive13.jircbotx.support;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -7,7 +8,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class BotDataCache {
-   private static final String dataFileName = "jIRCBot.data";
+   private static final String dataFileName = BotProperties.getInstance().getCacheDirectoryPath() + "/jIRCBot.data";
    private static BotDataCache instance = null;
 
    private Properties data;
@@ -16,6 +17,14 @@ public class BotDataCache {
    
    protected BotDataCache() {
       data = new Properties();
+      File cacheFile = new File(dataFileName);
+      if (!cacheFile.exists()) {
+         try {
+            cacheFile.createNewFile();
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+      }
       try {
          data.load(new FileInputStream(dataFileName));
       } catch (IOException ex) {

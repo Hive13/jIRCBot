@@ -120,7 +120,13 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
       }
    }
    
-   
+   /**
+    * This method will safely start an instance of the command thread. If an
+    * instance of the commandThread exists but is not running, it restarts that
+    * instance.
+    * 
+    * @param beQuiet    If beQuiet is true, we will not send any status messages.
+    */
    public void startCommandThread(boolean beQuiet)
    {
       if (listenerThreadChild == null) {
@@ -148,13 +154,21 @@ public abstract class ListenerThreadX extends ListenerAdapterX {
     * This method is more of a 'pause' commandThread. It stops the running java
     * Thread but does not delete the instance of the commandThread.
     */
-   public void stopCommandThread() {
+   public void stopCommandThread(boolean beQuiet) {
       if (listenerThreadChild != null && listenerThreadChild.getIsRunning()) {
-         sendMessage("Stopping the " + getCommandName() + " thread.", eMsgTypes.publicMsg);
+         if(!beQuiet) sendMessage("Stopping the " + getCommandName() + " thread.", eMsgTypes.publicMsg);
          listenerThreadChild.stop();
       } else {
-         sendMessage("The " + getCommandName() + " thread is not running.", eMsgTypes.publicMsg);
+         if(!beQuiet) sendMessage("The " + getCommandName() + " thread is not running.", eMsgTypes.publicMsg);
       }
+   }
+   
+   /**
+    * This method is more of a 'pause' commandThread. It stops the running java
+    * Thread but does not delete the instance of the commandThread.
+    */
+   public void stopCommandThread() {
+      stopCommandThread(false);
    }
    
    private boolean botIsInChannels()
