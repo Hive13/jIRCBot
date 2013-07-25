@@ -31,7 +31,6 @@ public class GitFeed extends RssReader {
     */
    @Override
    public void loop() {
-      // TODO: do some stuff here to re-get & re-validate the URL periodically.
       Date curDate = Calendar.getInstance().getTime();
       if((curDate.getTime() - lastGitUpdate.getTime()) > (12 * 60 * 60 * 1000) || updateFailed)
       {
