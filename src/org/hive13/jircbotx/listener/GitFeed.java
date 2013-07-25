@@ -41,7 +41,9 @@ public class GitFeed extends RssReader {
             
             // Reset the 'update failed' flag.
             updateFailed = false;
+            lastGitUpdate = Calendar.getInstance().getTime();
          } catch (MalformedURLException ex) {
+            updateFailed = true;
             Logger.getLogger(GitFeed.class.getName()).log(
                   Level.WARNING, null, ex);
             bot.log(getCommandName() + " failed to retrieve new github url.", eLogLevel.warning);
