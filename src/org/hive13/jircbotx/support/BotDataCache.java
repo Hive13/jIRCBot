@@ -13,6 +13,7 @@ public class BotDataCache {
 
    private Properties data;
 
+   private String defaultSavedTells = "";
    private String defaultTweetStatusID = "0";
    
    protected BotDataCache() {
@@ -65,6 +66,16 @@ public class BotDataCache {
        } catch (IOException e) {
            e.printStackTrace();
        }
+   }
+   
+   public String getSavedTells(String commandName)
+   {
+      return getProp("TellData-" + commandName, defaultSavedTells);
+   }
+   
+   public void setSavedTells(String commandName, String tellData)
+   {
+      setProp("TellData-" + commandName, tellData);
    }
    
    public long getLatestTweetID(String commandName)
