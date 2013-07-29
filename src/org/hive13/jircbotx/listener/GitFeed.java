@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,8 +13,10 @@ import org.hive13.jircbotx.JircBotX;
 import org.hive13.jircbotx.JircBotX.eLogLevel;
 import org.hive13.jircbotx.support.UrlTools;
 import org.hive13.jircbotx.support.WebFile.eUserAgent;
+import org.pircbotx.hooks.events.MessageEvent;
 
 public class GitFeed extends RssReader {
+   private AtomicBoolean abForceRefresh;
    private String gitUsername, gitPassword, gitOrg;
    private Date lastGitUpdate;
    
@@ -24,6 +27,7 @@ public class GitFeed extends RssReader {
       this.gitPassword = gitPassword;
       this.gitOrg = gitOrg;
       lastGitUpdate = Calendar.getInstance().getTime();
+      abForceRefresh.set(false);
    }
    
    /* (non-Javadoc)
@@ -32,14 +36,15 @@ public class GitFeed extends RssReader {
    @Override
    public void loop() {
       Date curDate = Calendar.getInstance().getTime();
-      if((curDate.getTime() - lastGitUpdate.getTime()) > (12 * 60 * 60 * 1000) || updateFailed)
+      if((curDate.getTime() - lastGitUpdate.getTime()) > (12 * 60 * 60 * 1000) || updateFailed || abForceRefresh.get())
       {
-         bot.log(getCommandName() + " attempting to retrieve new github feed URL. (updateFailed:" + updateFailed + ")", eLogLevel.info);
+         bot.log(getCommandName() + " attempting to retrieve new github feed URL. (updateFailed:" + updateFailed + ", forceRefresh:" + abForceRefresh.get() +")", eLogLevel.info);
          try {
             feedURL = new URL(getGitHubFeedURL(gitUsername, gitPassword, gitOrg));
             
             // Reset the 'update failed' flag.
             updateFailed = false;
+            abForceRefresh.set(false);
             lastGitUpdate = Calendar.getInstance().getTime();
          } catch (MalformedURLException ex) {
             updateFailed = true;
@@ -51,6 +56,23 @@ public class GitFeed extends RssReader {
       
       if(!updateFailed)
          super.loop();
+   }
+
+   
+   
+   /* (non-Javadoc)
+    * @see org.hive13.jircbotx.ListenerThreadX#handleMessage(org.pircbotx.hooks.events.MessageEvent)
+    */
+   @Override
+   protected void handleMessage(MessageEvent<JircBotX> event) throws Exception {
+      super.handleMessage(event);
+      String splitMessage[] = event.getMessage().toLowerCase().split(" ");
+      
+      if (splitMessage.length > 1 && splitMessage[0].equals("!" + getCommandName().toLowerCase())) {
+         if (splitMessage[1].equals("refresh")) {
+            abForceRefresh.set(true);
+         }
+      } 
    }
 
    /**
