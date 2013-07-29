@@ -75,6 +75,16 @@ public class GitFeed extends RssReader {
       } 
    }
 
+   
+   
+   /* (non-Javadoc)
+    * @see org.hive13.jircbotx.listener.RssReader#getHelp()
+    */
+   @Override
+   public String getHelp() {
+      return super.getHelp() + "; !" + getCommandName() + " refresh";
+   }
+
    /**
     * Call this to programmaticaly find the current 'hive13' feed URL.
     * 
