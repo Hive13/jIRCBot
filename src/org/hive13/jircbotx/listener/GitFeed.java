@@ -66,13 +66,12 @@ public class GitFeed extends RssReader {
    @Override
    protected void handleMessage(MessageEvent<JircBotX> event) throws Exception {
       super.handleMessage(event);
-      String splitMessage[] = event.getMessage().toLowerCase().split(" ");
+      String splitMessage[] = shouldHandleMsg(event.getMessage());
       
-      if (splitMessage.length > 1 && splitMessage[0].equals("!" + getCommandName().toLowerCase())) {
-         if (splitMessage[1].equals("refresh")) {
-            abForceRefresh.set(true);
-         }
-      } 
+      if(splitMessage != null && splitMessage[1].equalsIgnoreCase("refresh"))
+      {
+         abForceRefresh.set(true);
+      }
    }
 
    

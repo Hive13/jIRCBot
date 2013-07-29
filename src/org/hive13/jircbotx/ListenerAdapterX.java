@@ -45,6 +45,27 @@ public abstract class ListenerAdapterX extends ListenerAdapter<JircBotX> {
    }
    
    /**
+    * Check if we should handle the passed in msg. 
+    * Returns the # of parameters in the msg, including the command name.
+    * Returns -1 if we should NOT handle the message.  
+    * 
+    * @param msg  Msg to check if we should handle.
+    * @return
+    */
+   public String[] shouldHandleMsg(String msg)
+   {
+      String result[] = null;
+      
+      String splitMessage[] = msg.split(" ");
+      
+      if (splitMessage.length >= 1 && splitMessage[0].equalsIgnoreCase("!" + getCommandName().toLowerCase()))
+         // do nothing
+         result = splitMessage;
+      
+      return result;
+   }
+   
+   /**
     * This member variable is of pretty limited use. It basically exists for
     * commands that we might use on the backend (like Linkify) which the user
     * does not need to ever know about, but are actually implemented as

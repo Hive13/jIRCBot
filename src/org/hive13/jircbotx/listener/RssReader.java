@@ -25,6 +25,7 @@ import org.hive13.jircbotx.JircBotX.eMsgTypes;
 import org.hive13.jircbotx.ListenerThreadX;
 import org.hive13.jircbotx.support.BotProperties;
 import org.hive13.jircbotx.support.UrlTools;
+import org.pircbotx.hooks.events.MessageEvent;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -114,6 +115,31 @@ public class RssReader extends ListenerThreadX {
                   Level.INFO, null, ex);
             bot.log("Info: " + getCommandName() + " " + ex.toString());
          }
+      }
+   }
+
+   @Override
+   protected void handleMessage(MessageEvent<JircBotX> event) throws Exception {
+      super.handleMessage(event);
+      String[] splitMsg = shouldHandleMsg(event.getMessage());
+      if(splitMsg != null && splitMsg[1].equalsIgnoreCase("last"))
+      {
+         /* This is a little bit hackish, but this works because
+          * the bot is always trying to keep track of what RSS entries
+          * it has sent to the channel AND because if the bot gets
+          * a large # of new entries, it will only send the latest entry
+          * to the channel.  SOOOO, this just says:
+          *    "Trash all of our saved entries, and the next time the 'loop' 
+          *    runs it will see ALL of the downloaded entries as 'new', 
+          *    therefore it will send the latest entry to the channel."
+          * 
+          * This is _hardly_ the best implementation.  A much 'smarter'
+          * implementation would be to keep track of the last 'sent' message.
+          * With a 'remembered' message we could both 'resend' the remembered
+          * message AND the RssFeed could also prevent message 'flooding' where
+          * the same message is repeatedly sent to the channel.
+          */
+         lastEntryListSet(null);
       }
    }
    
