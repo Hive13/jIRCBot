@@ -27,7 +27,7 @@ public class GitFeed extends RssReader {
       this.gitPassword = gitPassword;
       this.gitOrg = gitOrg;
       lastGitUpdate = Calendar.getInstance().getTime();
-      abForceRefresh.set(false);
+      abForceRefresh = new AtomicBoolean(false);
    }
    
    /* (non-Javadoc)
@@ -35,6 +35,12 @@ public class GitFeed extends RssReader {
     */
    @Override
    public void loop() {
+      /* Check to see if we need to grab a new GitHub feed URL.
+       * The following conditions trigger the "Get new feed URL"
+       * - 24 hours has passed since the last feed update.
+       * - (updateFailed) The last feed access failed for some reason OR the last feed update failed.
+       * - (forceRefresh) A user has initiated a forced refresh for some unknown reason.
+       */
       Date curDate = Calendar.getInstance().getTime();
       if((curDate.getTime() - lastGitUpdate.getTime()) > (12 * 60 * 60 * 1000) || updateFailed || abForceRefresh.get())
       {

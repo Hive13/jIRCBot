@@ -41,6 +41,8 @@ public class RssReader extends ListenerThreadX {
    private final String[] formatItems = { "commandName", "Title", "Link",
          "Author", "EnclosureCache", "EnclosureLink" };
 
+   // Keeping the following for posterity as an example:
+   //    "[commandName]: [Title|c30] ~[Author|c20|r\\(.+\\)] ([Link])"
    private String formatString = "[commandName] - [Title|c50] ( [Link] )";
    private File cacheFile = null;
    private List<SyndEntry> lastEntryList_private = null;
@@ -140,6 +142,7 @@ public class RssReader extends ListenerThreadX {
           * the same message is repeatedly sent to the channel.
           */
          lastEntryListSet(null);
+         event.getBot().log(getCommandName() + ": dropped saved lastEntryListSet.", eLogLevel.info);
       }
    }
    
@@ -336,7 +339,8 @@ public class RssReader extends ListenerThreadX {
                   if (m.find()) {
                      formatItemReplacement = m.group();
                   } else {
-                     //*
+                     // This is caused when the bot is told to replace some character sequence
+                     // in the formatItemReplacement, however nothing matched that character sequence.
                      bot.log("RssReader.formatMessageItem( "
                            + message
                            + ", "
@@ -346,7 +350,6 @@ public class RssReader extends ListenerThreadX {
                            + ")"
                            + "Regex attempt failed to find anything to replace.",
                            eLogLevel.info);
-                           //*/
                   }
                } else if (par.equals(formatItem)) {
                   // Disregard the parameter if it
