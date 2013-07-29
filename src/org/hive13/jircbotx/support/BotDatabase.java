@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -424,6 +425,44 @@ public class BotDatabase {
        }
        
        return result;
+   }
+   
+   public static ArrayList<MessageRow> searchMessagesForString(String search)
+   {
+      return searchMessagesForString(search, null);
+   }
+   public static ArrayList<MessageRow> searchMessagesForString(String search, Date olderThanThis)
+   {
+      String dateFilter = "";
+      if(olderThanThis != null)
+         dateFilter = " AND tsMsgTime < ?";
+      
+      ArrayList<MessageRow> result = new ArrayList<MessageRow>();
+      
+      String stmtSearchQuery = "SELECT * " +
+                            "FROM messages " +
+                            "WHERE vcMessage LIKE ?" + dateFilter;
+      try {
+          PreparedStatement stmt = getStmtForConn(stmtSearchQuery);
+          search = "%" + search + "%";
+          stmt.setString(1, search);
+          if(olderThanThis != null)
+             stmt.setDate(2, (java.sql.Date) olderThanThis);
+          
+          ResultSet rs = stmt.executeQuery();
+          while(rs.next())
+              result.add(new MessageRow(rs));
+          
+      } catch (InvalidAttributesException e) {
+          // MySQL conn information not filled in.
+         e.printStackTrace();
+      } catch (SQLException e) {
+          e.printStackTrace();
+      } catch (ClassNotFoundException e) {
+          e.printStackTrace();
+      }
+      
+      return result;
    }
    
    /**

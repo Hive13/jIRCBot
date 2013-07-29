@@ -1,9 +1,14 @@
 package org.hive13.jircbotx.listener;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hive13.jircbotx.ListenerAdapterX;
+import org.hive13.jircbotx.support.BotDatabase;
+import org.hive13.jircbotx.support.BotProperties;
+import org.hive13.jircbotx.support.MessageRow;
 import org.hive13.jircbotx.support.UrlTools;
 import org.hive13.jircbotx.JircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -26,6 +31,8 @@ public class Linkify extends ListenerAdapterX {
       Matcher m = p.matcher(message);
       
       String returnMsg = "";
+      ArrayList<String> previousMsgs = new ArrayList<String>();
+      
       while (m.find()) {
           String url = "";
           String urlTitle = "";
@@ -47,6 +54,15 @@ public class Linkify extends ListenerAdapterX {
       
    }
 
+   public String checkForPastURL(String fullURL, Date eventDate)
+   {
+      if(BotDatabase.jdbcEnabled)
+      {
+         ArrayList<MessageRow> foundMessages = BotDatabase.searchMessagesForString(fullURL, eventDate);
+      }
+      return "";
+   }
+   
    @Override
    public String getCommandName() {
       return "linkify";
