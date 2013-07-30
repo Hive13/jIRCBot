@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import org.hive13.jircbotx.ListenerAdapterX;
 import org.hive13.jircbotx.support.BotDatabase;
-import org.hive13.jircbotx.support.BotProperties;
 import org.hive13.jircbotx.support.MessageRow;
 import org.hive13.jircbotx.support.UrlTools;
 import org.hive13.jircbotx.JircBotX;

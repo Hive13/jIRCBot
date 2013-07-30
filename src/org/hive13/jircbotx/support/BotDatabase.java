@@ -447,7 +447,10 @@ public class BotDatabase {
           search = "%" + search + "%";
           stmt.setString(1, search);
           if(olderThanThis != null)
-             stmt.setDate(2, (java.sql.Date) olderThanThis);
+          {
+             java.sql.Date dt = new java.sql.Date(olderThanThis.getTime());
+             stmt.setDate(2, dt);
+          }
           
           ResultSet rs = stmt.executeQuery();
           while(rs.next())
