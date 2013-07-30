@@ -429,28 +429,41 @@ public class BotDatabase {
    
    public static ArrayList<MessageRow> searchMessagesForString(String search)
    {
-      return searchMessagesForString(search, null);
+      return searchMessagesForString(search, null, null);
    }
-   public static ArrayList<MessageRow> searchMessagesForString(String search, Date olderThanThis)
+   public static ArrayList<MessageRow> searchMessagesForString(String search, String channel, Date olderThanThis)
    {
+      int index = 1;
+      
       String dateFilter = "";
       if(olderThanThis != null)
-         dateFilter = " AND tsMsgTime < ?";
+         dateFilter = " AND tsMsgTime < ? ";
+      
+      String chanJoin = "";
+      String chanFilter = "";
+      if(channel != null)
+      {
+         chanJoin = " JOIN channel on messages.fk_ChannelID = channel.pk_ChannelID ";
+         chanFilter = " AND channel.vcChannel = ?";
+      }
       
       ArrayList<MessageRow> result = new ArrayList<MessageRow>();
       
       String stmtSearchQuery = "SELECT * " +
-                            "FROM messages " +
-                            "WHERE vcMessage LIKE ?" + dateFilter;
+                            "FROM messages " + chanJoin +
+                            "WHERE vcMessage LIKE ?" + dateFilter + chanFilter;
       try {
           PreparedStatement stmt = getStmtForConn(stmtSearchQuery);
           search = "%" + search + "%";
-          stmt.setString(1, search);
+          stmt.setString(index++, search);
           if(olderThanThis != null)
           {
              java.sql.Date dt = new java.sql.Date(olderThanThis.getTime());
-             stmt.setDate(2, dt);
+             stmt.setDate(index++, dt);
           }
+          
+          if(channel != null)
+             stmt.setString(index++, channel);
           
           ResultSet rs = stmt.executeQuery();
           while(rs.next())

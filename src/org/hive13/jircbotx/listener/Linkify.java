@@ -15,9 +15,9 @@ import org.hive13.jircbotx.JircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 
 public class Linkify extends ListenerAdapterX {
-   public final int        MAX_URL_LENGTH  = 25;
-   public final boolean    USE_BITLY_TITLE = true;
-   public final boolean    WAIT_FOR_TITLE  = true;
+   public final int        MAX_URL_LENGTH          = 25;
+   public final boolean    USE_BITLY_TITLE         = true;
+   public final boolean    WAIT_FOR_TITLE          = true;
    public final int        WAIT_FOR_TITLE_TIMEOUT  = 5000;
    
    public Linkify()
@@ -47,7 +47,7 @@ public class Linkify extends ListenerAdapterX {
           returnMsg += urlTitle + " [ " + shortURL + " ]; ";
           
           // Find previous messages
-          previousMsgs.add(checkForPastURL(url, new Date(event.getTimestamp())));
+          previousMsgs.add(checkForPastURL(url, event.getChannel().getName(), new Date(event.getTimestamp())));
       }
       
       if(!returnMsg.isEmpty()) {
@@ -64,16 +64,16 @@ public class Linkify extends ListenerAdapterX {
       
    }
 
-   public String checkForPastURL(String fullURL, Date eventDate)
+   public String checkForPastURL(String fullURL, String channel, Date eventDate)
    {
       String result = "";
       if(BotDatabase.jdbcEnabled)
       {
-         ArrayList<MessageRow> foundMessages = BotDatabase.searchMessagesForString(fullURL, eventDate);
+         ArrayList<MessageRow> foundMessages = BotDatabase.searchMessagesForString(fullURL, channel, eventDate);
          Iterator<MessageRow> itMsgs = foundMessages.iterator();
          while(itMsgs.hasNext())
          {
-            result += "[" + getStringForMessageRow(itMsgs.next()) + "]";
+            result += "[" + getStringForMessageRow(itMsgs.next()) + " ]";
          }
       }
       if(!result.isEmpty())
