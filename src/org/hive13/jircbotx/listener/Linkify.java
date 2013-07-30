@@ -1,7 +1,9 @@
 package org.hive13.jircbotx.listener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,23 +46,55 @@ public class Linkify extends ListenerAdapterX {
           
           urlTitle = UrlTools.findURLTitle(url, shortURL, event.getBot());
           returnMsg += urlTitle + " [ " + shortURL + " ]; ";
+          
+          // Find previous messages
+          previousMsgs.add(checkForPastURL(url, new Date(event.getTimestamp())));
       }
       
       if(!returnMsg.isEmpty()) {
           // Remove the last ';' character
           returnMsg = returnMsg.substring(0, returnMsg.length()-2);
-          event.getBot().sendMessage(event.getChannel(), returnMsg);
+          event.getChannel().sendMessage(returnMsg);
+      }
+      
+      Iterator<String> itMsgs = previousMsgs.iterator();
+      while(itMsgs.hasNext())
+      {
+         event.getChannel().sendMessage(itMsgs.next());
       }
       
    }
 
    public String checkForPastURL(String fullURL, Date eventDate)
    {
+      String result = "";
       if(BotDatabase.jdbcEnabled)
       {
          ArrayList<MessageRow> foundMessages = BotDatabase.searchMessagesForString(fullURL, eventDate);
+         Iterator<MessageRow> itMsgs = foundMessages.iterator();
+         while(itMsgs.hasNext())
+         {
+            result += "[" + getStringForMessageRow(itMsgs.next()) + "]";
+         }
       }
-      return "";
+      if(!result.isEmpty())
+         result = "URL also sent by " + result;
+      
+      return result;
+   }
+   
+   public String getStringForMessageRow(MessageRow msgRow)
+   {
+      String result = "";
+      if(msgRow != null)
+      {
+         String dateURL = "http://portal.hive13.org/irclogger/index.php?d=";
+         dateURL += new SimpleDateFormat("yyyy-MM-dd").format(msgRow.tsMsgTime);
+         dateURL += "#msg" + msgRow.pk_MessageID;
+         
+         result = msgRow.vcUsername + " on " + UrlTools.generateShortURL(dateURL);
+      }
+      return result;
    }
    
    @Override
