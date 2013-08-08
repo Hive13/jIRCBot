@@ -76,7 +76,7 @@ public class HiveBot {
       bot.getListenerManager().addListener(new Quit());
       bot.getListenerManager().addListener(new Plugins());
       bot.getListenerManager().addListener(new UserAuth());
-      bot.getListenerManager().addListener(new TwitterSearch(bot, "Twitter", botChannel, "hive13 -2versa -b_hive13 -katerinabonvora -thehive_berlin -danielleabroad -joelix -jennifuchs"));
+      bot.getListenerManager().addListener(new TwitterSearch(bot, "Twitter", botChannel, "hive13 -2versa -b_hive13 -katerinabonvora -thehive_berlin -danielleabroad -joelix -jennifuchs -tessameronejust -yvonne -girlinlaundromat"));
       
       try {
          bot.getListenerManager().addListener(new RssReader(bot, "DoorAlert", botChannel, "http://www.hive13.org/isOpen/RSS.php"));
