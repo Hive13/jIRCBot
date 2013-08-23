@@ -145,7 +145,7 @@ public class UserAuth extends ListenerAdapterX {
    private void AuthCheckUser(JircBotX bot, Channel authChannel, User authUser)
    {
       try {
-         String regName = HiveBot.getRegisteredName(authUser.getNick());
+         String regName = HiveBot.getRegisteredName(authUser.getNick()).toLowerCase();
          if(regName != null && opList.contains(regName) && !authUser.getChannelsOpIn().contains(authChannel))
          {
             bot.op(authChannel, authUser);
