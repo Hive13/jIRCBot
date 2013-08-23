@@ -31,15 +31,26 @@ public class TwitterSearch extends ListenerThreadX {
    private String commandName = "";
    private String searchString = "";
    
-   public TwitterSearch(JircBotX bot, String commandName, String channelList, String searchString) {
-      this(bot, commandName, channelList, searchString, ListenerThreadX.LOOP_DELAY_DEFAULT);
+   private String omitList[] = null;
+   
+   public TwitterSearch(JircBotX bot, String commandName, String channelList, String searchString, String omitList) {
+      this(bot, commandName, channelList, searchString, omitList, ListenerThreadX.LOOP_DELAY_DEFAULT);
    }
 
-   public TwitterSearch(JircBotX bot, String commandName, String channelList, String searchString, long loopDelay) {
+   public TwitterSearch(JircBotX bot, String commandName, String channelList, String searchString, String omitList, long loopDelay) {
       super(bot, channelList, loopDelay);
       this.commandName = commandName;
       this.searchString = searchString;
       lastSentID = BotDataCache.getInstance().getLatestTweetID(getCommandName());
+      
+      this.omitList = omitList.split(",");
+      if(this.omitList != null)
+      {
+         for(int i = 0; i<this.omitList.length; ++i)
+         {
+            this.searchString += " -" + this.omitList[i];
+         }
+      }
    }
    
    @Override
