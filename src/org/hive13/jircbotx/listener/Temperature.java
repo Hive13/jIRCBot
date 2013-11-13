@@ -2,7 +2,7 @@
  * Weather Underground Info:
  * - General API documentation: http://www.wunderground.com/weather/api/d/documentation.html
  * - Java API page: http://code.google.com/p/wunderground-core/
- * - Wunderground API Key: ***REMOVED***/
+ * - Wunderground API Key: ad6ac91937e9a86c/
  * IMPORTANT: API key is limited to 10 requests / minute, 500 requests / day
  * 
  */

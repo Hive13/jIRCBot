@@ -84,9 +84,12 @@ public class TwitterSearch extends ListenerThreadX {
             Status lastTweet = tweetList.get(0);
             if(lastTweet.getId() > lastSentID)
             {
-               sendMessage(getCommandName() + " @" + lastTweet.getUser().getScreenName() 
-                     + ": " + lastTweet.getText() 
-                     + " [" + getTweetURL(lastTweet) + "]", eMsgTypes.publicMsg);
+               if(shouldDisplayTweet(lastTweet))
+               {
+                  sendMessage(getCommandName() + " @" + lastTweet.getUser().getScreenName() 
+                        + ": " + lastTweet.getText() 
+                        + " [" + getTweetURL(lastTweet) + "]", eMsgTypes.publicMsg);
+               }
                lastSentID = lastTweet.getId();
                BotDataCache.getInstance().setLatestTweetID(getCommandName(), lastSentID);
             }
@@ -104,6 +107,18 @@ public class TwitterSearch extends ListenerThreadX {
       }
    }
 
+   public boolean shouldDisplayTweet(Status tweet)
+   {
+      for(int i = 0; i < omitList.length; i++)
+      {
+         if(tweet.getUser().getScreenName().toLowerCase().contains(omitList[i].toLowerCase()))
+            return false;
+         if(tweet.getText().toLowerCase().contains(omitList[i].toLowerCase()))
+            return false;
+      }
+      
+      return true;
+   }
    @Override
    public String getCommandName() {
       return commandName;
