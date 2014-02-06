@@ -77,7 +77,7 @@ public final class WebFile {
          final String[] parts = type.split( ";" );
          MIMEtype = parts[0].trim( );
 
-         String rgxIsHTML = "(text/x?html|application/xhtml+xml)";
+         String rgxIsHTML = "(text/x?html|application/xhtml+xml|json)";
          Pattern p = Pattern.compile(rgxIsHTML);
          Matcher m = p.matcher(MIMEtype);
          if(m.find()) {
