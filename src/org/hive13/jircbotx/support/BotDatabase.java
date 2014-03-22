@@ -112,6 +112,10 @@ public class BotDatabase {
       try {
          conn = getConnection();
          stmt = conn.prepareStatement(insertStatement);
+         stmt.setInt(1, chanID);
+         stmt.setString(2, msgType.toString());
+         stmt.setString(3, username);
+         stmt.setString(4, msg);
          stmt.executeUpdate();
       } catch (ClassNotFoundException e) {
          e.printStackTrace();
