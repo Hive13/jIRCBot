@@ -46,3 +46,5 @@ Pretty much what the name implies these are the classes which provide some helpe
     * Common functions that many different classes use to Get Shit Done (R).  The class is divided into sections based on what functions are being provided be it database access, URL manipulation, or generating hashes.
 * `jIRCProperties`
     * I try to break common settings out into a *.properties file, this class manages these properties.
+
+Making a small, small change to trigger a build.
